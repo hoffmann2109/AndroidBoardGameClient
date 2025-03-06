@@ -46,11 +46,10 @@ class MyStomp(val callbacks: Callbacks) {
 
         scope.launch {
             Log.e("tag","connecting to topic")
-            jsonFlow= session.subscribeText("/topic/rcv-object")
-            jsonCollector=scope.launch { jsonFlow.collect{
+            topicFlow= session.subscribeText("/topic/hello-response")
+            collector=scope.launch { topicFlow.collect{
                     msg->
-                var o=JSONObject(msg)
-                callback(o.get("from").toString())
+                callback(msg)
             } }
             session.sendText("/app/hello","message from client")
            }
@@ -62,12 +61,13 @@ class MyStomp(val callbacks: Callbacks) {
         var o=json.toString()
 
         scope.launch {
-
-            topicFlow= session.subscribeText("/topic/hello-response")
-            collector=scope.launch { topicFlow.collect{
+            jsonFlow= session.subscribeText("/topic/rcv-object")
+            jsonCollector=scope.launch { jsonFlow.collect{
                     msg->
-                callback(msg)
+                var o=JSONObject(msg)
+                callback(o.get("text").toString())
             } }
+
             session.sendText("/app/object",o);
         }
 
