@@ -1,4 +1,4 @@
-package com.example.myapplication
+package at.aau.serg.websocketbrokerdemo
 
 import MyStomp
 import android.os.Bundle
@@ -6,8 +6,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import com.example.myapplication.R
 
-class MainActivity : ComponentActivity(),Callbacks {
+class MainActivity : ComponentActivity(), Callbacks {
     lateinit var mystomp:MyStomp
     lateinit var  response:TextView
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.example.myapplication
+package at.aau.serg.websocketbrokerdemo
 
 import org.junit.Test
 

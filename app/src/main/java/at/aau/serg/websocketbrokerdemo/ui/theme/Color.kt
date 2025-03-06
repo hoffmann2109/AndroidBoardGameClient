@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.theme
+package at.aau.serg.websocketbrokerdemo.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
