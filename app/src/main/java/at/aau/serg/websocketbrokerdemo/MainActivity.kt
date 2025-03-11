@@ -1,7 +1,9 @@
 package at.aau.serg.websocketbrokerdemo
 
 import MyStomp
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
@@ -17,10 +19,12 @@ class MainActivity : ComponentActivity(), Callbacks {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.fragment_fullscreen)
+
         findViewById<Button>(R.id.connectbtn).setOnClickListener { mystomp.connect() }
         findViewById<Button>(R.id.hellobtn).setOnClickListener{mystomp.sendHello()}
         findViewById<Button>(R.id.jsonbtn).setOnClickListener{mystomp.sendJson()}
         response=findViewById(R.id.response_view)
+
     }
 
     override fun onResponse(res: String) {

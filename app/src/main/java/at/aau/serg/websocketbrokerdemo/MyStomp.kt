@@ -32,12 +32,26 @@ class MyStomp(val callbacks: Callbacks) {
             client = StompClient(OkHttpWebSocketClient()) // other config can be passed in here
             scope.launch {
                 session=client.connect(WEBSOCKET_URI)
+                topicFlow= session.subscribeText("/topic/hello-response")
+                //connect to topic
+                collector=scope.launch { topicFlow.collect{
+                        msg->
+                    //todo logic
+                    callback(msg)
+                } }
+
+                //connect to topic
+                jsonFlow= session.subscribeText("/topic/rcv-object")
+                jsonCollector=scope.launch { jsonFlow.collect{
+                        msg->
+                    var o=JSONObject(msg)
+                    callback(o.get("text").toString())
+                } }
                 callback("connected")
             }
 
     }
     private fun callback(msg:String){
-
         Handler(Looper.getMainLooper()).post{
             callbacks.onResponse(msg)
         }
@@ -46,11 +60,7 @@ class MyStomp(val callbacks: Callbacks) {
 
         scope.launch {
             Log.e("tag","connecting to topic")
-            topicFlow= session.subscribeText("/topic/hello-response")
-            collector=scope.launch { topicFlow.collect{
-                    msg->
-                callback(msg)
-            } }
+
             session.sendText("/app/hello","message from client")
            }
     }
@@ -61,13 +71,6 @@ class MyStomp(val callbacks: Callbacks) {
         var o=json.toString()
 
         scope.launch {
-            jsonFlow= session.subscribeText("/topic/rcv-object")
-            jsonCollector=scope.launch { jsonFlow.collect{
-                    msg->
-                var o=JSONObject(msg)
-                callback(o.get("text").toString())
-            } }
-
             session.sendText("/app/object",o);
         }
 
