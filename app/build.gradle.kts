@@ -14,7 +14,7 @@ sonar {
         property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/testDebugUnitTest/jacocoTestReport.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths=app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
@@ -30,9 +30,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
         csv.required.set(false)
     }
-
-    val mainSrc = "$projectDir/src/main/java"
-    sourceDirectories.setFrom(files(mainSrc))
 
     classDirectories.setFrom(
         fileTree("build/tmp/kotlin-classes/debug") {
@@ -57,6 +54,12 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         }
     )
 }
+
+tasks.withType<Test> {
+    finalizedBy("jacocoTestReport")
+}
+
+tasks["jacocoTestReport"].finalizedBy("sonarqube")
 
 
 android {
