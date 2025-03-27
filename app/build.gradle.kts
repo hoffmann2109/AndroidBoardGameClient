@@ -18,6 +18,7 @@ sonar {
     }
 }
 
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
@@ -29,8 +30,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         xml.required.set(true)
         html.required.set(true)
         csv.required.set(false)
-        
     }
+
+    val mainSrc = "$projectDir/src/main/java"
+    sourceDirectories.setFrom(files(mainSrc))
 
     classDirectories.setFrom(
         fileTree("build/tmp/kotlin-classes/debug") {
@@ -55,12 +58,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         }
     )
 }
-
-tasks.withType<Test> {
-    finalizedBy("jacocoTestReport")
-}
-
-tasks["jacocoTestReport"].finalizedBy("sonarqube")
 
 
 android {
