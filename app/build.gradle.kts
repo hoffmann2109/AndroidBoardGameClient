@@ -8,17 +8,21 @@ plugins {
     id("org.sonarqube") version "5.1.0.4882"
 }
 
+
 sonar {
     properties {
         property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/testDebugUnitTest/jacocoTestReport.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/testDebugUnitTest/jacocoTestReport.xml")
     }
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 tasks.register<JacocoReport>("jacocoTestReport") {
-    // Ensure the unit tests are run first.
     dependsOn("testDebugUnitTest")
 
     reports {
@@ -26,23 +30,32 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
         csv.required.set(false)
     }
+
     val mainSrc = "$projectDir/src/main/java"
     sourceDirectories.setFrom(files(mainSrc))
 
-
     classDirectories.setFrom(
-        fileTree("${buildDir}/intermediates/javac/debug") {
+        fileTree("build/tmp/kotlin-classes/debug") {
+            include("at/aau/serg/websocketbrokerdemo/**/*.class")
             exclude(
+                "**/databinding/**",
                 "**/R.class",
                 "**/R$*.class",
                 "**/BuildConfig.*",
-                "**/Manifest*.*"
+                "**/Manifest*.*",
+                "**/ui/theme/**"
             )
         }
     )
-    executionData.setFrom(fileTree(buildDir) {
-        include("**/jacoco/testDebugUnitTest.exec")
-    })
+
+    executionData.setFrom(
+        fileTree(buildDir) {
+            include(
+                "jacoco/testDebugUnitTest.exec",
+                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
+            )
+        }
+    )
 }
 
 

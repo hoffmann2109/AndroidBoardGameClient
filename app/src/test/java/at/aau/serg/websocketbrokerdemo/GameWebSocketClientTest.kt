@@ -12,7 +12,6 @@ import org.mockito.Mockito.*
 import java.io.ByteArrayInputStream
 
 class GameWebSocketClientTest {
-
     private lateinit var context: Context
     private lateinit var assetManager: AssetManager
 
