@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
 
-        // Erstelle den WebSocketClient, wobei die Verbindung beim Init aufgebaut wird.
+        // create websocket client
         val webSocketClient = remember {
             GameWebSocketClient(context) {
                 log += "Connected to server\n"
