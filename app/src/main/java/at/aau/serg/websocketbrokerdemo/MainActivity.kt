@@ -54,9 +54,7 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    // Da die Verbindung bereits beim Erstellen aufgebaut wird,
-                    // können wir hier nur eine Info anzeigen.
-                    log += "WebSocket already connected\n"
+                    webSocketClient.connect()
                 }) {
                     Text("Connect")
                 }
