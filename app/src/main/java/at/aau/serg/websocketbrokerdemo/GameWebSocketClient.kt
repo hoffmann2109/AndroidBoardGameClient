@@ -1,18 +1,27 @@
 package at.aau.serg.websocketbrokerdemo
 
+import android.content.Context
 import android.util.Log
 import okhttp3.*
 import okio.ByteString
+import java.util.Properties
 
-class GameWebSocketClient {
-
+class GameWebSocketClient(
+    context: Context,
+    private val onConnected: () -> Unit
+) {
     private val client = OkHttpClient()
     private lateinit var webSocket: WebSocket
 
-    fun connect(onConnected: () -> Unit) {
-        val request = Request.Builder()
-            .url("ws://10.0.2.2:8080/monopoly")
-            .build()
+
+    private val serverUrl: String = loadServerUrl(context) ?: "ws://10.0.2.2:8080/monopoly"
+
+
+    private val request: Request = Request.Builder()
+        .url(serverUrl)
+        .build()
+
+    init {
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -49,5 +58,13 @@ class GameWebSocketClient {
 
     fun close() {
         webSocket.close(1000, "Goodbye!")
+    }
+
+    private fun loadServerUrl(context: Context): String? {
+        val properties = Properties()
+        context.assets.open("config.properties").use { input ->
+            properties.load(input)
+        }
+        return properties.getProperty("server.url")
     }
 }

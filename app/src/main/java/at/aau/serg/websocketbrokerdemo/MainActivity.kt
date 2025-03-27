@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,25 +11,27 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
-
 class MainActivity : ComponentActivity() {
-
-    private val webSocketClient = GameWebSocketClient()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MonopolyWebSocketApp()
-        }
+        setContent { MonopolyWebSocketApp() }
     }
 
     @Composable
     fun MonopolyWebSocketApp() {
+        val context = LocalContext.current
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
+
+        // Erstelle den WebSocketClient, wobei die Verbindung beim Init aufgebaut wird.
+        val webSocketClient = remember {
+            GameWebSocketClient(context) {
+                log += "Connected to server\n"
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -39,7 +40,6 @@ class MainActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "Monopoly WebSocket", style = MaterialTheme.typography.bodyMedium)
-
             TextField(
                 value = message,
                 onValueChange = { message = it },
@@ -54,9 +54,9 @@ class MainActivity : ComponentActivity() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    webSocketClient.connect {
-                        log += "Connected to server\n"
-                    }
+                    // Da die Verbindung bereits beim Erstellen aufgebaut wird,
+                    // können wir hier nur eine Info anzeigen.
+                    log += "WebSocket already connected\n"
                 }) {
                     Text("Connect")
                 }
@@ -90,11 +90,5 @@ class MainActivity : ComponentActivity() {
                     .padding(8.dp)
             )
         }
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewApp() {
-        MonopolyWebSocketApp()
     }
 }
