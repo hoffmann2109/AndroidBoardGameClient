@@ -1,4 +1,4 @@
-
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 plugins {
     alias(libs.plugins.android.application)
@@ -26,12 +26,10 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
         csv.required.set(false)
     }
-
-    // Specify the source directories (adjust if your sources are in a different folder)
     val mainSrc = "$projectDir/src/main/java"
     sourceDirectories.setFrom(files(mainSrc))
 
-    // Specify where the compiled classes are (for the debug variant)
+
     classDirectories.setFrom(
         fileTree("${buildDir}/intermediates/javac/debug") {
             exclude(
@@ -42,9 +40,6 @@ tasks.register<JacocoReport>("jacocoTestReport") {
             )
         }
     )
-
-    // Specify the location of the execution data file.
-    // Note: The .exec file is usually generated under the build directory.
     executionData.setFrom(fileTree(buildDir) {
         include("**/jacoco/testDebugUnitTest.exec")
     })
