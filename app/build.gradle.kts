@@ -29,6 +29,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         xml.required.set(true)
         html.required.set(true)
         csv.required.set(false)
+        
     }
 
     val mainSrc = "$projectDir/src/main/java"
