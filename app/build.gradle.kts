@@ -1,3 +1,5 @@
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -16,6 +18,7 @@ sonar {
 android {
     namespace = "com.example.myapplication"
     compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -47,7 +50,12 @@ android {
         compose = true
         viewBinding = true
     }
+
 }
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 
 dependencies {
 
@@ -64,6 +72,12 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
+    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.mockito:mockito-core:5.7.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
+    implementation("org.springframework:spring-websocket:6.1.4")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
