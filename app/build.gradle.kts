@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    jacoco
     id("org.sonarqube") version "5.1.0.4882"
 }
 
@@ -12,8 +13,43 @@ sonar {
         property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/testDebugUnitTest/jacocoTestReport.xml")
     }
 }
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    // Ensure the unit tests are run first.
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+
+    // Specify the source directories (adjust if your sources are in a different folder)
+    val mainSrc = "$projectDir/src/main/java"
+    sourceDirectories.setFrom(files(mainSrc))
+
+    // Specify where the compiled classes are (for the debug variant)
+    classDirectories.setFrom(
+        fileTree("${buildDir}/intermediates/javac/debug") {
+            exclude(
+                "**/R.class",
+                "**/R$*.class",
+                "**/BuildConfig.*",
+                "**/Manifest*.*"
+            )
+        }
+    )
+
+    // Specify the location of the execution data file.
+    // Note: The .exec file is usually generated under the build directory.
+    executionData.setFrom(fileTree(buildDir) {
+        include("**/jacoco/testDebugUnitTest.exec")
+    })
+}
+
 
 android {
     namespace = "com.example.myapplication"
