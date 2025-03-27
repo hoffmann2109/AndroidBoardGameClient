@@ -14,9 +14,10 @@ sonar {
         property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.coverage.jacoco.xmlReportPaths=app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
+
 
 
 tasks.withType<Test> {
