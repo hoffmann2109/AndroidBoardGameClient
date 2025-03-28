@@ -19,13 +19,22 @@ class AuthActivity : ComponentActivity() {
         val auth = FirebaseAuth.getInstance()
 
         if (auth.currentUser != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
+            try {
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                showErrorMessage("An error occurred while navigating to MainActivity.")
+            }
         } else {
             setContent {
                 AuthNavigation()
             }
         }
+    }
+
+    private fun showErrorMessage(message: String) {
+        println("Error: $message")
     }
 }
 
