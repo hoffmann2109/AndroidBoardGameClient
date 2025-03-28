@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +27,9 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
+
+        // Firebase Auth instance
+        val auth = FirebaseAuth.getInstance()
 
         // create websocket client
         val webSocketClient = remember {
@@ -78,6 +83,19 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
                 Text("Send Message")
+            }
+
+            // Logout button
+            Button(
+                onClick = {
+                    auth.signOut()  // Sign out user
+                    val intent = Intent(context, AuthActivity::class.java)
+                    context.startActivity(intent)
+                    (context as? android.app.Activity)?.finish() // Close MainActivity
+                },
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Text("Logout")
             }
 
             Text(
