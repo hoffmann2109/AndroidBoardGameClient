@@ -4,68 +4,14 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    jacoco
+    id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
     id("com.google.gms.google-services")
 }
 
-
-sonar {
-    properties {
-        property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
-        property("sonar.organization", "software-engineering-ii-gruppe2")
-        property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.coverage.jacoco.xmlReportPaths", "app/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
-    }
-}
-
-
-
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.register<JacocoReport>("jacocoTestReport") {
-    dependsOn("testDebugUnitTest")
-
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        csv.required.set(false)
-    }
-
-    val mainSrc = "$projectDir/src/main/java"
-    sourceDirectories.setFrom(files(mainSrc))
-
-    classDirectories.setFrom(
-        fileTree("build/tmp/kotlin-classes/debug") {
-            include("at/aau/serg/websocketbrokerdemo/**/*.class")
-            exclude(
-                "**/databinding/**",
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*",
-                "**/ui/theme/**"
-            )
-        }
-    )
-
-    executionData.setFrom(
-        fileTree(buildDir) {
-            include(
-                "jacoco/testDebugUnitTest.exec",
-                "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"
-            )
-        }
-    )
-}
-
-
 android {
     namespace = "com.example.myapplication"
     compileSdk = 35
-
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -95,17 +41,84 @@ android {
     }
     buildFeatures {
         compose = true
-        viewBinding = true
+    }
+
+    // --Hinzufügen--
+    testOptions {
+        unitTests {
+            all {
+                it.useJUnitPlatform()
+                it.finalizedBy(tasks.named("jacocoTestReport"))
+            }
+        }
     }
 
 }
-tasks.withType<Test>().configureEach {
+
+tasks.register<JacocoReport>("jacocoTestReport") {
+    group = "verification"
+    description = "Generates code coverage report for the test task."
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"))
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+
+    val debugTree =
+        fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+            exclude(fileFilter)
+        }
+
+    val javaDebugTree =
+        fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
+            exclude(fileFilter)
+        }
+
+    val mainSrc = listOf(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree, javaDebugTree))
+    executionData.setFrom(fileTree(project.layout.buildDirectory.get().asFile) {
+        include("jacoco/testDebugUnitTest.exec")
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
+}
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Software-Engineering-II-Gruppe2_WebSocketBroker-App")
+        property("sonar.organization", "software-engineering-ii-gruppe2")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.java.coveragePlugin", "jacoco")
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
+    }
+}
+/*
+tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+*/
 dependencies {
-
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
@@ -120,8 +133,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.core.ktx)
     testImplementation(libs.junit)
-    testImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.3")
-    testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.9.3")
+    testImplementation (libs.junit.jupiter.api)
+    testRuntimeOnly (libs.junit.jupiter.engine)
     testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito:mockito-core:5.7.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
