@@ -118,6 +118,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     testImplementation ("org.junit.jupiter:junit-jupiter-api:5.9.3")
     testRuntimeOnly ("org.junit.jupiter:junit-jupiter-engine:5.9.3")
@@ -132,5 +133,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("com.google.firebase:firebase-auth-ktx:21.1.0")
-
 }
