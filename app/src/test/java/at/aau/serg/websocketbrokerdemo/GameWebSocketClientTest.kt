@@ -31,13 +31,16 @@ class GameWebSocketClientTest {
 
     @Test
     fun testLoadServerUrl() {
-
         val propertiesContent = "server.url=ws://example.com"
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
 
-        val client = GameWebSocketClient(context) {}
+        val client = GameWebSocketClient(
+            context,
+            onConnected = { /* Not needed for this test */ },
+            onMessageReceived = { /* Not needed for this test */ }
+        )
 
         val field = GameWebSocketClient::class.java.getDeclaredField("serverUrl")
         field.isAccessible = true
@@ -56,7 +59,11 @@ class GameWebSocketClientTest {
 
         var onConnectedCalled = false
 
-        val client = GameWebSocketClient(context) { onConnectedCalled = true }
+        val client = GameWebSocketClient(
+            context,
+            onConnected = { onConnectedCalled = true },
+            onMessageReceived = { /* Not needed for this test */ }
+        )
 
 
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")

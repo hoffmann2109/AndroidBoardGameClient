@@ -8,7 +8,8 @@ import java.util.Properties
 
 class GameWebSocketClient(
     private val context: Context,
-    private val onConnected: () -> Unit
+    private val onConnected: () -> Unit,
+    private val onMessageReceived: (String) -> Unit
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
@@ -46,6 +47,7 @@ class GameWebSocketClient(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
+            onMessageReceived(text)
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
