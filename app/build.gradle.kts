@@ -109,15 +109,16 @@ sonar {
         )
     }
 }
-/*
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }
 
 tasks.withType<Test>().configureEach {
+    jvmArgs = listOf("-XX:+EnableDynamicAgentLoading")
     useJUnitPlatform()
 }
-*/
+
 dependencies {
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
