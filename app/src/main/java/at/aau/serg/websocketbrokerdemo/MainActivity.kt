@@ -31,11 +31,17 @@ class MainActivity : ComponentActivity() {
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
 
-        // create websocket client
+        // Create websocket client
         val webSocketClient = remember {
-            GameWebSocketClient(context) {
-                log += "Connected to server\n"
-            }
+            GameWebSocketClient(
+                context = context,
+                onConnected = {
+                    log += "Connected to server\n"
+                },
+                onMessageReceived = { receivedMessage ->
+                    log += "Received: $receivedMessage\n"
+                }
+            )
         }
 
         Column(
@@ -83,6 +89,17 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(vertical = 8.dp)
             ) {
                 Text("Send Message")
+            }
+
+            // Roll button
+            Button(
+                onClick = {
+                    webSocketClient.sendMessage("Roll")
+                    log += "Sent: Roll command\n"
+                },
+                modifier = Modifier.padding(vertical = 8.dp)
+            ) {
+                Text("Roll Dice")
             }
 
             // Logout button
