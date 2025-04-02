@@ -41,6 +41,7 @@ fun LobbyScreen(
     var showDisconnectIcon by remember { mutableStateOf(false) }
     var wifiIconSize by remember { mutableStateOf(320.dp) }
     var diceResult by remember { mutableStateOf("?") }
+    var lastProcessedLogLength by remember { mutableIntStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Hintergrundbild
@@ -146,19 +147,22 @@ fun LobbyScreen(
     }
 
     LaunchedEffect(log) {
-        println("Current log: $log")  // Debugging
-        val diceRegex = "rolled (\\d+)".toRegex()
-        val matchResult = diceRegex.find(log)
-        if (matchResult != null) {
-            val result = matchResult.groupValues[1]
-            println("Extracted dice result: $result")  // Debugging
-
-            // Nur aktualisieren, wenn sich das Ergebnis geändert hat
-            if (diceResult != result) {
-                diceResult = result
-                println("Updated dice result: $diceResult")  // Debugging
-            }
+        // println("Current log: $log")  // Debugging
+        if (log.length > lastProcessedLogLength){
+            val newContent = log.substring(lastProcessedLogLength)
+            lastProcessedLogLength = log.length
+            diceResult = parseDiceResult(newContent)
         }
+    }
+}
+
+private fun parseDiceResult(newContent: String): String {
+    val diceRegex = "rolled (\\d+)".toRegex()
+    val matchResult = diceRegex.find(newContent)
+    return if (matchResult != null){
+        matchResult.groupValues[1]
+    } else {
+        "?" // Displays ? if no dice result was found
     }
 }
 
