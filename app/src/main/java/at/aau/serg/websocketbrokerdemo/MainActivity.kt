@@ -1,20 +1,14 @@
 package at.aau.serg.websocketbrokerdemo
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import at.aau.serg.websocketbrokerdemo.ui.theme.LobbyScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,93 +29,32 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected = {
-                    log += "Connected to server\n"
-                },
-                onMessageReceived = { receivedMessage ->
-                    log += "Received: $receivedMessage\n"
-                }
+                onConnected = { log += "Connected to server\n" },
+                onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" }
             )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Monopoly WebSocket", style = MaterialTheme.typography.bodyMedium)
-            TextField(
-                value = message,
-                onValueChange = { message = it },
-                label = { Text("Enter your message") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(onClick = {
-                    webSocketClient.connect()
-                }) {
-                    Text("Connect")
+        // Lobby UI mit allen Funktionen verbinden
+        LobbyScreen(
+            message = message,
+            log = log,
+            onMessageChange = { message = it },
+            onConnect = { webSocketClient.connect() },
+            onDisconnect = { webSocketClient.close(); log += "Disconnected from server\n" },
+            onSendMessage = {
+                if (message.isNotEmpty()) {
+                    webSocketClient.sendMessage(message)
+                    log += "Sent: $message\n"
+                    message = ""
                 }
-
-                Button(onClick = {
-                    webSocketClient.close()
-                    log += "Disconnected from server\n"
-                }) {
-                    Text("Disconnect")
-                }
+            },
+            onRollDice = { webSocketClient.sendMessage("Roll"); log += "Sent: Roll command\n" },
+            onLogout = {
+                auth.signOut()
+                val intent = Intent(context, AuthActivity::class.java)
+                context.startActivity(intent)
+                (context as? Activity)?.finish()
             }
-
-            Button(
-                onClick = {
-                    if (message.isNotEmpty()) {
-                        webSocketClient.sendMessage(message)
-                        log += "Sent: $message\n"
-                        message = ""
-                    }
-                },
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Text("Send Message")
-            }
-
-            // Roll button
-            Button(
-                onClick = {
-                    webSocketClient.sendMessage("Roll")
-                    log += "Sent: Roll command\n"
-                },
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Text("Roll Dice")
-            }
-
-            // Logout button
-            Button(
-                onClick = {
-                    auth.signOut()  // Sign out user
-                    val intent = Intent(context, AuthActivity::class.java)
-                    context.startActivity(intent)
-                    (context as? android.app.Activity)?.finish() // Close MainActivity
-                },
-                modifier = Modifier.padding(vertical = 8.dp)
-            ) {
-                Text("Logout")
-            }
-
-            Text(
-                text = log,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(8.dp)
-            )
-        }
+        )
     }
 }
