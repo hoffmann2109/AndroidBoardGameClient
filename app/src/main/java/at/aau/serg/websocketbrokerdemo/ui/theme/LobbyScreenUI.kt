@@ -1,4 +1,4 @@
-package at.aau.serg.websocketbrokerdemo.ui
+package at.aau.serg.websocketbrokerdemo.ui.theme
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -130,7 +130,7 @@ fun LobbyScreen(
                     .fillMaxWidth()
                     .padding(8.dp),
                 color = Color.White,
-                fontSize = 30.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
         }

@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
-import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
+import at.aau.serg.websocketbrokerdemo.ui.theme.LobbyScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +53,7 @@ class MainActivity : ComponentActivity() {
                 auth.signOut()
                 val intent = Intent(context, AuthActivity::class.java)
                 context.startActivity(intent)
-                (context as? android.app.Activity)?.finish()
+                (context as? Activity)?.finish()
             }
         )
     }
