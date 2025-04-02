@@ -147,7 +147,6 @@ fun LobbyScreen(
     }
 
     LaunchedEffect(log) {
-        // println("Current log: $log")  // Debugging
         if (log.length > lastProcessedLogLength){
             val newContent = log.substring(lastProcessedLogLength)
             lastProcessedLogLength = log.length
