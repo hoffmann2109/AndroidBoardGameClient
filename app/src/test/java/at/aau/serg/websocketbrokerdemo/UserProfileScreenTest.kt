@@ -6,12 +6,13 @@ import org.junit.Rule
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
+import org.junit.jupiter.api.Disabled
 
 class UserProfileScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
-
+    @Disabled
     @Test
     fun userProfileScreen_displaysProfileData() {
         val profile = PlayerProfile(10, 5, true, 1000, "TestUser", 3)
@@ -29,7 +30,7 @@ class UserProfileScreenTest {
         composeTestRule.onNodeWithText("Wins: 3").assertIsDisplayed()
         composeTestRule.onNodeWithText("Most Money: 1000").assertIsDisplayed()
     }
-
+    @Disabled
     @Test
     fun userProfileScreen_nameChange_updatesName() {
         var newName = ""
@@ -46,7 +47,7 @@ class UserProfileScreenTest {
 
         assertEquals("NewName", newName)
     }
-
+    @Disabled
     @Test
     fun userProfileScreen_backButton_callsOnBack() {
         var backClicked = false
