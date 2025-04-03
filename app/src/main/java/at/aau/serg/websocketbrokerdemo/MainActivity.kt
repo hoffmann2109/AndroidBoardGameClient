@@ -9,6 +9,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.theme.LobbyScreen
+import androidx.navigation.compose.*
+import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
+import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
+import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,9 +28,19 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
+        var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
+        val userId = auth.currentUser?.uid
+
+        LaunchedEffect(userId) {
+            if (userId != null) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    playerProfile = FirestoreManager.getUserProfile(userId)
+                }
+            }
+        }
 
         // Create websocket client
         val webSocketClient = remember {
@@ -34,27 +51,45 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        // Lobby UI mit allen Funktionen verbinden
-        LobbyScreen(
-            message = message,
-            log = log,
-            onMessageChange = { message = it },
-            onConnect = { webSocketClient.connect() },
-            onDisconnect = { webSocketClient.close(); log += "Disconnected from server\n" },
-            onSendMessage = {
-                if (message.isNotEmpty()) {
-                    webSocketClient.sendMessage(message)
-                    log += "Sent: $message\n"
-                    message = ""
-                }
-            },
-            onRollDice = { webSocketClient.sendMessage("Roll"); log += "Sent: Roll command\n" },
-            onLogout = {
-                auth.signOut()
-                val intent = Intent(context, AuthActivity::class.java)
-                context.startActivity(intent)
-                (context as? Activity)?.finish()
+        val navController = rememberNavController()
+
+        NavHost(navController, startDestination = "lobby") {
+            composable("lobby") {
+                LobbyScreen(
+                    message = message,
+                    log = log,
+                    onMessageChange = { message = it },
+                    onConnect = { webSocketClient.connect() },
+                    onDisconnect = { webSocketClient.close(); log += "Disconnected from server\n" },
+                    onSendMessage = {
+                        if (message.isNotEmpty()) {
+                            webSocketClient.sendMessage(message)
+                            log += "Sent: $message\n"
+                            message = ""
+                        }
+                    },
+                    onRollDice = { webSocketClient.sendMessage("Roll"); log += "Sent: Roll command\n" },
+                    onLogout = {
+                        auth.signOut()
+                        val intent = Intent(context, AuthActivity::class.java)
+                        context.startActivity(intent)
+                        (context as? Activity)?.finish()
+                    },
+                    onProfileClick = { navController.navigate("profile") }
+                )
             }
-        )
+            composable("profile") {
+                UserProfileScreen(
+                    playerProfile = playerProfile,
+                    onNameChange = { newName ->
+                        CoroutineScope(Dispatchers.IO).launch {
+                            userId?.let { FirestoreManager.updateUserProfileName(it, newName) }
+                            playerProfile = playerProfile?.copy(name = newName)
+                        }
+                    },
+                    onBack = { navController.popBackStack() }//zurück zur Main
+                )
+            }
+        }
     }
 }

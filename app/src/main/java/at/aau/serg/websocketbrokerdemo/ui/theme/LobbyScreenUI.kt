@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import kotlinx.coroutines.delay
+import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 
 @Composable
 fun LobbyScreen(
@@ -35,7 +36,9 @@ fun LobbyScreen(
     onDisconnect: () -> Unit,
     onSendMessage: () -> Unit,
     onRollDice: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onProfileClick: () -> Unit,
+    playerProfile: PlayerProfile? = null
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
@@ -90,6 +93,7 @@ fun LobbyScreen(
                 AnimatedButton("Send Message", Color(0xFF0074cc), onSendMessage)
                 DiceRollingButton("Roll Dice", Color(0xFF3FAF3F), onRollDice, diceResult)
                 AnimatedButton("Logout", Color.Red, onLogout)
+                AnimatedButton("Profile", Color.Blue, onProfileClick)
             }
 
             // WiFi Icon Animation (Connect)
