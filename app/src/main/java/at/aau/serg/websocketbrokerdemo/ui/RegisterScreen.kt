@@ -3,6 +3,7 @@ package at.aau.serg.websocketbrokerdemo.ui
 import android.content.Context
 import android.content.Intent
 import android.app.Activity
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,8 +14,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.MainActivity
+import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
+import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuthException
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun RegisterScreen(navController: NavController) {
@@ -61,12 +67,32 @@ fun RegisterScreen(navController: NavController) {
     }
 }
 
-private fun registerUser(auth: FirebaseAuth, email: String, password: String, context: Context, setErrorMessage: (String) -> Unit) {
+internal fun registerUser(auth: FirebaseAuth, email: String, password: String, context: Context, setErrorMessage: (String) -> Unit) {
     auth.createUserWithEmailAndPassword(email, password)
-        .addOnSuccessListener {
-            // Wenn die Registrierung erfolgreich ist, gehe zur MainActivity
-            context.startActivity(Intent(context, MainActivity::class.java))
-            (context as? Activity)?.finish()
+        .addOnSuccessListener { authResult ->
+            val userId = authResult.user?.uid
+            if (userId != null) {
+                val profile = PlayerProfile(name = "user${userId.takeLast(4)}")
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        FirestoreManager.saveUserProfile(userId, profile)
+                        (context as? Activity)?.runOnUiThread {
+                            context.startActivity(Intent(context, MainActivity::class.java))
+                            (context as? Activity)?.finish()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("RegisterScreen", "Error saving profile: ${e.message}")
+                        (context as? Activity)?.runOnUiThread {
+                            setErrorMessage("Failed to save profile.")
+                        }
+                    }
+                }
+            } else {
+                Log.e("RegisterScreen", "Failed to get user ID.")
+                (context as? Activity)?.runOnUiThread {
+                    setErrorMessage("Failed to get user ID.")
+                }
+            }
         }
         .addOnFailureListener { error ->
             // Fehlerbehandlung
