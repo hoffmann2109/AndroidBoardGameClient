@@ -8,7 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
-import at.aau.serg.websocketbrokerdemo.ui.theme.LobbyScreen
+import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import androidx.navigation.compose.*
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager

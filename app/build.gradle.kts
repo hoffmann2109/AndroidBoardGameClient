@@ -22,7 +22,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    packaging{
+        resources{
+            excludes.add("META-INF/*.md")
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -135,12 +139,16 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.androidx.espresso.intents)
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testRuntimeOnly (libs.junit.jupiter.engine)
     testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito:mockito-core:5.7.0")
     testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
+    androidTestImplementation("org.mockito:mockito-core:5.7.0")
+    androidTestImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

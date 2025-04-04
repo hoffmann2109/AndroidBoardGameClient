@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LoginScreen
 import at.aau.serg.websocketbrokerdemo.ui.RegisterScreen
 import androidx.navigation.compose.rememberNavController
+import at.aau.serg.websocketbrokerdemo.ui.StartScreen
 
 
 class AuthActivity : ComponentActivity() {
