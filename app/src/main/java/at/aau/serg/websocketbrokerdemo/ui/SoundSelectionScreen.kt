@@ -1,7 +1,7 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,7 +24,7 @@ fun SoundSelectionScreen() {
             }
         }
         if (message.isNotEmpty()) {
-            Text(message, color = MaterialTheme.colors.primary)
+            Text(message, color = MaterialTheme.colorScheme.primary)
         }
     }
 }
