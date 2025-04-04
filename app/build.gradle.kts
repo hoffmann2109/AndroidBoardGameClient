@@ -134,6 +134,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testRuntimeOnly (libs.junit.jupiter.engine)
