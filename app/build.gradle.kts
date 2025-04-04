@@ -133,6 +133,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.core.ktx)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testRuntimeOnly (libs.junit.jupiter.engine)
