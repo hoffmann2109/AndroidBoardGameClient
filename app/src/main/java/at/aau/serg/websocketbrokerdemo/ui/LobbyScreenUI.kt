@@ -1,4 +1,4 @@
-package at.aau.serg.websocketbrokerdemo.ui.theme
+package at.aau.serg.websocketbrokerdemo.ui
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
