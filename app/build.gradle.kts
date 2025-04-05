@@ -7,6 +7,7 @@ plugins {
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlinx.kover") version "0.5.0"
 }
 
 android {
@@ -68,7 +69,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         xml.required.set(true)
         html.required.set(true)
         xml.outputLocation.set(file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"))
-        xml.outputLocation.set(file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.html"))
+        html.outputLocation.set(file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.html"))
     }
 
     val fileFilter = listOf(
@@ -127,38 +128,42 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.espresso.intents)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.test.junit4.android)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.core.ktx)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore)
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.core.ktx)
-    implementation(libs.androidx.junit.ktx)
-    implementation(libs.androidx.ui.test.junit4.android)
-    implementation(libs.androidx.espresso.intents)
+
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.junit.jupiter)
+
     testRuntimeOnly (libs.junit.jupiter.engine)
-    testImplementation ("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.mockito:mockito-core:5.7.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
-    androidTestImplementation("org.mockito:mockito-core:5.7.0")
-    androidTestImplementation("org.mockito:mockito-junit-jupiter:5.7.0")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
-    androidTestImplementation(libs.androidx.junit)
+
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.junit.jupiter)
+    androidTestImplementation(libs.kotlinx.coroutines.play.services)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("com.google.firebase:firebase-auth-ktx:21.1.0")
-    implementation("com.google.firebase:firebase-firestore:24.10.1")
+
 }

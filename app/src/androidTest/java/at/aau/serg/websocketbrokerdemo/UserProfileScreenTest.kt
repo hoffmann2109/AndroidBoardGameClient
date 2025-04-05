@@ -14,6 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.Ignore
 
+
 @RunWith(AndroidJUnit4::class)
 class UserProfileScreenTest {
 

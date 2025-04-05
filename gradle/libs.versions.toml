@@ -1,48 +1,61 @@
 [versions]
-agp = "8.9.1"
-kotlin = "2.0.21"
-coreKtx = "1.10.1"
-junit = "4.13.2"
-junitVersion = "1.1.5"
-junitJupiterApi = "5.7.0"
-espressoCore = "3.5.1"
-krossbowStompCore = "7.0.0"
-krossbowWebsocketBuiltin = "7.0.0"
-krossbowWebsocketOkhttp = "7.0.0"
-lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
+agp = "8.9.1"
 composeBom = "2024.09.00"
 constraintlayout = "2.2.1"
 coreKtxVersion = "1.6.1"
-uiTestJunit4Android = "1.7.8"
-junitKtx = "1.2.1"
+coreKtx = "1.10.1"
+espressoCore = "3.5.1"
 espressoIntents = "3.6.1"
+firebase-auth = "21.1.0"
+firebase-firestore = "24.10.1"
+junit = "4.13.2"
+junitJupiterApi = "5.7.0"
+junitKtx = "1.2.1"
+junitVersion = "1.1.5"
+krossbowStompCore = "7.0.0"
+krossbowWebsocketBuiltin = "7.0.0"
+krossbowWebsocketOkhttp = "7.0.0"
+kotlin = "2.0.21"
+kotlinx-coroutines = "1.8.0"
+lifecycleRuntimeKtx = "2.6.1"
+mockito = "5.7.0"
+navigation-compose = "2.5.3"
+uiTestJunit4Android = "1.7.8"
+
 
 [libraries]
-androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
-junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterApi" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
+core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebase-auth" }
+firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebase-firestore" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junitJupiterApi" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junitJupiterApi" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 krossbow-stomp-core = { module = "org.hildan.krossbow:krossbow-stomp-core", version.ref = "krossbowStompCore" }
 krossbow-websocket-builtin = { module = "org.hildan.krossbow:krossbow-websocket-builtin", version.ref = "krossbowWebsocketBuiltin" }
 krossbow-websocket-okhttp = { module = "org.hildan.krossbow:krossbow-websocket-okhttp", version.ref = "krossbowWebsocketOkhttp" }
-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
-androidx-ui-test-junit4-android = { group = "androidx.compose.ui", name = "ui-test-junit4-android", version.ref = "uiTestJunit4Android" }
-androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
-androidx-espresso-intents = { group = "androidx.test.espresso", name = "espresso-intents", version.ref = "espressoIntents" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

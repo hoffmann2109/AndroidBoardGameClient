@@ -38,7 +38,6 @@ fun LobbyScreen(
     onRollDice: () -> Unit,
     onLogout: () -> Unit,
     onProfileClick: () -> Unit,
-    playerProfile: PlayerProfile? = null
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
@@ -159,7 +158,7 @@ fun LobbyScreen(
     }
 }
 
-private fun parseDiceResult(newContent: String): String {
+fun parseDiceResult(newContent: String): String {
     val diceRegex = "rolled (\\d+)".toRegex()
     val matchResult = diceRegex.find(newContent)
     return if (matchResult != null){
@@ -203,7 +202,7 @@ fun AnimatedButton(text: String, color: Color, onClick: () -> Unit) {
 @Composable
 fun DiceRollingButton(text: String, color: Color, onClick: () -> Unit, diceResult: String) {
     var isPressed by remember { mutableStateOf(false) }
-    var rotateAngle by remember { mutableStateOf(0f) }
+    var rotateAngle by remember { mutableFloatStateOf(0f) }
 
     val rotation by animateFloatAsState(
         targetValue = rotateAngle,
