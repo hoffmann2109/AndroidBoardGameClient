@@ -7,6 +7,7 @@ plugins {
     id("jacoco")
     id("org.sonarqube") version "5.1.0.4882"
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlinx.kover") version "0.5.0"
 }
 
 android {
