@@ -159,7 +159,7 @@ fun LobbyScreen(
     }
 }
 
-private fun parseDiceResult(newContent: String): String {
+fun parseDiceResult(newContent: String): String {
     val diceRegex = "rolled (\\d+)".toRegex()
     val matchResult = diceRegex.find(newContent)
     return if (matchResult != null){
