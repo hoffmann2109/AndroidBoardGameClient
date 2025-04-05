@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.mockito.Mockito.`when`
+import org.junit.jupiter.api.Assertions.*
 
 class FirestoreManagerTest {
 
