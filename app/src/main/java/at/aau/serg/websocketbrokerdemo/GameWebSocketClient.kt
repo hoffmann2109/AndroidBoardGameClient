@@ -105,11 +105,13 @@ class GameWebSocketClient(
         }
     }
 
-    // Hilfsmethode zur Laufzeiterkennung des Emulators
     private fun isEmulator(): Boolean {
-        return (android.os.Build.FINGERPRINT.contains("generic")
+        val fingerprint = android.os.Build.FINGERPRINT
+        return (fingerprint != null && fingerprint.contains("generic")
                 || android.os.Build.MODEL.contains("Emulator")
                 || android.os.Build.MANUFACTURER.contains("Genymotion")
                 || (android.os.Build.BRAND.startsWith("generic") && android.os.Build.DEVICE.startsWith("generic")))
     }
+
+
 }
