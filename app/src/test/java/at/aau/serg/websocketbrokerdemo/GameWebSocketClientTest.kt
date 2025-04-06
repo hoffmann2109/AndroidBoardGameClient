@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.AfterEach
 import org.mockito.Mockito.*
 import java.io.ByteArrayInputStream
-import org.junit.jupiter.api.Assertions.*
 
 class GameWebSocketClientTest {
     private lateinit var context: Context
