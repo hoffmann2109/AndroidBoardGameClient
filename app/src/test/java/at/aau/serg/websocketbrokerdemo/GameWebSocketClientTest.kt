@@ -30,7 +30,7 @@ class GameWebSocketClientTest {
 
     @Test
     fun testLoadServerUrl() {
-        val propertiesContent = "server.url.device=ws://example.com"
+        val propertiesContent = "server.url=ws://example.com"
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
@@ -52,7 +52,7 @@ class GameWebSocketClientTest {
     @Test
     fun testSendMessage() {
 
-        val propertiesContent = "server.url.device=ws://example.com"
+        val propertiesContent = "server.url=ws://example.com"
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
@@ -61,8 +61,7 @@ class GameWebSocketClientTest {
         val client = GameWebSocketClient(
             context,
             onConnected = { onConnectedCalled = true },
-            onMessageReceived = { /* Not needed for this test */ },
-            isEmulatorProvider = { false }
+            onMessageReceived = { /* Not needed for this test */ }
         )
 
 
