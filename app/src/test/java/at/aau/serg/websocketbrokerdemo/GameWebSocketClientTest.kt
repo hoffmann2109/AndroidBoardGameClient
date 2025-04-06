@@ -61,7 +61,8 @@ class GameWebSocketClientTest {
         val client = GameWebSocketClient(
             context,
             onConnected = { onConnectedCalled = true },
-            onMessageReceived = { /* Not needed for this test */ }
+            onMessageReceived = { /* Not needed for this test */ },
+            isEmulatorProvider = { false }
         )
 
 

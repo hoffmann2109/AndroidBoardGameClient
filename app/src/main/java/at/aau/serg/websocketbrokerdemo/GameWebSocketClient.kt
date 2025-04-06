@@ -9,7 +9,15 @@ import java.util.Properties
 class GameWebSocketClient(
     private val context: Context,
     private val onConnected: () -> Unit,
-    private val onMessageReceived: (String) -> Unit
+    private val onMessageReceived: (String) -> Unit,
+    private val isEmulatorProvider: () -> Boolean = {
+        val fingerprint = android.os.Build.FINGERPRINT
+        (fingerprint != null && fingerprint.contains("generic")
+                || android.os.Build.MODEL?.contains("Emulator") == true
+                || android.os.Build.MANUFACTURER?.contains("Genymotion") == true
+                || (android.os.Build.BRAND?.startsWith("generic") == true &&
+                android.os.Build.DEVICE?.startsWith("generic") == true))
+    }
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
@@ -87,14 +95,13 @@ class GameWebSocketClient(
         webSocket = null
     }
 
-
     private fun loadServerUrl(context: Context): String {
         val properties = Properties()
         context.assets.open("config.properties").use { input ->
             properties.load(input)
         }
 
-        val isEmulator = isEmulator()
+        val isEmulator = isEmulatorProvider()
 
         return if (isEmulator) {
             properties.getProperty("server.url.emulator")
@@ -103,14 +110,6 @@ class GameWebSocketClient(
             properties.getProperty("server.url.device")
                 ?: throw IllegalStateException("Missing device URL in config.properties")
         }
-    }
-
-    private fun isEmulator(): Boolean {
-        val fingerprint = android.os.Build.FINGERPRINT
-        return (fingerprint != null && fingerprint.contains("generic")
-                || android.os.Build.MODEL.contains("Emulator")
-                || android.os.Build.MANUFACTURER.contains("Genymotion")
-                || (android.os.Build.BRAND.startsWith("generic") && android.os.Build.DEVICE.startsWith("generic")))
     }
 
 
