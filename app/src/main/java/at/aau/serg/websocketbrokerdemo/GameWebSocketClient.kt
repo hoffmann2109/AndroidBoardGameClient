@@ -93,6 +93,23 @@ class GameWebSocketClient(
         context.assets.open("config.properties").use { input ->
             properties.load(input)
         }
-        return properties.getProperty("server.url")
+
+        val isEmulator = isEmulator()
+
+        return if (isEmulator) {
+            properties.getProperty("server.url.emulator")
+                ?: throw IllegalStateException("Missing emulator URL in config.properties")
+        } else {
+            properties.getProperty("server.url.device")
+                ?: throw IllegalStateException("Missing device URL in config.properties")
+        }
+    }
+
+    // Hilfsmethode zur Laufzeiterkennung des Emulators
+    private fun isEmulator(): Boolean {
+        return (android.os.Build.FINGERPRINT.contains("generic")
+                || android.os.Build.MODEL.contains("Emulator")
+                || android.os.Build.MANUFACTURER.contains("Genymotion")
+                || (android.os.Build.BRAND.startsWith("generic") && android.os.Build.DEVICE.startsWith("generic")))
     }
 }
