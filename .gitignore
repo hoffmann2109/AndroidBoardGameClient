@@ -8,7 +8,14 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
+# Ignore all build directories
+**/build/
+
+# But don't ignore the jacoco reports
+!**/build/reports/
+!**/build/reports/jacoco/
+!**/build/reports/jacoco/**
+
 /captures
 .externalNativeBuild
 .cxx
