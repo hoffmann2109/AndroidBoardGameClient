@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - fix/SonarcloudCoverage
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
@@ -34,6 +35,8 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
+      - name: Generate coverage reports
+        run: ./gradlew jacocoUnitTestReport jacocoAndroidTestReport
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
