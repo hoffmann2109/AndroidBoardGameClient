@@ -22,6 +22,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SERVER_URL", "\"${project.properties["SERVER_URL"]}\"")
     }
     packaging{
         resources{
@@ -36,6 +37,10 @@ android {
                 "proguard-rules.pro"
             )
         }
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -46,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     // --Hinzufügen--
@@ -53,12 +59,81 @@ android {
         unitTests {
             all {
                 it.useJUnitPlatform()
-                it.finalizedBy(tasks.named("jacocoTestReport"))
+                it.finalizedBy(tasks.named("jacocoUnitTestReport"))
             }
         }
     }
 
 }
+
+tasks.register<JacocoReport>("jacocoUnitTestReport") {
+    dependsOn("testDebugUnitTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+
+    val debugTree =
+        fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+            exclude(fileFilter)
+        }
+
+    val javaDebugTree =
+        fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
+            exclude(fileFilter)
+        }
+
+    val mainSrc = listOf(
+        "${project.projectDir}/src/main/java",
+        "${project.projectDir}/src/main/kotlin"
+    )
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree, javaDebugTree))
+    executionData.setFrom(fileTree(project.layout.buildDirectory.get().asFile) {
+        include("jacoco/testDebugUnitTest.exec")
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+    })
+}
+
+tasks.register<JacocoReport>("jacocoAndroidTestReport") {
+    dependsOn("connectedDebugAndroidTest")
+
+    reports {
+        xml.required.set(true)  // Wichtig für SonarCloud!
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+
+    val debugTree = fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+
+    sourceDirectories.setFrom(files("${project.projectDir}/src/main/java"))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.layout.buildDirectory.get().asFile)  {
+        include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
+    })
+}
+
 
 tasks.register<JacocoReport>("jacocoTestReport") {
     group = "verification"
@@ -78,8 +153,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "android/**/*.*",
-        "**/data/**/*.*"
+        "android/**/*.*"
     )
 
     val debugTree =
@@ -111,10 +185,9 @@ sonar {
         property("sonar.organization", "software-engineering-ii-gruppe2")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.java.coveragePlugin", "jacoco")
-        property(
-            "sonar.coverage.jacoco.xmlReportPaths",
-            "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
-        )
+        property("sonar.coverage.jacoco.xmlReportPaths",
+            "${project.layout.projectDirectory.asFile}/app/build/reports/jacoco/jacocoUnitTestReport/jacocoUnitTestReport.xml," +
+                    "${project.layout.projectDirectory.asFile}/app/build/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml")
     }
 }
 
