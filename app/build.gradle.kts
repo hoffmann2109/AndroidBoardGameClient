@@ -110,7 +110,7 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
     dependsOn("connectedDebugAndroidTest")
 
     reports {
-        xml.required.set(true)  // Wichtig für SonarCloud!
+        xml.required.set(true)
         html.required.set(true)
     }
 
@@ -131,51 +131,6 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
     classDirectories.setFrom(files(debugTree))
     executionData.setFrom(fileTree(project.layout.buildDirectory.get().asFile)  {
         include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
-    })
-}
-
-
-tasks.register<JacocoReport>("jacocoTestReport") {
-    group = "verification"
-    description = "Generates code coverage report for the test task."
-    dependsOn("testDebugUnitTest")
-
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-        xml.outputLocation.set(file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"))
-        html.outputLocation.set(file("${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.html"))
-    }
-
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*"
-    )
-
-    val debugTree =
-        fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
-            exclude(fileFilter)
-        }
-
-    val javaDebugTree =
-        fileTree("${project.layout.buildDirectory.get().asFile}/intermediates/javac/debug") {
-            exclude(fileFilter)
-        }
-
-    val mainSrc = listOf(
-        "${project.projectDir}/src/main/java",
-        "${project.projectDir}/src/main/kotlin"
-    )
-
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree, javaDebugTree))
-    executionData.setFrom(fileTree(project.layout.buildDirectory.get().asFile) {
-        include("jacoco/testDebugUnitTest.exec")
-        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
     })
 }
 
