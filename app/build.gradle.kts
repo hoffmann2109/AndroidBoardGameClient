@@ -188,7 +188,8 @@ sonar {
         property("sonar.java.coveragePlugin", "jacoco")
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
-            "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+            "build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml," +
+            "build/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"
         )
     }
 }
