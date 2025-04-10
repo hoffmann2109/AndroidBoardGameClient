@@ -8,10 +8,25 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-/build
+
 /captures
 .externalNativeBuild
 .cxx
 local.properties
 app/google-services.json
 app/src/main/assets/config.properties
+
+# Jacoco reports should be tracked by git and pushed
+**/build/generated
+**/build/gmpAppId
+**/build/intermediates
+**/build/kotlin
+**/build/kover
+**/build/outputs
+**/build/test-results
+**/build/tmp
+**/build/reports/androidTests
+**/build/reports/tests
+**/build/reports/jacoco/jacocoAndroidTestReport/html
+**/build/reports/jacoco/jacocoTestReport/jacocoTestReport.html
+**/build/reports/jacoco/jacocoUnitTestReport/html
