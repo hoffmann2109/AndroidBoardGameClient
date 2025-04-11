@@ -30,7 +30,8 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onRollDice = {},
                 onLogout = {},
-                onProfileClick = {}
+                onProfileClick = {},
+                onJoinGame = {}
             )
         }
 
@@ -57,7 +58,8 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onRollDice = {},
                 onLogout = {},
-                onProfileClick = {}
+                onProfileClick = {},
+                onJoinGame = {}
             )
         }
 
@@ -85,7 +87,8 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onRollDice = {},
                 onLogout = {},
-                onProfileClick = {}
+                onProfileClick = {},
+                onJoinGame = {}
             )
         }
 
@@ -110,7 +113,8 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onRollDice = {},
                 onLogout = {},
-                onProfileClick = {}
+                onProfileClick = {},
+                onJoinGame = {}
             )
         }
 
