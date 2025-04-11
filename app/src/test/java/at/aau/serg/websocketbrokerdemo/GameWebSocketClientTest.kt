@@ -37,9 +37,11 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = { /* Not needed for this test */ },
-            onMessageReceived = { /* Not needed for this test */ }
+            onConnected = {}, // <- einfaches leeres Lambda
+            onMessageReceived = { /* Not needed for this test */ },
+            onGameStateReceived = {} //
         )
+
 
         val field = GameWebSocketClient::class.java.getDeclaredField("serverUrl")
         field.isAccessible = true
@@ -61,7 +63,8 @@ class GameWebSocketClientTest {
         val client = GameWebSocketClient(
             context,
             onConnected = { onConnectedCalled = true },
-            onMessageReceived = { /* Not needed for this test */ }
+            onMessageReceived = { /* Not needed for this test */ },
+            onGameStateReceived = {} //
         )
 
 
