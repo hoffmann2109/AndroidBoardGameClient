@@ -2,9 +2,8 @@ package at.aau.serg.websocketbrokerdemo.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,34 +24,36 @@ fun PlayboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFD8F3DC)) // Monopoly green color
+            .background(Color(0xFFD8F3DC)) // Light green background
     ) {
-        Column(
+        // Main content area (80% of screen width)
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(end = 16.dp)
+        ) {
+            // This is where the game board will be displayed
+            // For now, it's empty
+        }
+
+        // Player info column on the right (20% of screen width)
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .fillMaxWidth(0.2f)
+                .fillMaxHeight()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Player Information",
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-
             if (players.isEmpty()) {
                 Text(
                     text = "No players connected yet",
-                    color = Color.White,
+                    color = Color.Black,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(16.dp)
                 )
             } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.weight(1f)
                 ) {
@@ -65,7 +66,7 @@ fun PlayboardScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = onBackToLobby,
@@ -113,17 +114,29 @@ fun PlayerCard(
             Text(
                 text = "ID: ${player.id}",
                 color = Color.White,
-                fontSize = 14.sp
+                fontSize = 8.sp
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "$${player.money}",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "EUR",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${player.money}",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
-} 
+}
