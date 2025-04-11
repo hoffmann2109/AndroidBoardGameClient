@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import kotlinx.coroutines.delay
-import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 
 @Composable
 fun LobbyScreen(

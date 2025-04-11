@@ -25,7 +25,7 @@ fun PlayboardScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(Color(0xFFD8F3DC)) // Monopoly green color
     ) {
         Column(
             modifier = Modifier
@@ -56,7 +56,7 @@ fun PlayboardScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    items(players) { player ->
+                    items(players.take(4)) { player ->
                         PlayerCard(
                             player = player,
                             isCurrentPlayer = player.id == currentPlayerId

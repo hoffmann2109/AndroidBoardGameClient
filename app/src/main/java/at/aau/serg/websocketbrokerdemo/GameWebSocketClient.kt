@@ -116,12 +116,4 @@ class GameWebSocketClient(
         return properties.getProperty("server.url")
     }
 
-    fun parseGameState(message: String): List<PlayerMoney>? {
-        if (message.startsWith("GAME_STATE:")) {
-            val jsonData = message.substring("GAME_STATE:".length)
-            val type = object : TypeToken<List<PlayerMoney>>() {}.type
-            return Gson().fromJson(jsonData, type)
-        }
-        return null
-    }
 }
