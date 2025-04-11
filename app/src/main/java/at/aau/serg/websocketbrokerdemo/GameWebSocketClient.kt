@@ -2,6 +2,9 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
+import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import okhttp3.*
 import okio.ByteString
 import java.util.Properties
@@ -94,5 +97,14 @@ class GameWebSocketClient(
             properties.load(input)
         }
         return properties.getProperty("server.url")
+    }
+
+    fun parseGameState(message: String): List<PlayerMoney>? {
+        if (message.startsWith("GAME_STATE:")) {
+            val jsonData = message.substring("GAME_STATE:".length)
+            val type = object : TypeToken<List<PlayerMoney>>() {}.type
+            return Gson().fromJson(jsonData, type)
+        }
+        return null
     }
 }

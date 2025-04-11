@@ -223,6 +223,7 @@ dependencies {
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
