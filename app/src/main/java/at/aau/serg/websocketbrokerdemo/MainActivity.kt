@@ -16,6 +16,8 @@ import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
+import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,6 +31,7 @@ class MainActivity : ComponentActivity() {
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
+        var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -47,7 +50,8 @@ class MainActivity : ComponentActivity() {
             GameWebSocketClient(
                 context = context,
                 onConnected = { log += "Connected to server\n" },
-                onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" }
+                onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" },
+                onGameStateReceived = { players -> playerMoneyList = players }
             )
         }
 
@@ -75,7 +79,8 @@ class MainActivity : ComponentActivity() {
                         context.startActivity(intent)
                         (context as? Activity)?.finish()
                     },
-                    onProfileClick = { navController.navigate("profile") }
+                    onProfileClick = { navController.navigate("profile") },
+                    onJoinGame = { navController.navigate("playerInfo") }
                 )
             }
             composable("profile") {
@@ -87,7 +92,14 @@ class MainActivity : ComponentActivity() {
                             playerProfile = playerProfile?.copy(name = newName)
                         }
                     },
-                    onBack = { navController.popBackStack() }//zurück zur Main
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("playerInfo") {
+                PlayboardScreen(
+                    players = playerMoneyList,
+                    currentPlayerId = userId ?: "",
+                    onBackToLobby = { navController.navigate("lobby") }
                 )
             }
         }
