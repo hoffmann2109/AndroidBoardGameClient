@@ -47,7 +47,7 @@ fun PlayboardScreen(
         ) {
             if (players.isEmpty()) {
                 Text(
-                    text = "No players connected yet",
+                    text = "Not enough players connected yet",
                     color = Color.Black,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(16.dp)

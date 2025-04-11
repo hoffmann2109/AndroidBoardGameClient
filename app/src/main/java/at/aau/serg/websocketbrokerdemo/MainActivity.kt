@@ -64,7 +64,11 @@ class MainActivity : ComponentActivity() {
                     log = log,
                     onMessageChange = { message = it },
                     onConnect = { webSocketClient.connect() },
-                    onDisconnect = { webSocketClient.close(); log += "Disconnected from server\n" },
+                    onDisconnect = {
+                        webSocketClient.close()
+                        log = "Logs:\n" // Clear the log
+                        log += "Disconnected from server\n"
+                    },
                     onSendMessage = {
                         if (message.isNotEmpty()) {
                             webSocketClient.sendMessage(message)
