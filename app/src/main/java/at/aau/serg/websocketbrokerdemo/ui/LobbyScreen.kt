@@ -38,6 +38,7 @@ fun LobbyScreen(
     onRollDice: () -> Unit,
     onLogout: () -> Unit,
     onProfileClick: () -> Unit,
+    onJoinGame: () -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
@@ -93,6 +94,13 @@ fun LobbyScreen(
                 DiceRollingButton("Roll Dice", Color(0xFF3FAF3F), onRollDice, diceResult)
                 AnimatedButton("Logout", Color.Red, onLogout)
                 AnimatedButton("Profile", Color.Blue, onProfileClick)
+
+                // Join Game button
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AnimatedButton("Join Game", Color(0xFF9C27B0)) {
+                    onJoinGame()
+                }
             }
 
             // WiFi Icon Animation (Connect)

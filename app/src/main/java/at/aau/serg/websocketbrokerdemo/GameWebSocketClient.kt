@@ -12,11 +12,13 @@ import java.util.Properties
 class GameWebSocketClient(
     private val context: Context,
     private val onConnected: () -> Unit,
-    private val onMessageReceived: (String) -> Unit
+    private val onMessageReceived: (String) -> Unit,
+    private val onGameStateReceived: (List<PlayerMoney>) -> Unit
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
     private var webSocket: WebSocket? = null
+    private val gson = Gson()
 
     // Load the server URL from the config.properties file in the assets folder.
     private val serverUrl: String = loadServerUrl(context)
@@ -50,6 +52,21 @@ class GameWebSocketClient(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
+
+
+            // Check if this is a game state message
+            if (text.startsWith("GAME_STATE:")) {
+                try {
+                    val jsonData = text.substring("GAME_STATE:".length)
+                    val type = object : TypeToken<List<PlayerMoney>>() {}.type
+                    val players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
+                    onGameStateReceived(players)
+                } catch (e: Exception) {
+                    Log.e("WebSocket", "Error parsing game state: ${e.message}", e)
+                }
+            }
+
+            // Always call the general message handler
             onMessageReceived(text)
         }
 
