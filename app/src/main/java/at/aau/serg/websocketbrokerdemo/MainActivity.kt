@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
                             message = ""
                         }
                     },
-                    onRollDice = { webSocketClient.sendMessage("Roll"); log += "Sent: Roll command\n" },
+                    // onRollDice = { webSocketClient.sendMessage("Roll"); log += "Sent: Roll command\n" },
                     onLogout = {
                         auth.signOut()
                         val intent = Intent(context, AuthActivity::class.java)

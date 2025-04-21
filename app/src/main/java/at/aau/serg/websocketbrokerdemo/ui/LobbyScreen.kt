@@ -34,7 +34,7 @@ fun LobbyScreen(
     onConnect: () -> Unit,
     onDisconnect: () -> Unit,
     onSendMessage: () -> Unit,
-    onRollDice: () -> Unit,
+    //onRollDice: () -> Unit,
     onLogout: () -> Unit,
     onProfileClick: () -> Unit,
     onJoinGame: () -> Unit,
@@ -90,7 +90,7 @@ fun LobbyScreen(
                     onDisconnect()
                 }
                 AnimatedButton("Send Message", Color(0xFF0074cc), onSendMessage)
-                DiceRollingButton("Roll Dice", Color(0xFF3FAF3F), onRollDice, diceResult)
+                //DiceRollingButton("Roll Dice", Color(0xFF3FAF3F), onRollDice, diceResult)
                 AnimatedButton("Logout", Color.Red, onLogout)
                 AnimatedButton("Profile", Color.Blue, onProfileClick)
 
@@ -206,6 +206,7 @@ fun AnimatedButton(text: String, color: Color, onClick: () -> Unit) {
     }
 }
 
+/*
 @Composable
 fun DiceRollingButton(text: String, color: Color, onClick: () -> Unit, diceResult: String) {
     var isPressed by remember { mutableStateOf(false) }
@@ -259,3 +260,5 @@ fun DiceFace(diceValue: String) {
         )
     }
 }
+
+ */
