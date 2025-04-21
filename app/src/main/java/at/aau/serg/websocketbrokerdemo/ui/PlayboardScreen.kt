@@ -28,10 +28,10 @@ fun PlayboardScreen(
     players: List<PlayerMoney>,
     currentPlayerId: String,
     onRollDice: () -> Unit,
-    onBackToLobby: () -> Unit
+    onBackToLobby: () -> Unit,
+    diceResult:     Int?,
+    dicePlayerId:   String?
 ) {
-    var diceResult by remember { mutableStateOf("?") }
-    diceResult = parseDiceResult("Player 2 rolled 5")
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +57,12 @@ fun PlayboardScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            DiceRollingButton("Roll Dice", Color(0xFF3FAF3F), onRollDice, diceResult)
+            DiceRollingButton(
+                text = "Roll Dice",
+                color = Color(0xFF3FAF3F),
+                onClick = onRollDice,
+                diceValue = diceResult,
+            )
         }
 
         // Player info column on the right (20% of screen width)
@@ -176,7 +181,13 @@ fun PlayerCard(
 }
 
 @Composable
-fun DiceRollingButton(text: String, color: Color, onClick: () -> Unit, diceResult: String) {
+fun DiceRollingButton(
+    text: String,
+    color: Color,
+    onClick: () -> Unit,
+    diceValue: Int?
+) {
+
     var isPressed by remember { mutableStateOf(false) }
     var rotateAngle by remember { mutableFloatStateOf(0f) }
 
@@ -203,8 +214,8 @@ fun DiceRollingButton(text: String, color: Color, onClick: () -> Unit, diceResul
         Text(text, fontSize = 18.sp)
     }
 
-    // Anzeige der geworfenen Zahl
-    DiceFace(diceResult)
+    // show the face
+    DiceFace(diceValue)
 
     LaunchedEffect(isPressed) {
         if (isPressed) {
@@ -215,15 +226,16 @@ fun DiceRollingButton(text: String, color: Color, onClick: () -> Unit, diceResul
 }
 
 @Composable
-fun DiceFace(diceValue: String) {
+fun DiceFace(diceValue: Int?) {
     Box(
-        modifier = Modifier.size(100.dp)
+        modifier = Modifier
+            .size(100.dp)
             .background(Color.White, RoundedCornerShape(12.dp))
             .padding(10.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = diceValue,
+            text = diceValue?.toString() ?: "?",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
