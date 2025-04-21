@@ -28,7 +28,6 @@ class LobbyScreenTest {
                 onConnect = {},
                 onDisconnect = {},
                 onSendMessage = {},
-                onRollDice = {},
                 onLogout = {},
                 onProfileClick = {},
                 onJoinGame = {}
@@ -38,7 +37,6 @@ class LobbyScreenTest {
         composeTestRule.onNodeWithText("Connect").assertIsDisplayed()
         composeTestRule.onNodeWithText("Disconnect").assertIsDisplayed()
         composeTestRule.onNodeWithText("Send Message").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Roll Dice").assertIsDisplayed()
         composeTestRule.onNodeWithText("Logout").assertIsDisplayed()
         composeTestRule.onNodeWithText("Profile").assertIsDisplayed()
     }
@@ -56,7 +54,6 @@ class LobbyScreenTest {
                 onConnect = {},
                 onDisconnect = {},
                 onSendMessage = {},
-                onRollDice = {},
                 onLogout = {},
                 onProfileClick = {},
                 onJoinGame = {}
@@ -85,7 +82,6 @@ class LobbyScreenTest {
                 onConnect = { wasConnectClicked = true },
                 onDisconnect = {},
                 onSendMessage = {},
-                onRollDice = {},
                 onLogout = {},
                 onProfileClick = {},
                 onJoinGame = {}
@@ -95,35 +91,6 @@ class LobbyScreenTest {
         composeTestRule.onNodeWithText("Connect").performClick()
         composeTestRule.runOnIdle {
             assertTrue("onConnect callback should be invoked", wasConnectClicked)
-        }
-    }
-
-    @Test
-    fun lobbyScreen_diceRollUpdatesDiceResult() {
-        val messageState = mutableStateOf("")
-        val logState = mutableStateOf("")
-
-        composeTestRule.setContent {
-            LobbyScreen(
-                message = messageState.value,
-                log = logState.value,
-                onMessageChange = { messageState.value = it },
-                onConnect = {},
-                onDisconnect = {},
-                onSendMessage = {},
-                onRollDice = {},
-                onLogout = {},
-                onProfileClick = {},
-                onJoinGame = {}
-            )
-        }
-
-        composeTestRule.runOnIdle {
-            logState.value = "Player1 rolled 4"
-        }
-
-        composeTestRule.waitUntil(timeoutMillis = 2000) {
-            runCatching { composeTestRule.onNodeWithText("4").assertExists() }.isSuccess
         }
     }
 }

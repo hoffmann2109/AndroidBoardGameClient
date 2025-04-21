@@ -22,7 +22,8 @@ class PlayboardScreenTest {
         )
 
         composeTestRule.setContent {
-            PlayboardScreen(players = players, currentPlayerId = "1", onBackToLobby = {})
+            PlayboardScreen(players = players, currentPlayerId = "1", onRollDice = {}, onBackToLobby = {}, diceResult = 5,
+            dicePlayerId = "")
         }
 
         // Check if player names are displayed
@@ -33,7 +34,8 @@ class PlayboardScreenTest {
     @Test
     fun testPlayboardScreenDisplaysNoPlayersMessage() {
         composeTestRule.setContent {
-            PlayboardScreen(players = emptyList(), currentPlayerId = "", onBackToLobby = {})
+            PlayboardScreen(players = emptyList(), currentPlayerId = "", onRollDice = {}, onBackToLobby = {}, diceResult = 5,
+                dicePlayerId = "")
         }
 
         // Check if the "Not enough players connected yet" message is displayed

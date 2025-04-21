@@ -39,6 +39,7 @@ class GameWebSocketClientTest {
             context,
             onConnected = {}, // <- einfaches leeres Lambda
             onMessageReceived = { /* Not needed for this test */ },
+            onDiceRolled = { _, _ -> }, // Also not needed for this test
             onGameStateReceived = {} //
         )
 
@@ -64,6 +65,7 @@ class GameWebSocketClientTest {
             context,
             onConnected = { onConnectedCalled = true },
             onMessageReceived = { /* Not needed for this test */ },
+            onDiceRolled = { _, _ -> }, // Also not needed for this test
             onGameStateReceived = {} //
         )
 
