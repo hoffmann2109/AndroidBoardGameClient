@@ -5,6 +5,9 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import com.example.myapplication.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -43,8 +47,12 @@ fun PlayboardScreen(
                 .fillMaxSize()
                 .padding(end = 16.dp)
         ) {
-            // This is where the game board will be displayed
-            // For now, it's empty
+            Image(
+                painter = painterResource(id = R.drawable.gameboard),
+                contentDescription = "Game Board",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
         }
 
         // Dice info column on the left (10% of screen width)
@@ -213,6 +221,8 @@ fun DiceRollingButton(
     ) {
         Text(text, fontSize = 18.sp)
     }
+
+    Spacer(modifier = Modifier.height(16.dp))
 
     // show the face
     DiceFace(diceValue)
