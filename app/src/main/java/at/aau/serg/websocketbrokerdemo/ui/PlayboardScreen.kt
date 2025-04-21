@@ -118,16 +118,6 @@ fun PlayboardScreen(
     }
 }
 
-fun parseDiceResult(newContent: String): String {
-    val diceRegex = "rolled (\\d+)".toRegex()
-    val matchResult = diceRegex.find(newContent)
-    return if (matchResult != null){
-        matchResult.groupValues[1]
-    } else {
-        "?" // Displays ? if no dice result was found
-    }
-}
-
 @Composable
 fun PlayerCard(
     player: PlayerMoney,
@@ -213,7 +203,7 @@ fun DiceRollingButton(
         onClick = {
             isPressed = true
             rotateAngle += 720f
-            onClick() // Hier wird diceResult im Log aktualisiert
+            onClick()
         },
         modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
         shape = RoundedCornerShape(8.dp),

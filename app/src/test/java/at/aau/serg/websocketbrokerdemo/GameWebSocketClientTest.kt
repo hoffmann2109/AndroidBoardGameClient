@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo
 
-
 import android.content.Context
 import android.content.res.AssetManager
 import okhttp3.WebSocket
