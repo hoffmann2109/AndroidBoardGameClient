@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo
 
-
 import android.content.Context
 import android.content.res.AssetManager
 import okhttp3.WebSocket
@@ -39,6 +38,7 @@ class GameWebSocketClientTest {
             context,
             onConnected = {}, // <- einfaches leeres Lambda
             onMessageReceived = { /* Not needed for this test */ },
+            onDiceRolled = { _, _ -> }, // Also not needed for this test
             onGameStateReceived = {} //
         )
 
@@ -64,6 +64,7 @@ class GameWebSocketClientTest {
             context,
             onConnected = { onConnectedCalled = true },
             onMessageReceived = { /* Not needed for this test */ },
+            onDiceRolled = { _, _ -> }, // Also not needed for this test
             onGameStateReceived = {} //
         )
 

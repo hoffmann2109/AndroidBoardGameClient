@@ -2,6 +2,7 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
+import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import com.google.common.reflect.TypeToken
 import com.google.gson.Gson
@@ -13,6 +14,7 @@ class GameWebSocketClient(
     private val context: Context,
     private val onConnected: () -> Unit,
     private val onMessageReceived: (String) -> Unit,
+    private val onDiceRolled: (playerId: String, value: Int) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit
 ) {
     private val client = OkHttpClient()
@@ -65,6 +67,15 @@ class GameWebSocketClient(
                     Log.e("WebSocket", "Error parsing game state: ${e.message}", e)
                 }
             }
+
+            // try to parse dice‐roll JSON first
+            try {
+                val obj = gson.fromJson(text, DiceRollMessage::class.java)
+                if (obj.type == "DICE_ROLL") {
+                    onDiceRolled(obj.playerId, obj.value)
+                    return  // don’t fall through to the generic log handler
+                }
+            } catch (_: Exception) { /* not a dice‐roll */ }
 
             // Always call the general message handler
             onMessageReceived(text)

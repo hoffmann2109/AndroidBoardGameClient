@@ -30,3 +30,4 @@ app/src/main/assets/config.properties
 **/build/reports/jacoco/jacocoAndroidTestReport/html
 **/build/reports/jacoco/jacocoTestReport/jacocoTestReport.html
 **/build/reports/jacoco/jacocoUnitTestReport/html
+build/reports/problems/problems-report.html

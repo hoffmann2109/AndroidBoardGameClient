@@ -32,6 +32,8 @@ class MainActivity : ComponentActivity() {
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
+        var diceValue   by remember { mutableStateOf<Int?>(null) }
+        var dicePlayer  by remember { mutableStateOf<String?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -51,7 +53,11 @@ class MainActivity : ComponentActivity() {
                 context = context,
                 onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" },
-                onGameStateReceived = { players -> playerMoneyList = players }
+                onGameStateReceived = { players -> playerMoneyList = players },
+                onDiceRolled       = { pid, value ->
+                    dicePlayer = pid
+                    diceValue  = value
+                }
             )
         }
 
@@ -76,7 +82,6 @@ class MainActivity : ComponentActivity() {
                             message = ""
                         }
                     },
-                    onRollDice = { webSocketClient.sendMessage("Roll"); log += "Sent: Roll command\n" },
                     onLogout = {
                         auth.signOut()
                         val intent = Intent(context, AuthActivity::class.java)
@@ -103,7 +108,10 @@ class MainActivity : ComponentActivity() {
                 PlayboardScreen(
                     players = playerMoneyList,
                     currentPlayerId = userId ?: "",
-                    onBackToLobby = { navController.navigate("lobby") }
+                    onRollDice = { webSocketClient.sendMessage("Roll")},
+                    onBackToLobby = { navController.navigate("lobby") },
+                    diceResult      = diceValue,
+                    dicePlayerId    = dicePlayer
                 )
             }
         }
