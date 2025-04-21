@@ -34,7 +34,6 @@ fun LobbyScreen(
     onConnect: () -> Unit,
     onDisconnect: () -> Unit,
     onSendMessage: () -> Unit,
-    //onRollDice: () -> Unit,
     onLogout: () -> Unit,
     onProfileClick: () -> Unit,
     onJoinGame: () -> Unit,
@@ -42,7 +41,6 @@ fun LobbyScreen(
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
     var wifiIconSize by remember { mutableStateOf(320.dp) }
-    var diceResult by remember { mutableStateOf("?") }
     var lastProcessedLogLength by remember { mutableIntStateOf(0) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -90,7 +88,6 @@ fun LobbyScreen(
                     onDisconnect()
                 }
                 AnimatedButton("Send Message", Color(0xFF0074cc), onSendMessage)
-                //DiceRollingButton("Roll Dice", Color(0xFF3FAF3F), onRollDice, diceResult)
                 AnimatedButton("Logout", Color.Red, onLogout)
                 AnimatedButton("Profile", Color.Blue, onProfileClick)
 
@@ -155,24 +152,6 @@ fun LobbyScreen(
             showDisconnectIcon = false
         }
     }
-
-    LaunchedEffect(log) {
-        if (log.length > lastProcessedLogLength){
-            val newContent = log.substring(lastProcessedLogLength)
-            lastProcessedLogLength = log.length
-            diceResult = parseDiceResult(newContent)
-        }
-    }
-}
-
-fun parseDiceResult(newContent: String): String {
-    val diceRegex = "rolled (\\d+)".toRegex()
-    val matchResult = diceRegex.find(newContent)
-    return if (matchResult != null){
-        matchResult.groupValues[1]
-    } else {
-        "?" // Displays ? if no dice result was found
-    }
 }
 
 @Composable
@@ -205,60 +184,3 @@ fun AnimatedButton(text: String, color: Color, onClick: () -> Unit) {
         }
     }
 }
-
-/*
-@Composable
-fun DiceRollingButton(text: String, color: Color, onClick: () -> Unit, diceResult: String) {
-    var isPressed by remember { mutableStateOf(false) }
-    var rotateAngle by remember { mutableFloatStateOf(0f) }
-
-    val rotation by animateFloatAsState(
-        targetValue = rotateAngle,
-        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
-    )
-    val scale by animateFloatAsState(if (isPressed) 1.1f else 1f, animationSpec = tween(150))
-    val buttonColor by animateColorAsState(
-        targetValue = if (isPressed) color.copy(alpha = 0.7f) else color,
-        animationSpec = tween(durationMillis = 150)
-    )
-
-    Button(
-        onClick = {
-            isPressed = true
-            rotateAngle += 720f
-            onClick() // Hier wird diceResult im Log aktualisiert
-        },
-        modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
-        shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
-    ) {
-        Text(text, fontSize = 18.sp)
-    }
-
-    // Anzeige der geworfenen Zahl
-    DiceFace(diceResult)
-
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(1000)
-            isPressed = false
-        }
-    }
-}
-
-@Composable
-fun DiceFace(diceValue: String) {
-    Box(
-        modifier = Modifier.size(100.dp).background(Color.White, RoundedCornerShape(12.dp)).padding(10.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = diceValue,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-    }
-}
-
- */
