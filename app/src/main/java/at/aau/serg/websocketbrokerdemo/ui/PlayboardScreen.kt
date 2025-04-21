@@ -26,7 +26,7 @@ fun PlayboardScreen(
             .fillMaxSize()
             .background(Color(0xFFD8F3DC)) // Light green background
     ) {
-        // Main content area (80% of screen width)
+        // Main content area (70% of screen width)
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -34,6 +34,19 @@ fun PlayboardScreen(
         ) {
             // This is where the game board will be displayed
             // For now, it's empty
+        }
+
+        // Dice info column on the left (10% of screen width)
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxWidth(0.1f)
+                .fillMaxHeight()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text("🎲 Dice", fontSize = 24.sp, color = Color.Black)
         }
 
         // Player info column on the right (20% of screen width)
