@@ -1,17 +1,23 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -32,10 +38,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.GameData
 import kotlinx.coroutines.launch
@@ -47,6 +56,7 @@ import java.util.Locale
 fun StatisticsScreen(userId: String?, onBack: () -> Unit) {
     var gameHistory by remember { mutableStateOf<List<GameData>>(emptyList()) }
     var selectedFilter by remember { mutableStateOf("all") }
+    var showChart by remember { mutableStateOf(true) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(userId) {
@@ -65,6 +75,15 @@ fun StatisticsScreen(userId: String?, onBack: () -> Unit) {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    IconButton(onClick = { showChart = !showChart }) {
+                        Icon(
+                            if (showChart) Icons.AutoMirrored.Filled.List else Icons.Default.Search,
+                            contentDescription = "Toggle View"
+                        )
+                    }
+                    FilterDropdown(selectedFilter) { selectedFilter = it }
                 }
             )
         }
@@ -72,61 +91,131 @@ fun StatisticsScreen(userId: String?, onBack: () -> Unit) {
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
                 .fillMaxSize()
         ) {
-            // Filter Dropdown
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                var expanded by remember { mutableStateOf(false) }
-                val filters = mapOf(
-                    "all" to "All Time",
-                    "week" to "Last Week",
-                    "month" to "Last Month"
+            if (showChart) {
+                SimpleBarChart(
+                    games = gameHistory,
+                    filter = selectedFilter,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .padding(16.dp)
                 )
+            }
 
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded }
+            GameHistoryList(
+                games = gameHistory,
+                filter = selectedFilter
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FilterDropdown(currentFilter: String, onFilterSelected: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val filters = mapOf(
+        "all" to "All Time",
+        "week" to "Last Week",
+        "month" to "Last Month"
+    )
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        TextField(
+            readOnly = true,
+            value = filters[currentFilter] ?: "",
+            onValueChange = {},
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.menuAnchor().width(120.dp)
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            filters.forEach { (key, value) ->
+                DropdownMenuItem(
+                    text = { Text(value) },
+                    onClick = {
+                        onFilterSelected(key)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SimpleBarChart(games: List<GameData>, filter: String, modifier: Modifier = Modifier) {
+    val filteredGames = remember(games, filter) {
+        games.filter {
+            val timestamp = it.timestamp.toDate().time
+            when (filter) {
+                "week" -> System.currentTimeMillis() - timestamp < 604_800_000
+                "month" -> System.currentTimeMillis() - timestamp < 2_592_000_000
+                else -> true
+            }
+        }
+    }
+
+    val maxMoney = filteredGames.maxOfOrNull { it.endMoney } ?: 1
+    val dateFormat = remember { SimpleDateFormat("dd.MM", Locale.getDefault()) }
+
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            filteredGames.takeLast(7).forEach { game ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.width(40.dp)
                 ) {
-                    TextField(
-                        readOnly = true,
-                        value = filters[selectedFilter] ?: "",
-                        onValueChange = {},
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        modifier = Modifier.menuAnchor()
+                    Text(
+                        text = dateFormat.format(game.timestamp.toDate()),
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        filters.forEach { (key, value) ->
-                            DropdownMenuItem(
-                                text = { Text(value) },
-                                onClick = {
-                                    selectedFilter = key
-                                    expanded = false
-                                }
-                            )
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height((game.endMoney.toFloat() / maxMoney * 150).dp)
+                            .background(MaterialTheme.colorScheme.primary)
+                    )
                 }
             }
+        }
+    }
+}
 
-            // Statistics Cards
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(gameHistory.filter {
-                    val timestampMillis = it.timestamp.toDate().time // Konvertiere zu Date Format
-                    when(selectedFilter) {
-                        "week" -> System.currentTimeMillis() - timestampMillis < 604_800_000
-                        "month" -> System.currentTimeMillis() - timestampMillis < 2_592_000_000
-                        else -> true
-                    }
-                }) { game ->
-                    GameStatCard(game)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+@Composable
+private fun GameHistoryList(games: List<GameData>, filter: String) {
+    val filteredGames = remember(games, filter) {
+        games.filter {
+            val timestamp = it.timestamp.toDate().time
+            when (filter) {
+                "week" -> System.currentTimeMillis() - timestamp < 604_800_000
+                "month" -> System.currentTimeMillis() - timestamp < 2_592_000_000
+                else -> true
             }
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        items(filteredGames) { game ->
+            GameStatCard(game)
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -136,32 +225,46 @@ fun GameStatCard(game: GameData) {
     val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()) }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = if (game.won) Color(0xFFC8E6C9) else Color(0xFFFFCDD2)
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Datum: ${dateFormat.format(game.timestamp.toDate())}",
-                style = MaterialTheme.typography.bodySmall
+                text = dateFormat.format(game.timestamp.toDate()),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Result: ${if (game.won) "WON" else "LOST"}", fontWeight = FontWeight.Bold)
-                Text("Money: ₩${game.endMoney}")
+                Text("Result:", fontWeight = FontWeight.Bold)
+                Text(
+                    text = if (game.won) "VICTORY" else "DEFEAT",
+                    color = if (game.won) Color(0xFF2E7D32) else Color(0xFFC62828)
+                )
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Duration: ${game.durationMinutes}min")
-                Text("Level +${game.levelGained}")
-            }
+
+            StatRow("Money Earned", "₩${game.endMoney}")
+            StatRow("Duration", "${game.durationMinutes} minutes")
+            StatRow("Players", game.playersCount.toString())
+            StatRow("Level Progress", "+${game.levelGained}")
         }
+    }
+}
+
+@Composable
+private fun StatRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(label, fontWeight = FontWeight.Medium)
+        Text(value)
     }
 }
