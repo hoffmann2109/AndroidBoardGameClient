@@ -79,6 +79,7 @@ internal fun registerUser(auth: FirebaseAuth, email: String, password: String, c
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         FirestoreManager.saveUserProfile(userId, profile)
+                        FirestoreManager.initializeUserStats(userId)
                         (context as? Activity)?.runOnUiThread {
                             context.startActivity(Intent(context, MainActivity::class.java))
                             (context as? Activity)?.finish()

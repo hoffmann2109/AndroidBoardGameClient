@@ -28,7 +28,7 @@ fun UserProfileScreen(
             Text("Level: ${playerProfile.level}")
             Text("Games Played: ${playerProfile.gamesPlayed}")
             Text("Wins: ${playerProfile.wins}")
-            Text("Most Money: ${playerProfile.mostMoney}")
+            Text("Most Money: ${playerProfile.highestMoney}")
 
             Spacer(modifier = Modifier.height(16.dp))
 
