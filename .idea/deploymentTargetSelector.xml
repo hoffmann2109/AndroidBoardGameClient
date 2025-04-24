@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-04-24T06:15:13.210647547Z">
+        <DropdownSelection timestamp="2025-04-24T06:56:27.664860526Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/home/thomas/.android/avd/Medium_Tablet_4.avd" />
@@ -13,10 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="PlayboardScreenTest">
+      <SelectionState runConfigName="GameboardAndroidTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testRollDiceButtonResetsAfterAnimation()">
+      <SelectionState runConfigName="gameboard_renders_all_tiles_and_is_clickable()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="gameboard_inner_tiles_have_inner_color()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="gameboard_displays_player_circles_on_outer_tiles()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="testInnerTilesHaveADifferentColor()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

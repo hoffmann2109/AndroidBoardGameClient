@@ -8,6 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 
@@ -31,6 +34,7 @@ fun Gameboard(
     Box(
         modifier = modifier
             .background(Color.Gray)
+            .testTag("gameboard")
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
@@ -56,12 +60,14 @@ fun Gameboard(
                                 .weight(1f)
                                 .aspectRatio(1f)
                                 .background(if (isOuter) outerTileColor else innerTileColor)
-                                .clickable { onTileClick(row, col) },
+                                .clickable { onTileClick(row, col) }
+                                .semantics { contentDescription = "Tile($row,$col)" }
+                                .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
                             if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
                                 Row(
-                                    modifier = Modifier.fillMaxSize(0.8f),
+                                    modifier = Modifier.fillMaxSize(0.8f).testTag("players_row_${row}_$col"),
                                     horizontalArrangement = Arrangement.SpaceEvenly,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -76,6 +82,8 @@ fun Gameboard(
                                                     playerColors[colorIndex],
                                                     CircleShape
                                                 )
+                                                .semantics { contentDescription = "Player(${player.id})" }
+                                                .testTag("playerCircle_${player.id}")
                                         )
                                     }
                                 }
