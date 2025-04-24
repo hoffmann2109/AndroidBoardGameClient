@@ -21,8 +21,8 @@ class PlayboardScreenTest {
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
         val players = listOf(
-            PlayerMoney(id = "1", name = "Player 1", money = 1500),
-            PlayerMoney(id = "2", name = "Player 2", money = 1500)
+            PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0),
+            PlayerMoney(id = "2", name = "Player 2", money = 1500, position = 0)
         )
 
         composeTestRule.setContent {

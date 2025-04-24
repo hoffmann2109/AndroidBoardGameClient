@@ -5,9 +5,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.Image
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import com.example.myapplication.R
 import kotlinx.coroutines.delay
 
 @Composable
@@ -44,14 +40,14 @@ fun PlayboardScreen(
         // Main content area (70% of screen width)
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .align(Alignment.Center)
+                .fillMaxWidth(0.6f)
+                .fillMaxHeight(0.9f)
                 .padding(end = 16.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.gameboard),
-                contentDescription = "Game Board",
+            Gameboard(
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
+                players = players
             )
         }
 
@@ -174,6 +170,14 @@ fun PlayerCard(
                     fontWeight = FontWeight.Bold
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Position: ${player.position}",
+                color = Color.White,
+                fontSize = 8.sp
+            )
         }
     }
 }
