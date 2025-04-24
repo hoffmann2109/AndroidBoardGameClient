@@ -19,7 +19,8 @@ fun Gameboard(
     onTileClick: (row: Int, col: Int) -> Unit = { _, _ -> },
     players: List<PlayerMoney> = emptyList()
 ) {
-    // Farben für Spieler 1 - 4 (später werden Bilder von Figuren hinzugefügt)
+    // TODO: Add images of the game pieces instead of the circles
+    // Simple colors for all the 4 players
     val playerColors = listOf(
         Color.Red,
         Color.Blue,
@@ -34,6 +35,7 @@ fun Gameboard(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            // TODO: Add a list of properties instead of the blank tiles later
             repeat(11) { row ->
                 Row(
                     modifier = Modifier
@@ -43,10 +45,10 @@ fun Gameboard(
                     repeat(11) { col ->
                         val isOuter = row == 0 || row == 10 || col == 0 || col == 10
 
-                        // Feldposition von 0 - 39 im Uhrzeigersinn berechnen:
+                        // Calculate position 0 - 39 clockwise:
                         val tilePosition = calculateTilePosition(row, col)
 
-                        // Alle Spieler auf einem Feld suchen:
+                        // Search for all players on a tile:
                         val playersOnTile = players.filter { it.position == tilePosition }
 
                         Box(
@@ -87,15 +89,23 @@ fun Gameboard(
 }
 
 /**
- * 0 = Los-Feld
- * Indizes werden im Uhrzeigersinn erhöht
+ * 0 = Start-Tile
+ * Indices are increased clockwise (0-39)
  */
-private fun calculateTilePosition(row: Int, col: Int): Int {
+fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
-        row == 10 -> if (col >= 0 && col <= 10) 10 - col else -1 // Unten: (0-10)
-        col == 0 -> if (row >= 0 && row <= 10) 10 + (10 - row) else -1 // Links: (11-20)
-        row == 0 -> if (col >= 0 && col <= 10) 20 + col else -1 // Oben: (21-30)
-        col == 10 -> if (row >= 1 && row <= 9) 30 + row else -1 // Rechts: (31-39)
-        else -> -1 // Innen
+        // Corners:
+        row == 10 && col == 10 -> 0  // Bottom-right corner (Start)
+        row == 10 && col == 0 -> 10  // Bottom-left corner
+        row == 0 && col == 0 -> 20   // Top-left corner
+        row == 0 && col == 10 -> 30  // Top-right corner
+
+        // Normal Tiles:
+        row == 10 -> if (col > 0 && col < 10) 10 - col else -1  // Bottom row (1-9)
+        col == 0 -> if (row > 0 && row < 10) 10 + (10 - row) else -1  // Left column (11-19)
+        row == 0 -> if (col > 0 && col < 10) 20 + col else -1  // Top row (21-29)
+        col == 10 -> if (row > 0 && row < 10) 30 + row else -1  // Right column (31-39)
+
+        else -> -1  // Inner or invalid positions
     }
 }
