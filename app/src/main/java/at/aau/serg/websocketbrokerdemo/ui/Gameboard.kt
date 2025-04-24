@@ -57,24 +57,24 @@ fun Gameboard(
                                 .clickable { onTileClick(row, col) },
                             contentAlignment = Alignment.Center
                         ) {
-                            if (playersOnTile.isNotEmpty()) {
-                                if (isOuter) {
-                                    Row(
-                                        modifier = Modifier.fillMaxSize(0.8f),
-                                        horizontalArrangement = Arrangement.SpaceEvenly,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        playersOnTile.forEachIndexed { index, player ->
-                                            val colorIndex = players.indexOf(player) % playerColors.size
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(16.dp)
-                                                    .background(
-                                                        playerColors[colorIndex],
-                                                        CircleShape
-                                                    )
-                                            )
-                                        }
+                            if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
+                                Row(
+                                    modifier = Modifier.fillMaxSize(0.8f),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    playersOnTile.forEachIndexed { index, player ->
+                                        val playerIndex = players.indexOfFirst { it.id == player.id }
+                                        val colorIndex = if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
+
+                                        Box(
+                                            modifier = Modifier
+                                                .size(12.dp)
+                                                .background(
+                                                    playerColors[colorIndex],
+                                                    CircleShape
+                                                )
+                                        )
                                     }
                                 }
                             }
@@ -92,19 +92,10 @@ fun Gameboard(
  */
 private fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
-        // Unten: (0-10)
-        row == 10 -> 10 - col
-
-        // Links: (11-20)
-        col == 0 -> 10 + (10 - row)
-
-        // Oben: (21-30)
-        row == 0 -> 20 + col
-
-        // Rechts: (31-39)
-        col == 10 -> 30 + row - 1
-
-        // Innen:
-        else -> -1
+        row == 10 -> if (col >= 0 && col <= 10) 10 - col else -1 // Unten: (0-10)
+        col == 0 -> if (row >= 0 && row <= 10) 10 + (10 - row) else -1 // Links: (11-20)
+        row == 0 -> if (col >= 0 && col <= 10) 20 + col else -1 // Oben: (21-30)
+        col == 10 -> if (row >= 1 && row <= 9) 30 + row else -1 // Rechts: (31-39)
+        else -> -1 // Innen
     }
 }
