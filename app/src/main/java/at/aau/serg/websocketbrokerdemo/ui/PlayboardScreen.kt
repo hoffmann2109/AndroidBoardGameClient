@@ -174,6 +174,14 @@ fun PlayerCard(
                     fontWeight = FontWeight.Bold
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Position: ${player.position}",
+                color = Color.White,
+                fontSize = 8.sp
+            )
         }
     }
 }
