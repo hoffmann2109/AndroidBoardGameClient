@@ -46,7 +46,8 @@ fun PlayboardScreen(
                 .padding(end = 16.dp)
         ) {
             Gameboard(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                players = players
             )
         }
 
