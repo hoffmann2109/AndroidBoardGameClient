@@ -1,26 +1,40 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.properties.Property
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+
 
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
     outerTileColor: Color = Color.DarkGray,
     innerTileColor: Color = Color.LightGray,
-    onTileClick: (row: Int, col: Int) -> Unit = { _, _ -> },
-    players: List<PlayerMoney> = emptyList()
+    onTileClick: (tilePosition: Int) -> Unit = {},
+    players: List<PlayerMoney> = emptyList(),
+    properties: List<Property> = emptyList()
 ) {
     // TODO: Add images of the game pieces instead of the circles
     // Simple colors for all the 4 players
@@ -55,16 +69,47 @@ fun Gameboard(
                         // Search for all players on a tile:
                         val playersOnTile = players.filter { it.position == tilePosition }
 
+                        val property = properties.find { it.position == tilePosition }
+
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
                                 .background(if (isOuter) outerTileColor else innerTileColor)
-                                .clickable { onTileClick(row, col) }
+                                .clickable (enabled = tilePosition >= 0) {
+                                    onTileClick(tilePosition)
+                                }
                                 .semantics { contentDescription = "Tile($row,$col)" }
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
+                            // Show property image and name
+                            if (isOuter && property != null) {
+
+                                val context = LocalContext.current
+                                val imageResId = getDrawableIdFromName(property.image, context)
+
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxSize().padding(4.dp)
+                                ) {
+                                    if (imageResId != 0) {
+                                        Image(
+                                            painter = painterResource(imageResId),
+                                            contentDescription = property.name,
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                    Text(
+                                        text = property.name,
+                                        fontSize = 8.sp,
+                                        color = Color.White,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
                             if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
                                 Row(
                                     modifier = Modifier.fillMaxSize(0.8f).testTag("players_row_${row}_$col"),
