@@ -34,7 +34,7 @@ fun Gameboard(
     innerTileColor: Color = Color.LightGray,
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
-    properties: List<Property> = emptyList()
+    properties: List<Property>
 ) {
     // TODO: Add images of the game pieces instead of the circles
     // Simple colors for all the 4 players
@@ -83,33 +83,6 @@ fun Gameboard(
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
-                            // Show property image and name
-                            if (isOuter && property != null) {
-
-                                val context = LocalContext.current
-                                val imageResId = getDrawableIdFromName(property.image, context)
-
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier.fillMaxSize().padding(4.dp)
-                                ) {
-                                    if (imageResId != 0) {
-                                        Image(
-                                            painter = painterResource(imageResId),
-                                            contentDescription = property.name,
-                                            contentScale = ContentScale.Fit,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    }
-                                    Text(
-                                        text = property.name,
-                                        fontSize = 8.sp,
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
                             if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
                                 Row(
                                     modifier = Modifier.fillMaxSize(0.8f).testTag("players_row_${row}_$col"),

@@ -17,11 +17,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import kotlinx.coroutines.delay
+import at.aau.serg.websocketbrokerdemo.data.properties.Property
+import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
+import androidx.compose.foundation.Image
+import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+
 
 @Composable
 fun PlayboardScreen(
@@ -32,6 +39,34 @@ fun PlayboardScreen(
     diceResult:     Int?,
     dicePlayerId:   String?
 ) {
+    val context = LocalContext.current
+    val propertyViewModel = remember { PropertyViewModel() }
+    val properties = remember { propertyViewModel.getProperties(context) }
+
+    var selectedProperty by remember { mutableStateOf<Property?>(null) }
+    var lastPosition by remember { mutableStateOf<Int?>(null) }
+    var justLanded by remember { mutableStateOf(false) }
+    var openedByClick by remember { mutableStateOf(false) }
+    // show property popup when player lands
+    LaunchedEffect(players) {
+        val player = players.find { it.id == currentPlayerId }
+        val currentPosition = player?.position
+
+        if (
+            currentPosition != null &&
+            currentPosition != lastPosition
+        ) {
+            lastPosition = currentPosition
+            val landedProperty = properties.find { it.position == currentPosition }
+
+            if (landedProperty != null) {
+                selectedProperty = landedProperty
+                openedByClick = false
+                justLanded = true
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -47,7 +82,12 @@ fun PlayboardScreen(
         ) {
             Gameboard(
                 modifier = Modifier.fillMaxSize(),
-                players = players
+                players = players,
+                properties = properties,
+                onTileClick = { tilePos ->
+                    selectedProperty = properties.find { it.position == tilePos }
+                    openedByClick = true
+                }
             )
         }
 
@@ -110,6 +150,60 @@ fun PlayboardScreen(
             ) {
                 Text("Back to Lobby", fontSize = 18.sp)
             }
+        }
+        if (selectedProperty != null) {
+            val context = LocalContext.current
+            val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
+
+            AlertDialog(
+                onDismissRequest = {
+                    selectedProperty = null
+                    justLanded = false
+                    openedByClick = false
+                },
+                confirmButton = {
+                    if (!openedByClick) { // Nur wenn gelandet
+                        Button(onClick = {
+                            // TODO: Kauflogik
+                            selectedProperty = null
+                            justLanded = false
+                            openedByClick = false
+                        }) {
+                            Text("Buy")
+                        }
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = {
+                        selectedProperty = null
+                        justLanded = false
+                        openedByClick = false
+                    }) {
+                        Text("Exit")
+                    }
+                },
+                title = {
+                    Text(text = selectedProperty!!.name)
+                },
+                text = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (imageResId != 0) {
+                            Image(
+                                painter = painterResource(imageResId),
+                                contentDescription = selectedProperty!!.name,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                            )
+                        }
+                    }
+                }
+            )
         }
     }
 }
