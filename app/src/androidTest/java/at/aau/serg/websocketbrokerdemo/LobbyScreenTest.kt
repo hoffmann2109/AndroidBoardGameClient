@@ -30,6 +30,7 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onLogout = {},
                 onProfileClick = {},
+                onStatisticsClick = {},
                 onJoinGame = {}
             )
         }
@@ -56,6 +57,7 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onLogout = {},
                 onProfileClick = {},
+                onStatisticsClick = {},
                 onJoinGame = {}
             )
         }
@@ -84,6 +86,7 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onLogout = {},
                 onProfileClick = {},
+                onStatisticsClick = {},
                 onJoinGame = {}
             )
         }

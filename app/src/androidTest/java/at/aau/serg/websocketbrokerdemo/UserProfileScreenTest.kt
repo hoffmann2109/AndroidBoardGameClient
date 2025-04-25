@@ -31,7 +31,7 @@ class UserProfileScreenTest {
 
     @Test
     fun userProfileScreen_displaysProfileInformation() {
-        val testProfile = PlayerProfile(name = "TestUser", level = 5, gamesPlayed = 10, wins = 7, mostMoney = 1000)
+        val testProfile = PlayerProfile(name = "TestUser", level = 5, gamesPlayed = 10, wins = 7, highestMoney = 1000, averageMoney = 0.0)
         composeTestRule.setContent {
             UserProfileScreen(playerProfile = testProfile, onNameChange = {}, onBack = {})
         }
@@ -61,7 +61,7 @@ class UserProfileScreenTest {
         val onBack: () -> Unit = { backClicked = true }
 
         composeTestRule.setContent {
-            UserProfileScreen(playerProfile = PlayerProfile(1,2, true, 4, "test", 5), onNameChange = {}, onBack = onBack)
+            UserProfileScreen(playerProfile = PlayerProfile(1,2, "testUser", 2, 0.0, 0), onNameChange = {}, onBack = onBack)
         }
 
         composeTestRule.onNodeWithText("Zurück").performClick()

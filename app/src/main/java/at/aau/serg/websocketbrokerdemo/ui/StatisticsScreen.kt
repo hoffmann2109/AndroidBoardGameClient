@@ -130,7 +130,7 @@ fun StatisticsScreen(userId: String?, onBack: () -> Unit) {
     }
 }
 
-private fun calculateChartData(
+internal fun calculateChartData(
     games: List<GameData>,
     filter: String,
     metric: Metric
@@ -146,7 +146,7 @@ private fun calculateChartData(
 
 private enum class ChartType { BAR, LINE }
 
-private enum class Metric(val displayName: String) {
+internal enum class Metric(val displayName: String) {
     WINS("Wins"),
     LEVEL("Level"),
     MONEY("Money"),
@@ -414,7 +414,7 @@ private fun StatRow(label: String, value: String, highlight: Boolean, color: Col
     }
 }
 
-private fun List<GameData>.filterByDate(filter: String): List<GameData> {
+internal fun List<GameData>.filterByDate(filter: String): List<GameData> {
     return this.filter {
         val timestamp = it.timestamp.toDate().time
         when (filter) {
@@ -425,7 +425,7 @@ private fun List<GameData>.filterByDate(filter: String): List<GameData> {
     }.sortedBy { it.timestamp.toDate().time }
 }
 
-private fun List<GameData>.cumulativeWins(): Map<String, Float> {
+internal fun List<GameData>.cumulativeWins(): Map<String, Float> {
     var cumulative = 0
     return this.associate { game ->
         cumulative += if (game.won) 1 else 0
@@ -433,7 +433,7 @@ private fun List<GameData>.cumulativeWins(): Map<String, Float> {
     }
 }
 
-private fun List<GameData>.groupByTime(filter: String, metric: Metric): Map<String, Float> {
+internal fun List<GameData>.groupByTime(filter: String, metric: Metric): Map<String, Float> {
     val format = when (filter) {
         "week" -> SimpleDateFormat("EEE", Locale.getDefault())
         "month" -> SimpleDateFormat("dd", Locale.getDefault())

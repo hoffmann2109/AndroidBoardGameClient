@@ -5,7 +5,6 @@ data class PlayerProfile(
     val gamesPlayed: Int = 0,
     val name: String = "",
     val wins: Int = 0,
-    val totalWins: Int = 0,
     val averageMoney: Double = 0.0,
     val highestMoney: Int = 0
 )

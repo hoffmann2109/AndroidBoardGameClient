@@ -229,6 +229,7 @@ dependencies {
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect")
 
     testRuntimeOnly (libs.junit.jupiter.engine)
 

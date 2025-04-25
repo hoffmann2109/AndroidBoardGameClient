@@ -36,7 +36,7 @@ class FirestoreManagerTest {
     @Test
     fun saveUserProfile_shouldSaveProfile(): Unit = runBlocking {
         val userId = "testUserId"
-        val profile = PlayerProfile(1, 0, true, 0, "TestUser", 0)
+        val profile = PlayerProfile(1, 0, "TestUser", 0, 0.0, 0)
 
         // Mocking collection("users")
         `when`(firestore.collection("users")).thenReturn(collectionReference)
@@ -53,7 +53,7 @@ class FirestoreManagerTest {
     @Test
     fun getUserProfile_shouldReturnProfile() = runBlocking {
         val userId = "testUserId"
-        val profile = PlayerProfile(1, 0, true, 0, "TestUser", 0)
+        val profile = PlayerProfile(1, 0, "TestUser", 0,  0.0, 0)
 
         // Mocking collection("users")
         `when`(firestore.collection("users")).thenReturn(collectionReference)

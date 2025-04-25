@@ -15,7 +15,7 @@ class UserProfileScreenTest {
     @Disabled
     @Test
     fun userProfileScreen_displaysProfileData() {
-        val profile = PlayerProfile(10, 5, "TestUser", 3, 1000, 0.0, 0)
+        val profile = PlayerProfile(10, 5, "TestUser", 3, 1000.0,0)
         composeTestRule.setContent {
             UserProfileScreen(
                 playerProfile = profile,
@@ -36,7 +36,7 @@ class UserProfileScreenTest {
         var newName = ""
         composeTestRule.setContent {
             UserProfileScreen(
-                playerProfile = PlayerProfile(0, 0, "OldName", 0, 0, 0.0, 0),
+                playerProfile = PlayerProfile(0, 0, "OldName", 0, 0.0, 0),
                 onNameChange = { name -> newName = name },
                 onBack = {}
             )
@@ -53,7 +53,7 @@ class UserProfileScreenTest {
         var backClicked = false
         composeTestRule.setContent {
             UserProfileScreen(
-                playerProfile = PlayerProfile(0, 0, "TestUser",0, 0, 0.0, 0),
+                playerProfile = PlayerProfile(0, 0, "TestUser",0, 0.0, 0),
                 onNameChange = {},
                 onBack = { backClicked = true }
             )
