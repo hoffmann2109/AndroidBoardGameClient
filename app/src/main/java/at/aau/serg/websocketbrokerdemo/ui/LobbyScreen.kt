@@ -36,6 +36,7 @@ fun LobbyScreen(
     onSendMessage: () -> Unit,
     onLogout: () -> Unit,
     onProfileClick: () -> Unit,
+    onStatisticsClick: () -> Unit,
     onJoinGame: () -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
@@ -90,6 +91,8 @@ fun LobbyScreen(
                 AnimatedButton("Send Message", Color(0xFF0074cc), onSendMessage)
                 AnimatedButton("Logout", Color.Red, onLogout)
                 AnimatedButton("Profile", Color.Blue, onProfileClick)
+                AnimatedButton("Statistics", Color.Blue, onStatisticsClick)
+
 
                 // Join Game button
                 Spacer(modifier = Modifier.height(16.dp))

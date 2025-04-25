@@ -18,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +91,8 @@ class MainActivity : ComponentActivity() {
                         (context as? Activity)?.finish()
                     },
                     onProfileClick = { navController.navigate("profile") },
-                    onJoinGame = { navController.navigate("playerInfo") }
+                    onJoinGame = { navController.navigate("playerInfo") },
+                    onStatisticsClick = { navController.navigate("statistics") }
                 )
             }
             composable("profile") {
@@ -101,6 +104,12 @@ class MainActivity : ComponentActivity() {
                             playerProfile = playerProfile?.copy(name = newName)
                         }
                     },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable("statistics") {
+                StatisticsScreen(
+                    userId = userId,
                     onBack = { navController.popBackStack() }
                 )
             }
