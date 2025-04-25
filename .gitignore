@@ -33,3 +33,4 @@ app/src/main/assets/config.properties
 **/build/reports/jacoco/jacocoTestReport/jacocoTestReport.html
 **/build/reports/jacoco/jacocoUnitTestReport/html
 build/reports/problems/problems-report.html
+.kotlin/sessions/kotlin-compiler-16925759521385048694.salive
