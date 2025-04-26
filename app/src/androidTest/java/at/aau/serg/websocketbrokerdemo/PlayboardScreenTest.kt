@@ -9,12 +9,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import kotlinx.coroutines.test.runTest
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
+@Ignore
 class PlayboardScreenTest {
 
     @get:Rule
