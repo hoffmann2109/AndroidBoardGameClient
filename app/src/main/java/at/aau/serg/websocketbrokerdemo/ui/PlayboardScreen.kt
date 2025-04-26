@@ -28,6 +28,7 @@ import at.aau.serg.websocketbrokerdemo.data.properties.Property
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
 import androidx.compose.foundation.Image
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 
 
 @Composable
@@ -37,7 +38,8 @@ fun PlayboardScreen(
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
-    dicePlayerId:   String?
+    dicePlayerId:   String?,
+    webSocketClient: GameWebSocketClient
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -65,12 +67,19 @@ fun PlayboardScreen(
                 players = players,
                 properties = properties,
                 onTileClick = { tilePos ->
-                    val currentPlayer = players.find { it.id == currentPlayerId }
+                    // Find the player who rolled the dice (dicePlayerId)
+                    val currentPlayer = players.find { it.id == dicePlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
-
                     openedByClick = true
                     canBuy = currentPlayer?.position == tilePos
 
+                    // Add detailed debug logging
+                    android.util.Log.d("PlayboardScreen", "Tile clicked: $tilePos")
+                    android.util.Log.d("PlayboardScreen", "Dice player ID: $dicePlayerId")
+                    android.util.Log.d("PlayboardScreen", "All players: ${players.map { "${it.id} (${it.name}) at ${it.position}" }}")
+                    android.util.Log.d("PlayboardScreen", "Found current player: ${currentPlayer?.id} (${currentPlayer?.name}) at ${currentPlayer?.position}")
+                    android.util.Log.d("PlayboardScreen", "Selected property: ${selectedProperty?.name} at position ${selectedProperty?.position}")
+                    android.util.Log.d("PlayboardScreen", "Can buy: $canBuy")
                 }
             )
         }
@@ -146,9 +155,10 @@ fun PlayboardScreen(
                     canBuy = false
                 },
                 confirmButton = {
-                    if (canBuy) { // <<< Nur wenn er wirklich auf dem Feld steht!
+                    if (canBuy) {
                         Button(onClick = {
-                            // TODO: Kauflogik
+                            // Send buy request to server with property ID instead of position
+                            webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
                             selectedProperty = null
                             openedByClick = false
                             canBuy = false

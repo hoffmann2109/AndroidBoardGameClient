@@ -36,10 +36,21 @@ class MainActivity : ComponentActivity() {
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
         var diceValue   by remember { mutableStateOf<Int?>(null) }
         var dicePlayer  by remember { mutableStateOf<String?>(null) }
+        var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
+
+        // Update currentGamePlayerId when game state changes
+        LaunchedEffect(playerMoneyList, userId) {
+            if (userId != null) {
+                // Find the first player that matches our Firebase ID or assign a new one
+                currentGamePlayerId = playerMoneyList.find { it.id == userId }?.id
+                    ?: playerMoneyList.firstOrNull()?.id
+                    ?: userId // Fallback to Firebase ID if no players exist yet
+            }
+        }
 
         LaunchedEffect(userId) {
             if (userId != null) {
@@ -55,7 +66,15 @@ class MainActivity : ComponentActivity() {
                 context = context,
                 onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" },
-                onGameStateReceived = { players -> playerMoneyList = players },
+                onGameStateReceived = { players -> 
+                    playerMoneyList = players
+                    // Update current game player ID when game state changes
+                    if (userId != null) {
+                        currentGamePlayerId = players.find { it.id == userId }?.id
+                            ?: players.firstOrNull()?.id
+                            ?: userId
+                    }
+                },
                 onDiceRolled       = { pid, value ->
                     dicePlayer = pid
                     diceValue  = value
@@ -114,13 +133,18 @@ class MainActivity : ComponentActivity() {
                 )
             }
             composable("playerInfo") {
+                // Add debug logging for player ID
+                android.util.Log.d("MainActivity", "Passing current game player ID to PlayboardScreen: $currentGamePlayerId")
+                android.util.Log.d("MainActivity", "Current game state players: $playerMoneyList")
+                
                 PlayboardScreen(
                     players = playerMoneyList,
-                    currentPlayerId = userId ?: "",
+                    currentPlayerId = currentGamePlayerId ?: "",
                     onRollDice = { webSocketClient.sendMessage("Roll")},
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult      = diceValue,
-                    dicePlayerId    = dicePlayer
+                    dicePlayerId    = dicePlayer,
+                    webSocketClient = webSocketClient
                 )
             }
         }

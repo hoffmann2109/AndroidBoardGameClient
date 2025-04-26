@@ -73,7 +73,7 @@ class GameWebSocketClient(
                 val obj = gson.fromJson(text, DiceRollMessage::class.java)
                 if (obj.type == "DICE_ROLL") {
                     onDiceRolled(obj.playerId, obj.value)
-                    return  // don’t fall through to the generic log handler
+                    return  // don't fall through to the generic log handler
                 }
             } catch (_: Exception) { /* not a dice‐roll */ }
 
@@ -109,6 +109,7 @@ class GameWebSocketClient(
 
     fun sendMessage(message: String) {
         webSocket?.send(message)
+        Log.d("WebSocket", "Sent: $message")
     }
 
 
@@ -118,6 +119,15 @@ class GameWebSocketClient(
         webSocket = null
     }
 
+    /**
+     * Sends a property buy request to the server.
+     * @param propertyId The ID of the property to buy
+     */
+    fun buyProperty(propertyId: Int) {
+        val message = "BUY_PROPERTY:$propertyId"
+        webSocket?.send(message)
+        Log.d("WebSocket", "Sent: $message")
+    }
 
     private fun loadServerUrl(context: Context): String {
         val properties = Properties()
