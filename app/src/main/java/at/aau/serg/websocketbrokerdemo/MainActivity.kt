@@ -3,6 +3,7 @@ package at.aau.serg.websocketbrokerdemo
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
@@ -66,13 +67,10 @@ class MainActivity : ComponentActivity() {
                 context = context,
                 onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" },
-                onGameStateReceived = { players -> 
+                onGameStateReceived = { players ->
                     playerMoneyList = players
-                    // Update current game player ID when game state changes
                     if (userId != null) {
-                        currentGamePlayerId = players.find { it.id == userId }?.id
-                            ?: players.firstOrNull()?.id
-                            ?: userId
+                        currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                     }
                 },
                 onDiceRolled       = { pid, value ->
@@ -81,6 +79,22 @@ class MainActivity : ComponentActivity() {
                 }
             )
         }
+
+        LaunchedEffect(webSocketClient) {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            currentUser?.uid?.let { userId ->
+                val profile = FirestoreManager.getUserProfile(userId)
+                val name = profile?.name ?: "Unknown"
+                val initMessage = """{
+                "type": "INIT",
+                "userId": "$userId",
+                "name": "$name"
+            }""".trimIndent()
+                webSocketClient.sendMessage(initMessage)
+                Log.d("WebSocket", "Sent INIT message: $initMessage")
+            }
+        }
+
 
         val navController = rememberNavController()
 
