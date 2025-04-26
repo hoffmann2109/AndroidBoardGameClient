@@ -8,6 +8,7 @@ import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,7 +21,8 @@ class GameWebSocketClient(
     private val onConnected: () -> Unit,
     private val onMessageReceived: (String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
-    private val onGameStateReceived: (List<PlayerMoney>) -> Unit
+    private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
@@ -52,18 +54,20 @@ class GameWebSocketClient(
     }
 
     private fun sendInitMessage() {
+        CoroutineScope(coroutineDispatcher).launch {
         val currentUser = FirebaseAuth.getInstance().currentUser
         currentUser?.uid?.let { userId ->
             CoroutineScope(Dispatchers.IO).launch {
-                val profile = FirestoreManager.getUserProfile(userId)
-                val name = profile?.name ?: "Unknown"
-                val initMessage = """{
-                "type": "INIT",
-                "userId": "$userId",
-                "name": "$name"
-            }""".trimIndent()
-                webSocket?.send(initMessage)
-                Log.d("WebSocket", "Sent INIT message: $initMessage")
+                    val profile = FirestoreManager.getUserProfile(userId)
+                    val name = profile?.name ?: "Unknown"
+                    val initMessage = """{
+                    "type": "INIT",
+                    "userId": "$userId",
+                    "name": "$name"
+                }""".trimIndent()
+                    webSocket?.send(initMessage)
+                    Log.d("WebSocket", "Sent INIT message: $initMessage")
+                }
             }
         }
     }
