@@ -118,7 +118,8 @@ fun PlayboardScreen(
                     items(players.take(4)) { player ->
                         PlayerCard(
                             player = player,
-                            isCurrentPlayer = player.id == currentPlayerId
+                            isCurrentPlayer = player.id == currentPlayerId,
+                            playerIndex = players.indexOf(player)
                         )
                     }
                 }
@@ -196,7 +197,8 @@ fun PlayboardScreen(
 @Composable
 fun PlayerCard(
     player: PlayerMoney,
-    isCurrentPlayer: Boolean
+    isCurrentPlayer: Boolean,
+    playerIndex: Int
 ) {
     val playerColors = listOf(
         Color(0x80FF0000), // Less saturated Red
@@ -205,12 +207,7 @@ fun PlayerCard(
         Color(0x80FFFF00)  // Less saturated Yellow
     )
     
-    val playerIndex = (player.id.hashCode() and Int.MAX_VALUE) % playerColors.size
-    val backgroundColor = if (isCurrentPlayer) {
-        playerColors[playerIndex].copy(alpha = 0.5f)
-    } else {
-        playerColors[playerIndex].copy(alpha = 0.3f)
-    }
+    val backgroundColor = playerColors[playerIndex].copy(alpha = 0.4f)
 
     Card(
         modifier = Modifier
