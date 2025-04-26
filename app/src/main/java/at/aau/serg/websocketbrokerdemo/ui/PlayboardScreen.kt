@@ -72,14 +72,6 @@ fun PlayboardScreen(
                     selectedProperty = properties.find { it.position == tilePos }
                     openedByClick = true
                     canBuy = currentPlayer?.position == tilePos
-
-                    // Add detailed debug logging
-                    android.util.Log.d("PlayboardScreen", "Tile clicked: $tilePos")
-                    android.util.Log.d("PlayboardScreen", "Dice player ID: $dicePlayerId")
-                    android.util.Log.d("PlayboardScreen", "All players: ${players.map { "${it.id} (${it.name}) at ${it.position}" }}")
-                    android.util.Log.d("PlayboardScreen", "Found current player: ${currentPlayer?.id} (${currentPlayer?.name}) at ${currentPlayer?.position}")
-                    android.util.Log.d("PlayboardScreen", "Selected property: ${selectedProperty?.name} at position ${selectedProperty?.position}")
-                    android.util.Log.d("PlayboardScreen", "Can buy: $canBuy")
                 }
             )
         }
