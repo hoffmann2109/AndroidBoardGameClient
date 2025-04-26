@@ -7,16 +7,20 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
 
 @RunWith(AndroidJUnit4::class)
 class PlayboardScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
+    
+    private val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
@@ -26,8 +30,15 @@ class PlayboardScreenTest {
         )
 
         composeTestRule.setContent {
-            PlayboardScreen(players = players, currentPlayerId = "1", onRollDice = {}, onBackToLobby = {}, diceResult = 5,
-            dicePlayerId = "")
+            PlayboardScreen(
+                players = players,
+                currentPlayerId = "1",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = 5,
+                dicePlayerId = "",
+                webSocketClient = mockWebSocketClient
+            )
         }
 
         // Check if player names are displayed
@@ -38,8 +49,15 @@ class PlayboardScreenTest {
     @Test
     fun testPlayboardScreenDisplaysNoPlayersMessage() {
         composeTestRule.setContent {
-            PlayboardScreen(players = emptyList(), currentPlayerId = "", onRollDice = {}, onBackToLobby = {}, diceResult = 5,
-                dicePlayerId = "")
+            PlayboardScreen(
+                players = emptyList(),
+                currentPlayerId = "",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = 5,
+                dicePlayerId = "",
+                webSocketClient = mockWebSocketClient
+            )
         }
 
         // Check if the "Not enough players connected yet" message is displayed
@@ -49,8 +67,15 @@ class PlayboardScreenTest {
     @Test
     fun testRollDiceButtonResetsAfterAnimation() = runTest {
         composeTestRule.setContent {
-        PlayboardScreen(players = emptyList(), currentPlayerId = "1", onRollDice = {}, onBackToLobby = {}, diceResult = 5,
-            dicePlayerId = "")
+            PlayboardScreen(
+                players = emptyList(),
+                currentPlayerId = "1",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = 5,
+                dicePlayerId = "",
+                webSocketClient = mockWebSocketClient
+            )
         }
 
         composeTestRule.onNodeWithText("Roll Dice").performClick()
@@ -58,5 +83,5 @@ class PlayboardScreenTest {
         composeTestRule.mainClock.advanceTimeBy(1000)
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Roll Dice").assertIsEnabled()
-        }
+    }
 }

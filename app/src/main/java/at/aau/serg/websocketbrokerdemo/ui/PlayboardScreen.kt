@@ -28,6 +28,7 @@ import at.aau.serg.websocketbrokerdemo.data.properties.Property
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
 import androidx.compose.foundation.Image
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 
 
 @Composable
@@ -37,7 +38,8 @@ fun PlayboardScreen(
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
-    dicePlayerId:   String?
+    dicePlayerId:   String?,
+    webSocketClient: GameWebSocketClient
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -65,12 +67,11 @@ fun PlayboardScreen(
                 players = players,
                 properties = properties,
                 onTileClick = { tilePos ->
-                    val currentPlayer = players.find { it.id == currentPlayerId }
+                    // Find the player who rolled the dice (dicePlayerId)
+                    val currentPlayer = players.find { it.id == dicePlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
-
                     openedByClick = true
                     canBuy = currentPlayer?.position == tilePos
-
                 }
             )
         }
@@ -117,7 +118,8 @@ fun PlayboardScreen(
                     items(players.take(4)) { player ->
                         PlayerCard(
                             player = player,
-                            isCurrentPlayer = player.id == currentPlayerId
+                            isCurrentPlayer = player.id == currentPlayerId,
+                            playerIndex = players.indexOf(player)
                         )
                     }
                 }
@@ -148,7 +150,7 @@ fun PlayboardScreen(
                 confirmButton = {
                     if (canBuy) { // <<< Nur wenn er wirklich auf dem Feld steht!
                         Button(onClick = {
-                            // TODO: Kauflogik
+                            webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
                             selectedProperty = null
                             openedByClick = false
                             canBuy = false
@@ -195,9 +197,17 @@ fun PlayboardScreen(
 @Composable
 fun PlayerCard(
     player: PlayerMoney,
-    isCurrentPlayer: Boolean
+    isCurrentPlayer: Boolean,
+    playerIndex: Int
 ) {
-    val backgroundColor = if (isCurrentPlayer) Color(0x4000FF00) else Color(0x40000000)
+    val playerColors = listOf(
+        Color(0x80FF0000), // Less saturated Red
+        Color(0x800000FF), // Less saturated Blue
+        Color(0x8000FF00), // Less saturated Green
+        Color(0x80FFFF00)  // Less saturated Yellow
+    )
+    
+    val backgroundColor = playerColors[playerIndex].copy(alpha = 0.4f)
 
     Card(
         modifier = Modifier
