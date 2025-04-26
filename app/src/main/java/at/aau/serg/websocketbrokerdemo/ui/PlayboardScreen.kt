@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -44,28 +45,8 @@ fun PlayboardScreen(
     val properties = remember { propertyViewModel.getProperties(context) }
 
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
-    var lastPosition by remember { mutableStateOf<Int?>(null) }
-    var justLanded by remember { mutableStateOf(false) }
+    var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
-    // show property popup when player lands
-    LaunchedEffect(players) {
-        val player = players.find { it.id == currentPlayerId }
-        val currentPosition = player?.position
-
-        if (
-            currentPosition != null &&
-            currentPosition != lastPosition
-        ) {
-            lastPosition = currentPosition
-            val landedProperty = properties.find { it.position == currentPosition }
-
-            if (landedProperty != null) {
-                selectedProperty = landedProperty
-                openedByClick = false
-                justLanded = true
-            }
-        }
-    }
 
     Box(
         modifier = Modifier
@@ -85,8 +66,12 @@ fun PlayboardScreen(
                 players = players,
                 properties = properties,
                 onTileClick = { tilePos ->
+                    val currentPlayer = players.find { it.id == currentPlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
+
                     openedByClick = true
+                    canBuy = currentPlayer?.position == tilePos
+
                 }
             )
         }
@@ -151,23 +136,23 @@ fun PlayboardScreen(
                 Text("Back to Lobby", fontSize = 18.sp)
             }
         }
+        // Popup für Grundstück
         if (selectedProperty != null) {
-            val context = LocalContext.current
             val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
 
             AlertDialog(
                 onDismissRequest = {
                     selectedProperty = null
-                    justLanded = false
                     openedByClick = false
+                    canBuy = false
                 },
                 confirmButton = {
-                    if (!openedByClick) { // Nur wenn gelandet
+                    if (canBuy) { // <<< Nur wenn er wirklich auf dem Feld steht!
                         Button(onClick = {
                             // TODO: Kauflogik
                             selectedProperty = null
-                            justLanded = false
                             openedByClick = false
+                            canBuy = false
                         }) {
                             Text("Buy")
                         }
@@ -176,8 +161,8 @@ fun PlayboardScreen(
                 dismissButton = {
                     Button(onClick = {
                         selectedProperty = null
-                        justLanded = false
                         openedByClick = false
+                        canBuy = false
                     }) {
                         Text("Exit")
                     }
