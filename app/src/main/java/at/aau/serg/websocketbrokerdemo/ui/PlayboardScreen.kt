@@ -48,6 +48,22 @@ fun PlayboardScreen(
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
+    var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(players, dicePlayerId) {
+        val currentPlayer = players.find { it.id == dicePlayerId }
+        val newPosition = currentPlayer?.position
+
+        if (newPosition != null && newPosition != lastPlayerPosition) {
+            lastPlayerPosition = newPosition
+            val landedProperty = properties.find { it.position == newPosition }
+            if (landedProperty != null) {
+                selectedProperty = landedProperty
+                openedByClick = false
+                canBuy = true
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
