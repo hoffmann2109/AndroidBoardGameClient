@@ -109,7 +109,6 @@ class GameWebSocketClient(
 
     fun sendMessage(message: String) {
         webSocket?.send(message)
-        Log.d("WebSocket", "Sent: $message")
     }
 
 
