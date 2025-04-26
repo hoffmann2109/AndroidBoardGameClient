@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
