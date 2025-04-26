@@ -147,9 +147,8 @@ fun PlayboardScreen(
                     canBuy = false
                 },
                 confirmButton = {
-                    if (canBuy) {
+                    if (canBuy) { // <<< Nur wenn er wirklich auf dem Feld steht!
                         Button(onClick = {
-                            // Send buy request to server with property ID instead of position
                             webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
                             selectedProperty = null
                             openedByClick = false
@@ -199,7 +198,19 @@ fun PlayerCard(
     player: PlayerMoney,
     isCurrentPlayer: Boolean
 ) {
-    val backgroundColor = if (isCurrentPlayer) Color(0x4000FF00) else Color(0x40000000)
+    val playerColors = listOf(
+        Color(0x80FF0000), // Less saturated Red
+        Color(0x800000FF), // Less saturated Blue
+        Color(0x8000FF00), // Less saturated Green
+        Color(0x80FFFF00)  // Less saturated Yellow
+    )
+    
+    val playerIndex = (player.id.hashCode() and Int.MAX_VALUE) % playerColors.size
+    val backgroundColor = if (isCurrentPlayer) {
+        playerColors[playerIndex].copy(alpha = 0.5f)
+    } else {
+        playerColors[playerIndex].copy(alpha = 0.3f)
+    }
 
     Card(
         modifier = Modifier
