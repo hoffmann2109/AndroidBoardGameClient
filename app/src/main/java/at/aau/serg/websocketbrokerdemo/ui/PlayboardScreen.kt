@@ -161,8 +161,8 @@ fun PlayboardScreen(
 
             AlertDialog(
                 modifier = Modifier
-                    .width(300.dp) // kleineres Rechteck
-                    .height(400.dp), // kleinere Höhe
+                    .width(300.dp)
+                    .height(400.dp),
                 onDismissRequest = {
                     selectedProperty = null
                     openedByClick = false
@@ -194,7 +194,7 @@ fun PlayboardScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(250.dp), // Platz für das Bild
+                                    .height(250.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Image(
@@ -222,7 +222,7 @@ fun PlayboardScreen(
                                 openedByClick = false
                                 canBuy = false
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7))
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
                         ) {
                             Text("Exit")
                         }
@@ -234,7 +234,7 @@ fun PlayboardScreen(
                                     openedByClick = false
                                     canBuy = false
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF673AB7))
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
                             ) {
                                 Text("Buy")
                             }
