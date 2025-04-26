@@ -1,5 +1,7 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,14 +15,17 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.properties.Property
+
 
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
     outerTileColor: Color = Color.DarkGray,
     innerTileColor: Color = Color.LightGray,
-    onTileClick: (row: Int, col: Int) -> Unit = { _, _ -> },
-    players: List<PlayerMoney> = emptyList()
+    onTileClick: (tilePosition: Int) -> Unit = {},
+    players: List<PlayerMoney> = emptyList(),
+    properties: List<Property>
 ) {
     // TODO: Add images of the game pieces instead of the circles
     // Simple colors for all the 4 players
@@ -55,12 +60,16 @@ fun Gameboard(
                         // Search for all players on a tile:
                         val playersOnTile = players.filter { it.position == tilePosition }
 
+                        val property = properties.find { it.position == tilePosition }
+
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
                                 .background(if (isOuter) outerTileColor else innerTileColor)
-                                .clickable { onTileClick(row, col) }
+                                .clickable (enabled = tilePosition >= 0) {
+                                    onTileClick(tilePosition)
+                                }
                                 .semantics { contentDescription = "Tile($row,$col)" }
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center

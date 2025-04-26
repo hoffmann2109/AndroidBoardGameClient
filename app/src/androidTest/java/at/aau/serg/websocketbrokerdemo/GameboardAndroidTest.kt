@@ -20,11 +20,12 @@ class GameboardAndroidTest {
 
     @Test
     fun testIfGameBoardIsClickableAndRendersAllTiles() {
-        var clickedRow = -1
-        var clickedCol = -1
+        var clickedTilePosition = -1
         composeTestRule.setContent {
             Gameboard(
-                onTileClick = { row, col -> clickedRow = row; clickedCol = col }
+                onTileClick = { tilePosition -> clickedTilePosition = tilePosition },
+                players = emptyList(),
+                properties = emptyList()
             )
         }
 
@@ -32,7 +33,7 @@ class GameboardAndroidTest {
             .assertHasClickAction()
             .performClick()
 
-        assert(clickedRow == 10 && clickedCol == 10)
+        assert(clickedTilePosition == 0)
     }
 
     @Test
@@ -41,13 +42,16 @@ class GameboardAndroidTest {
             PlayerMoney(id = "1", name = "Player A", money = 1500, position = 0),
             PlayerMoney(id = "2", name = "Player B", money = 1500, position = 10)
         )
+
         composeTestRule.setContent {
             Gameboard(
-                players = players
+                onTileClick = { _ -> },
+                players = players,
+                properties = emptyList()
             )
         }
 
-        composeTestRule.onNodeWithTag("playerCircle_1",  useUnmergedTree = true).assertExists()
-        composeTestRule.onNodeWithTag("playerCircle_2",  useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("playerCircle_1", useUnmergedTree = true).assertExists()
+        composeTestRule.onNodeWithTag("playerCircle_2", useUnmergedTree = true).assertExists()
     }
 }
