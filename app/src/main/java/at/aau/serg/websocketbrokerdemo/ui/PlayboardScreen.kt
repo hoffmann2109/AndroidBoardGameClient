@@ -27,6 +27,8 @@ import kotlinx.coroutines.delay
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
 import androidx.compose.foundation.Image
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 
@@ -48,6 +50,22 @@ fun PlayboardScreen(
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
+    var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(players, dicePlayerId) {
+        val currentPlayer = players.find { it.id == dicePlayerId }
+        val newPosition = currentPlayer?.position
+
+        if (newPosition != null && newPosition != lastPlayerPosition) {
+            lastPlayerPosition = newPosition
+            val landedProperty = properties.find { it.position == newPosition }
+            if (landedProperty != null) {
+                selectedProperty = landedProperty
+                openedByClick = false
+                canBuy = true
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -142,53 +160,88 @@ fun PlayboardScreen(
             val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
 
             AlertDialog(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(400.dp),
                 onDismissRequest = {
                     selectedProperty = null
                     openedByClick = false
                     canBuy = false
                 },
-                confirmButton = {
-                    if (canBuy) { // <<< Nur wenn er wirklich auf dem Feld steht!
-                        Button(onClick = {
-                            webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
-                            selectedProperty = null
-                            openedByClick = false
-                            canBuy = false
-                        }) {
-                            Text("Buy")
-                        }
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = {
-                        selectedProperty = null
-                        openedByClick = false
-                        canBuy = false
-                    }) {
-                        Text("Exit")
-                    }
-                },
                 title = {
-                    Text(text = selectedProperty!!.name)
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = selectedProperty!!.name,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
                 },
                 text = {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(300.dp),
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         if (imageResId != 0) {
-                            Image(
-                                painter = painterResource(imageResId),
-                                contentDescription = selectedProperty!!.name,
+                            Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(200.dp)
-                            )
+                                    .height(250.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(imageResId),
+                                    contentDescription = selectedProperty!!.name,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .width(180.dp)
+                                        .height(240.dp)
+                                )
+                            }
                         }
                     }
-                }
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = {
+                                selectedProperty = null
+                                openedByClick = false
+                                canBuy = false
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                        ) {
+                            Text("Exit")
+                        }
+                        if (canBuy) {
+                            Button(
+                                onClick = {
+                                    webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
+                                    selectedProperty = null
+                                    openedByClick = false
+                                    canBuy = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                            ) {
+                                Text("Buy")
+                            }
+                        }
+                    }
+                },
+                dismissButton = {}
             )
         }
     }
@@ -206,7 +259,7 @@ fun PlayerCard(
         Color(0x8000FF00), // Less saturated Green
         Color(0x80FFFF00)  // Less saturated Yellow
     )
-    
+
     val backgroundColor = playerColors[playerIndex].copy(alpha = 0.4f)
 
     Card(
