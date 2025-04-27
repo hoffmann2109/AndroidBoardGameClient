@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.AfterEach
 import org.mockito.Mockito.*
+import android.util.Log
+import io.mockk.every
+import io.mockk.mockkStatic
 import java.io.ByteArrayInputStream
 
 class GameWebSocketClientTest {
@@ -17,6 +20,8 @@ class GameWebSocketClientTest {
     @BeforeEach
     fun setUp() {
         // Erstelle Mocks für Context und AssetManager
+        mockkStatic(Log::class)
+        every { Log.d(any(), any()) } returns 0
         context = mock(Context::class.java)
         assetManager = mock(AssetManager::class.java)
         `when`(context.assets).thenReturn(assetManager)
@@ -50,6 +55,7 @@ class GameWebSocketClientTest {
 
         assertEquals("ws://example.com", loadedUrl)
     }
+
 
     @Test
     fun testSendMessage() {

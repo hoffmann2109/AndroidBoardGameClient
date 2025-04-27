@@ -21,7 +21,7 @@ class PlayboardScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
-    
+
     private val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
     @Test

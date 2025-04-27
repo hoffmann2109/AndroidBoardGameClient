@@ -230,7 +230,7 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
-
+    testImplementation("io.mockk:mockk:1.13.5")
     testRuntimeOnly (libs.junit.jupiter.engine)
 
     androidTestImplementation(libs.androidx.espresso.core)
