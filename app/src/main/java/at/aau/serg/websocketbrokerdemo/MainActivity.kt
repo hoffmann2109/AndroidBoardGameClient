@@ -7,17 +7,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
-import com.google.firebase.auth.FirebaseAuth
-import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import androidx.navigation.compose.*
-import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
+import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
+import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
+import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
+import at.aau.serg.websocketbrokerdemo.ui.SettingsScreen
+import at.aau.serg.websocketbrokerdemo.ui.SoundSelectionScreen
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
-import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +78,7 @@ class MainActivity : ComponentActivity() {
                         log += "Disconnected from server\n"
                     },
                     onSendMessage = {
-                        if (message.isNotEmpty()) {
+                        if (message.isNotEmpty()){
                             webSocketClient.sendMessage(message)
                             log += "Sent: $message\n"
                             message = ""
@@ -89,7 +91,11 @@ class MainActivity : ComponentActivity() {
                         (context as? Activity)?.finish()
                     },
                     onProfileClick = { navController.navigate("profile") },
-                    onJoinGame = { navController.navigate("playerInfo") }
+                    onJoinGame = { navController.navigate("playerInfo") },
+
+                    onOpenSettings ={navController.navigate("settings")},
+                    onOpenSoundSelection ={navController.navigate("soundSelection")}
+
                 )
             }
             composable("profile") {
@@ -113,6 +119,12 @@ class MainActivity : ComponentActivity() {
                     diceResult      = diceValue,
                     dicePlayerId    = dicePlayer
                 )
+            }
+            composable("settings"){
+                SettingsScreen()
+            }
+            composable("soundSelection"){
+                SoundSelectionScreen()
             }
         }
     }
