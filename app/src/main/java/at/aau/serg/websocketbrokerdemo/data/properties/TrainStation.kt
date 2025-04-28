@@ -10,5 +10,5 @@ data class TrainStation(
     val rent3Stations: Int,
     val rent4Stations: Int,
     override val image: String,
-    override val isMortgaged: Boolean
+    override val isMortgaged: Boolean, override val ownerId: String?
 ) : Property()
