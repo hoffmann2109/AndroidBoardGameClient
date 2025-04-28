@@ -78,6 +78,10 @@ class MainActivity : ComponentActivity() {
                 onDiceRolled       = { pid, value ->
                     dicePlayer = pid
                     diceValue  = value
+                },
+                onChatMessageReceived = {pid, mes ->
+                    dicePlayer= pid;
+                    message= mes;
                 }
             )
         }

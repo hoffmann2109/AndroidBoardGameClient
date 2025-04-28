@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -51,6 +52,9 @@ fun PlayboardScreen(
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+    var chatOpen by remember{ mutableStateOf(false)}
+    var chatInput by remember { mutableStateOf("") }
+    val chatMessage= remember { mutableStateListOf<String>()}
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -244,6 +248,80 @@ fun PlayboardScreen(
                 dismissButton = {}
             )
         }
+
+        // Chat Open/Close Button (immer sichtbar, unten rechts)
+        Button(
+            onClick = { chatOpen = !chatOpen },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        ) {
+            Text(if (chatOpen) "Close Chat" else "Open Chat", fontSize = 16.sp)
+        }
+
+// Chat Overlay
+        if (chatOpen) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
+                    .padding(32.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .background(Color.Gray.copy(alpha = 0.95f), RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                ) {
+                    // Nachrichtenliste
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(8.dp)
+                    ) {
+                        items(chatMessage) { message ->
+                            Text(
+                                text = message,
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Eingabe und Senden
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TextField(
+                            value = chatInput,
+                            onValueChange = { chatInput = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = { Text("Type your message...") }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = {
+                                if (chatInput.isNotBlank()) {
+                                    // Hier wird deine Nachricht hinzugefügt oder gesendet
+                                    chatMessage.add("Me: $chatInput")
+                                    chatInput = ""
+                                }
+                            }
+                        ) {
+                            Text("Send")
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
 
