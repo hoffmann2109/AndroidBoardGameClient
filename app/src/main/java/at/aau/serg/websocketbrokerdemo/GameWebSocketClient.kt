@@ -3,9 +3,15 @@ package at.aau.serg.websocketbrokerdemo
 import android.content.Context
 import android.util.Log
 import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
+import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import com.google.common.reflect.TypeToken
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import okhttp3.*
 import okio.ByteString
 import java.util.Properties
@@ -15,7 +21,9 @@ class GameWebSocketClient(
     private val onConnected: () -> Unit,
     private var onMessageReceived: (String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
-    private val onGameStateReceived: (List<PlayerMoney>) -> Unit
+    private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
+    private val onPlayerTurn: (playerId: String) -> Unit,
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
@@ -35,6 +43,7 @@ class GameWebSocketClient(
     fun connect() {
         if (webSocket == null) {
             initWebSocket()
+            sendInitMessage()
         } else {
             Log.d("WebSocket", "Already connected or connection already exists.")
         }
@@ -43,6 +52,25 @@ class GameWebSocketClient(
     // Initializes the WebSocket connection.
     private fun initWebSocket() {
         webSocket = client.newWebSocket(request, createListener())
+    }
+
+    private fun sendInitMessage() {
+        CoroutineScope(coroutineDispatcher).launch {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.uid?.let { userId ->
+            CoroutineScope(Dispatchers.IO).launch {
+                    val profile = FirestoreManager.getUserProfile(userId)
+                    val name = profile?.name ?: "Unknown"
+                    val initMessage = """{
+                    "type": "INIT",
+                    "userId": "$userId",
+                    "name": "$name"
+                }""".trimIndent()
+                    webSocket?.send(initMessage)
+                    Log.d("WebSocket", "Sent INIT message: $initMessage")
+                }
+            }
+        }
     }
 
     // Creates a WebSocketListener that handles connection events.
@@ -67,6 +95,18 @@ class GameWebSocketClient(
                     onGameStateReceived(players)
                 } catch (e: Exception) {
                     Log.e("WebSocket", "Error parsing game state: ${e.message}", e)
+                }
+            }
+
+            // Player's turn message:
+            if (text.startsWith("PLAYER_TURN")) {
+                try {
+                    // drop the prefix, grab everything after the colon
+                    val sessionId = text.substringAfter("PLAYER_TURN:")
+                    onPlayerTurn(sessionId)
+                    return
+                } catch (e: Exception) {
+                    Log.e("WebSocket", "Error parsing PLAYER_TURN: ${e.message}", e)
                 }
             }
 
