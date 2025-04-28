@@ -38,6 +38,7 @@ class MainActivity : ComponentActivity() {
         var diceValue   by remember { mutableStateOf<Int?>(null) }
         var dicePlayer  by remember { mutableStateOf<String?>(null) }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
+        var localPlayerId by remember { mutableStateOf<String?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -65,17 +66,18 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected = { log += "Connected to server\n" },
-                onMessageReceived = { receivedMessage -> log += "Received: $receivedMessage\n" },
+                onConnected       = { log += "Connected to server\n" },
+                onMessageReceived = { msg -> log += "Received: $msg\n" },
+                onDiceRolled      = { pid, value -> dicePlayer = pid; diceValue = value },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
-                    if (userId != null) {
-                        currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
-                    }
+                    // (you already had logic for matching firebase ID → session-ID)
+                    currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
-                onDiceRolled       = { pid, value ->
-                    dicePlayer = pid
-                    diceValue  = value
+                onPlayerTurn      = { sessionId ->
+                    // here’s where we grab “my” session-id from the server
+                    localPlayerId = sessionId
+                    Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
                 }
             )
         }
@@ -158,7 +160,8 @@ class MainActivity : ComponentActivity() {
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult      = diceValue,
                     dicePlayerId    = dicePlayer,
-                    webSocketClient = webSocketClient
+                    webSocketClient = webSocketClient,
+                    localPlayerId    = localPlayerId ?: ""
                 )
             }
         }
