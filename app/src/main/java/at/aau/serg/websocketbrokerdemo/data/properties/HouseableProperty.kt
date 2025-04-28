@@ -15,5 +15,5 @@ data class HouseableProperty(
     val hotelPrice: Int,
     val mortgageValue: Int,
     override val image: String,
-    override val isMortgaged: Boolean
+    override val isMortgaged: Boolean, override var ownerId: String?
 ) : Property()

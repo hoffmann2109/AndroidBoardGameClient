@@ -19,7 +19,7 @@ import java.util.Properties
 class GameWebSocketClient(
     private val context: Context,
     private val onConnected: () -> Unit,
-    private val onMessageReceived: (String) -> Unit,
+    private var onMessageReceived: (String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (playerId: String) -> Unit,
@@ -83,7 +83,9 @@ class GameWebSocketClient(
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
 
-
+            if (text.contains("PROPERTY_BOUGHT")) {
+                propertyBoughtListener?.invoke(text)
+            }
             // Check if this is a game state message
             if (text.startsWith("GAME_STATE:")) {
                 try {
@@ -167,6 +169,13 @@ class GameWebSocketClient(
         webSocket?.send(message)
         Log.d("WebSocket", "Sent: $message")
     }
+
+    private var propertyBoughtListener: ((String) -> Unit)? = null
+
+    fun setPropertyBoughtListener(listener: (String) -> Unit) {
+        propertyBoughtListener = listener
+    }
+
 
     private fun loadServerUrl(context: Context): String {
         val properties = Properties()

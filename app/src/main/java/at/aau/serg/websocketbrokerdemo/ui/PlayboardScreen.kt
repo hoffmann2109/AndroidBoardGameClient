@@ -27,11 +27,30 @@ import kotlinx.coroutines.delay
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
+import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 
+fun extractPlayerId(message: String): String {
+    val regex = """Player ([a-f0-9\-]+) bought""".toRegex()
+    return regex.find(message)?.groupValues?.get(1) ?: ""
+}
+
+fun extractPropertyId(message: String): Int {
+    val regex = """property (\d+)""".toRegex()
+    return regex.find(message)?.groupValues?.get(1)?.toIntOrNull() ?: -1
+}
 
 @Composable
 fun PlayboardScreen(
@@ -46,7 +65,7 @@ fun PlayboardScreen(
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
-    val properties = remember { propertyViewModel.getProperties(context) }
+    val properties = remember { mutableStateListOf<Property>().apply { addAll(propertyViewModel.getProperties(context)) } }
     val isMyTurn = currentPlayerId == localPlayerId
 
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
@@ -65,6 +84,17 @@ fun PlayboardScreen(
                 selectedProperty = landedProperty
                 openedByClick = false
                 canBuy = true
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        webSocketClient.setPropertyBoughtListener { message ->
+            val playerId = extractPlayerId(message)
+            val propertyId = extractPropertyId(message)
+
+            properties.find { it.id == propertyId }?.let { property ->
+                property.ownerId = playerId
             }
         }
     }
@@ -139,8 +169,13 @@ fun PlayboardScreen(
                     items(players.take(4)) { player ->
                         PlayerCard(
                             player = player,
+                            ownedProperties = properties.filter { it.ownerId == player.id },
                             isCurrentPlayer = player.id == currentPlayerId,
-                            playerIndex = players.indexOf(player)
+                            playerIndex = players.indexOf(player),
+                            onPropertySetClicked = { colorSet ->
+                                println("Clicked on color set: $colorSet")
+                            },
+                            allProperties = properties,
                         )
                     }
                 }
@@ -253,8 +288,11 @@ fun PlayboardScreen(
 @Composable
 fun PlayerCard(
     player: PlayerMoney,
+    ownedProperties: List<Property>,
+    allProperties: List<Property>,
     isCurrentPlayer: Boolean,
-    playerIndex: Int
+    playerIndex: Int,
+    onPropertySetClicked: (PropertyColor) -> Unit
 ) {
     val playerColors = listOf(
         Color(0x80FF0000), // Less saturated Red
@@ -265,10 +303,12 @@ fun PlayerCard(
 
     val backgroundColor = playerColors[playerIndex].copy(alpha = 0.4f)
 
+    var selectedColorSet by remember { mutableStateOf<PropertyColor?>(null) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp),
+            .wrapContentHeight(),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -279,52 +319,227 @@ fun PlayerCard(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = player.name,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = player.name,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "EUR ${player.money}",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Pos: ${player.position}",
+                    color = Color.White,
+                    fontSize = 12.sp
+                )
+            }
 
             Text(
                 text = "ID: ${player.id}",
                 color = Color.White,
-                fontSize = 8.sp
+                fontSize = 6.sp
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Divider(
+                color = Color.White,
+                thickness = 1.dp,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "EUR",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "${player.money}",
-                    color = Color.White,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+            BesitzkartenGrid(
+                ownedProperties = ownedProperties,
+                allProperties = allProperties,
+                onPropertySetClicked = { colorSet -> selectedColorSet = colorSet }
+            )
+
+            if (selectedColorSet != null) {
+                PropertySetPopup(
+                    colorSet = selectedColorSet!!,
+                    ownedProperties = ownedProperties,
+                    allProperties = allProperties,
+                    onDismiss = { selectedColorSet = null }
                 )
             }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(8.dp))
+@Composable
+fun BesitzkartenGrid(
+    ownedProperties: List<Property>,
+    allProperties: List<Property>,
+    onPropertySetClicked: (PropertyColor) -> Unit
+) {
+    val propertySets = PropertyColor.values()
 
-            Text(
-                text = "Position: ${player.position}",
-                color = Color.White,
-                fontSize = 8.sp
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(5),
+        modifier = Modifier
+            .heightIn(max = 120.dp)
+    ) {
+        items(propertySets.size) { index ->
+            val colorSet = propertySets[index]
+            PropertySetCard(
+                colorSet = colorSet,
+                ownedProperties = ownedProperties,
+                allProperties = allProperties,
+                onClick = { onPropertySetClicked(colorSet) }
             )
         }
     }
 }
+
+@Composable
+fun PropertySetCard(
+    colorSet: PropertyColor,
+    ownedProperties: List<Property>,
+    allProperties: List<Property>,
+    onClick: () -> Unit
+) {
+    val propertiesInSet = ownedProperties.filter { getColorForPosition(it.position) == colorSet }
+    val ownsCompleteSet = checkCompleteSet(colorSet, propertiesInSet, allProperties)
+
+    val cardAlpha = if (propertiesInSet.isEmpty()) 0.3f else if (ownsCompleteSet) 1f else 0.6f
+
+    Card(
+        modifier = Modifier
+            .padding(2.dp)
+            .aspectRatio(1f)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = getColorForSet(colorSet).copy(alpha = cardAlpha)
+        )
+    ) {}
+}
+
+fun checkCompleteSet(colorSet: PropertyColor, owned: List<Property>, allProperties: List<Property>): Boolean {
+    val totalInSet = allProperties.count { getColorForPosition(it.position) == colorSet }
+    return owned.size == totalInSet
+}
+
+fun getColorForSet(colorSet: PropertyColor): Color {
+    return when (colorSet) {
+        PropertyColor.BROWN -> Color(0xFF964B00)
+        PropertyColor.LIGHT_BLUE -> Color(0xFFADD8E6)
+        PropertyColor.PINK -> Color(0xFFFFC0CB)
+        PropertyColor.ORANGE -> Color(0xFFFFA500)
+        PropertyColor.RED -> Color.Red
+        PropertyColor.YELLOW -> Color.Yellow
+        PropertyColor.GREEN -> Color.Green
+        PropertyColor.DARK_BLUE -> Color(0xFF00008B)
+        PropertyColor.RAILROAD -> Color(0xFF8B4513)
+        PropertyColor.UTILITY -> Color (0xFF20B2AA)
+        PropertyColor.NONE -> Color (0xFFA9A9A9)
+    }
+}
+
+fun getColorForPosition(position: Int): PropertyColor {
+    return when (position) {
+        1, 3 -> PropertyColor.BROWN
+        6, 8, 9 -> PropertyColor.LIGHT_BLUE
+        11, 13, 14 -> PropertyColor.PINK
+        16, 18, 19 -> PropertyColor.ORANGE
+        21, 23, 24 -> PropertyColor.RED
+        26, 27, 29 -> PropertyColor.YELLOW
+        31, 32, 34 -> PropertyColor.GREEN
+        37, 39 -> PropertyColor.DARK_BLUE
+        5, 15, 25, 35 -> PropertyColor.RAILROAD
+        12, 28 -> PropertyColor.UTILITY
+        else -> PropertyColor.NONE
+    }
+}
+
+@Composable
+fun PropertySetPopup(
+    colorSet: PropertyColor,
+    ownedProperties: List<Property>,
+    allProperties: List<Property>,
+    onDismiss: () -> Unit
+) {
+    val context = LocalContext.current
+    val propertiesInSet = allProperties.filter { getColorForPosition(it.position) == colorSet }
+
+    AlertDialog(
+        modifier = Modifier
+            .width(420.dp)
+            .height(400.dp),
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "${colorSet.name} Set",
+                style = TextStyle(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        text = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp)
+                    .horizontalScroll(rememberScrollState())
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                propertiesInSet.forEach { property ->
+                    val imageResId = getDrawableIdFromName(property.image, context)
+
+                    Box(
+                        modifier = Modifier
+                            .width(180.dp)
+                            .aspectRatio(0.7f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                Color.LightGray.copy(alpha = 1f)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (imageResId != 0) {
+                            Image(
+                                painter = painterResource(id = imageResId),
+                                contentDescription = property.name,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(if (property.ownerId != null) 1f else 0.4f)
+                            )
+                        } else {
+                            Text(
+                                text = property.name,
+                                color = Color.Black,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Exit", color = Color.White)
+            }
+        },
+        dismissButton = {}
+    )
+}
+
 
 @Composable
 fun DiceRollingButton(
