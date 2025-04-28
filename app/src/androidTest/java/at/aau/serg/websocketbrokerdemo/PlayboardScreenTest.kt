@@ -35,6 +35,7 @@ class PlayboardScreenTest {
             PlayboardScreen(
                 players = players,
                 currentPlayerId = "1",
+                localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
                 diceResult = 5,
@@ -54,6 +55,7 @@ class PlayboardScreenTest {
             PlayboardScreen(
                 players = emptyList(),
                 currentPlayerId = "",
+                localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
                 diceResult = 5,
@@ -72,6 +74,7 @@ class PlayboardScreenTest {
             PlayboardScreen(
                 players = emptyList(),
                 currentPlayerId = "1",
+                localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
                 diceResult = 5,
