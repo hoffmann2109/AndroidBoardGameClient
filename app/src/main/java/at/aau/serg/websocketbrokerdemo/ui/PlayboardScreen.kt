@@ -37,6 +37,7 @@ import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 fun PlayboardScreen(
     players: List<PlayerMoney>,
     currentPlayerId: String,
+    localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
@@ -46,6 +47,7 @@ fun PlayboardScreen(
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
     val properties = remember { propertyViewModel.getProperties(context) }
+    val isMyTurn = currentPlayerId == localPlayerId
 
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
@@ -109,6 +111,7 @@ fun PlayboardScreen(
                 color = Color(0xFF3FAF3F),
                 onClick = onRollDice,
                 diceValue = diceResult,
+                enabled   = isMyTurn
             )
         }
 
@@ -328,7 +331,8 @@ fun DiceRollingButton(
     text: String,
     color: Color,
     onClick: () -> Unit,
-    diceValue: Int?
+    diceValue: Int?,
+    enabled: Boolean = true
 ) {
 
     var isPressed by remember { mutableStateOf(false) }
@@ -338,18 +342,24 @@ fun DiceRollingButton(
         targetValue = rotateAngle,
         animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
     )
-    val scale by animateFloatAsState(if (isPressed) 1.1f else 1f, animationSpec = tween(150))
+    val scale by animateFloatAsState(if (isPressed && enabled) 1.1f else 1f, animationSpec = tween(150))
     val buttonColor by animateColorAsState(
-        targetValue = if (isPressed) color.copy(alpha = 0.7f) else color,
+        targetValue = when {
+            !enabled      -> Color.Gray
+            isPressed     -> color.copy(alpha = 0.7f)
+            else          -> color
+            },
         animationSpec = tween(durationMillis = 150)
     )
 
     Button(
         onClick = {
+            if (!enabled) return@Button
             isPressed = true
             rotateAngle += 720f
             onClick()
-        },
+            },
+        enabled = enabled,
         modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
         shape = RoundedCornerShape(8.dp),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor)

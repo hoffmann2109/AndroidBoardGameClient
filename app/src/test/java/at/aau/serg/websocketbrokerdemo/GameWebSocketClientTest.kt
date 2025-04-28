@@ -2,13 +2,13 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.util.Log
 import okhttp3.WebSocket
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.AfterEach
 import org.mockito.Mockito.*
-import android.util.Log
 import io.mockk.every
 import io.mockk.mockkStatic
 import java.io.ByteArrayInputStream
@@ -38,15 +38,14 @@ class GameWebSocketClientTest {
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
-
         val client = GameWebSocketClient(
             context,
-            onConnected = {}, // <- einfaches leeres Lambda
-            onMessageReceived = { /* Not needed for this test */ },
-            onDiceRolled = { _, _ -> }, // Also not needed for this test
-            onGameStateReceived = {} //
+            onConnected        = { /* unused */ },
+            onMessageReceived  = { /* unused */ },
+            onDiceRolled       = { _, _ -> /* unused */ },
+            onGameStateReceived= { /* unused */ },
+            onPlayerTurn       = { _ -> /* unused */ }
         )
-
 
         val field = GameWebSocketClient::class.java.getDeclaredField("serverUrl")
         field.isAccessible = true
@@ -59,7 +58,6 @@ class GameWebSocketClientTest {
 
     @Test
     fun testSendMessage() {
-
         val propertiesContent = "server.url=ws://example.com"
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
@@ -68,12 +66,12 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = { onConnectedCalled = true },
-            onMessageReceived = { /* Not needed for this test */ },
-            onDiceRolled = { _, _ -> }, // Also not needed for this test
-            onGameStateReceived = {} //
+            onConnected        = { onConnectedCalled = true },
+            onMessageReceived  = { /* unused */ },
+            onDiceRolled       = { _, _ -> /* unused */ },
+            onGameStateReceived= { /* unused */ },
+            onPlayerTurn       = { _ -> /* unused */ }
         )
-
 
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
         webSocketField.isAccessible = true
@@ -86,6 +84,4 @@ class GameWebSocketClientTest {
 
         verify(mockedWebSocket, times(1)).send("Hello")
     }
-
-
 }

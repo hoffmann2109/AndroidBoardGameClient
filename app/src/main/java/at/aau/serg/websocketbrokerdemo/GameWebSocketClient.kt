@@ -22,6 +22,7 @@ class GameWebSocketClient(
     private val onMessageReceived: (String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
+    private val onPlayerTurn: (playerId: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val client = OkHttpClient()
@@ -92,6 +93,18 @@ class GameWebSocketClient(
                     onGameStateReceived(players)
                 } catch (e: Exception) {
                     Log.e("WebSocket", "Error parsing game state: ${e.message}", e)
+                }
+            }
+
+            // Player's turn message:
+            if (text.startsWith("PLAYER_TURN")) {
+                try {
+                    // drop the prefix, grab everything after the colon
+                    val sessionId = text.substringAfter("PLAYER_TURN:")
+                    onPlayerTurn(sessionId)
+                    return
+                } catch (e: Exception) {
+                    Log.e("WebSocket", "Error parsing PLAYER_TURN: ${e.message}", e)
                 }
             }
 
