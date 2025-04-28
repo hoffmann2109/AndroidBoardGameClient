@@ -2,7 +2,7 @@ package at.aau.serg.websocketbrokerdemo.data.properties
 
 sealed class Property {
     abstract val id: Int
-    abstract val ownerId: String?
+    abstract var ownerId: String?
     abstract val name: String
     abstract val purchasePrice: Int
     abstract val position: Int
