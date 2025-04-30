@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import androidx.navigation.compose.*
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
         var diceValue   by remember { mutableStateOf<Int?>(null) }
         var dicePlayer  by remember { mutableStateOf<String?>(null) }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
+        val chatMessages = remember { mutableStateListOf<ChatEntry>() }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -79,9 +81,8 @@ class MainActivity : ComponentActivity() {
                     dicePlayer = pid
                     diceValue  = value
                 },
-                onChatMessageReceived = {pid, mes ->
-                    dicePlayer= pid;
-                    message= mes;
+                onChatMessageReceived = { senderId, text ->
+                    chatMessages.add(ChatEntry(senderId, text))
                 }
             )
         }
@@ -148,7 +149,8 @@ class MainActivity : ComponentActivity() {
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult      = diceValue,
                     dicePlayerId    = dicePlayer,
-                    webSocketClient = webSocketClient
+                    webSocketClient = webSocketClient,
+                    chatMessages= chatMessages
                 )
             }
         }

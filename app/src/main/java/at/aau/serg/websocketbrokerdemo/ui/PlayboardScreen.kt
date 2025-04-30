@@ -32,6 +32,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 
 
 @Composable
@@ -42,7 +44,8 @@ fun PlayboardScreen(
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
     dicePlayerId:   String?,
-    webSocketClient: GameWebSocketClient
+    webSocketClient: GameWebSocketClient,
+    chatMessages: List<ChatEntry>
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -54,7 +57,7 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var chatOpen by remember{ mutableStateOf(false)}
     var chatInput by remember { mutableStateOf("") }
-    val chatMessage= remember { mutableStateListOf<String>()}
+
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -251,6 +254,7 @@ fun PlayboardScreen(
 
         // Chat Open/Close Button (immer sichtbar, unten rechts)
         Button(
+
             onClick = { chatOpen = !chatOpen },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
             modifier = Modifier
@@ -261,6 +265,7 @@ fun PlayboardScreen(
         }
 
 // Chat Overlay
+
         if (chatOpen) {
             Box(
                 modifier = Modifier
@@ -272,7 +277,7 @@ fun PlayboardScreen(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .fillMaxWidth()
-                        .background(Color.Gray.copy(alpha = 0.95f), RoundedCornerShape(12.dp))
+                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
                         .padding(16.dp)
                 ) {
                     // Nachrichtenliste
@@ -280,15 +285,34 @@ fun PlayboardScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(1f)
-                            .padding(8.dp)
+                            .padding(8.dp),
+                        reverseLayout = true
                     ) {
-                        items(chatMessage) { message ->
-                            Text(
-                                text = message,
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                modifier = Modifier.padding(vertical = 4.dp)
-                            )
+                        items(chatMessages.reversed()) { entry ->
+                            val isOwnMessage = entry.senderId == currentPlayerId
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = if (isOwnMessage) Arrangement.End else Arrangement.Start
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            if (isOwnMessage) Color(0xFFDCF8C6) else Color.White,
+                                            RoundedCornerShape(12.dp)
+                                        )
+                                        .padding(12.dp)
+                                        .widthIn(max = 240.dp)
+                                ) {
+                                    Text(
+                                        text = entry.message,
+                                        color = Color.Black,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -309,9 +333,8 @@ fun PlayboardScreen(
                         Button(
                             onClick = {
                                 if (chatInput.isNotBlank()) {
-                                    // Hier wird deine Nachricht hinzugefügt oder gesendet
-                                    chatMessage.add("Me: $chatInput")
-                                    chatInput = ""
+                                    webSocketClient.sendChatMessage(currentPlayerId, chatInput)
+                                    chatInput = "" // Nach Senden Eingabefeld leeren
                                 }
                             }
                         ) {
@@ -321,6 +344,7 @@ fun PlayboardScreen(
                 }
             }
         }
+
 
     }
 }
