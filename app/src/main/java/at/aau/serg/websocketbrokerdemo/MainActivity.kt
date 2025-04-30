@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import androidx.navigation.compose.*
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
@@ -35,9 +36,10 @@ class MainActivity : ComponentActivity() {
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
-        var diceValue   by remember { mutableStateOf<Int?>(null) }
-        var dicePlayer  by remember { mutableStateOf<String?>(null) }
+        var diceValue by remember { mutableStateOf<Int?>(null) }
+        var dicePlayer by remember { mutableStateOf<String?>(null) }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
+        val chatMessages = remember { mutableStateListOf<ChatEntry>() }
         var localPlayerId by remember { mutableStateOf<String?>(null) }
 
         // Firebase Auth instance
@@ -50,7 +52,7 @@ class MainActivity : ComponentActivity() {
                 // Find the first player that matches our Firebase ID or assign a new one
                 currentGamePlayerId = playerMoneyList.find { it.id == userId }?.id
                     ?: playerMoneyList.firstOrNull()?.id
-                    ?: userId // Fallback to Firebase ID if no players exist yet
+                            ?: userId // Fallback to Firebase ID if no players exist yet
             }
         }
 
@@ -66,21 +68,25 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected       = { log += "Connected to server\n" },
+                onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled      = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
                     currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
-                onPlayerTurn      = { sessionId ->
+                onPlayerTurn = { sessionId ->
                     // here’s where we grab “my” session-id from the server
                     localPlayerId = sessionId
                     Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
+                },
+                onChatMessageReceived = { senderId, text ->
+                    chatMessages.add(ChatEntry(senderId, text))
                 }
             )
         }
+
 
         LaunchedEffect(webSocketClient) {
             val currentUser = FirebaseAuth.getInstance().currentUser
@@ -150,20 +156,26 @@ class MainActivity : ComponentActivity() {
             }
             composable("playerInfo") {
                 // Add debug logging for player ID
-                android.util.Log.d("MainActivity", "Passing current game player ID to PlayboardScreen: $currentGamePlayerId")
+                android.util.Log.d(
+                    "MainActivity",
+                    "Passing current game player ID to PlayboardScreen: $currentGamePlayerId"
+                )
                 android.util.Log.d("MainActivity", "Current game state players: $playerMoneyList")
-                
+
                 PlayboardScreen(
                     players = playerMoneyList,
                     currentPlayerId = currentGamePlayerId ?: "",
-                    onRollDice = { webSocketClient.sendMessage("Roll")},
+                    onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
-                    diceResult      = diceValue,
-                    dicePlayerId    = dicePlayer,
+                    diceResult = diceValue,
+                    dicePlayerId = dicePlayer,
                     webSocketClient = webSocketClient,
-                    localPlayerId    = localPlayerId ?: ""
+                    localPlayerId = localPlayerId ?: "",
+                    chatMessages = chatMessages
                 )
             }
         }
     }
-}
+
+        }
+
