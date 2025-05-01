@@ -108,32 +108,19 @@ fun Gameboard(
                         }
 
                         if (isOuter && playersOnTile.isNotEmpty()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize(0.8f)
-                                    .testTag("players_row_${row}_$col"),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                playersOnTile.forEachIndexed { index, player ->
-                                    val playerIndex =
-                                        players.indexOfFirst { it.id == player.id }
-                                    val colorIndex =
-                                        if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
+                            playersOnTile.forEachIndexed { index, player ->
+                                val playerIndex = players.indexOfFirst { it.id == player.id }
+                                val colorIndex =
+                                    if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
 
-                                    Box(
-                                        modifier = Modifier
-                                            .size(12.dp)
-                                            .background(
-                                                playerColors[colorIndex],
-                                                CircleShape
-                                            )
-                                            .semantics {
-                                                contentDescription = "Player(${player.id})"
-                                            }
-                                            .testTag("playerCircle_${player.id}")
-                                    )
-                                }
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .offset(x = (-2).dp, y = (-2).dp) // leichte Verschiebung zur Mitte
+                                        .background(playerColors[colorIndex], CircleShape)
+                                        .semantics { contentDescription = "Player(${player.id})" }
+                                        .testTag("playerCircle_${player.id}")
+                                )
                             }
                         }
                     }
@@ -141,6 +128,7 @@ fun Gameboard(
             }
         }
     }
+
 }
 
 
