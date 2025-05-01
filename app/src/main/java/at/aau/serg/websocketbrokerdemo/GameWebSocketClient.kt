@@ -23,6 +23,7 @@ class GameWebSocketClient(
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (playerId: String) -> Unit,
+    private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val client = OkHttpClient()
@@ -82,6 +83,13 @@ class GameWebSocketClient(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
+
+            // Check for "passed GO" message
+            if (text.contains("passed GO and collected")) {
+                val playerId = text.substringAfter("Player ").substringBefore(" passed")
+                val playerName = players.find { it.id == playerId }?.name ?: "Unknown Player"
+                onPlayerPassedGo(playerName)
+            }
 
             if (text.contains("PROPERTY_BOUGHT")) {
                 propertyBoughtListener?.invoke(text)
