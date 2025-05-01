@@ -110,16 +110,22 @@ fun Gameboard(
                         if (isOuter && playersOnTile.isNotEmpty()) {
                             playersOnTile.forEachIndexed { index, player ->
                                 val playerIndex = players.indexOfFirst { it.id == player.id }
-                                val colorIndex =
-                                    if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
+                                val imageName = "Player${(playerIndex + 1)}.png"
+                                val playerPainter =
+                                    rememberAsyncImagePainter("file:///android_asset/$imageName")
 
-                                Box(
+                                Image(
+                                    painter = playerPainter,
+                                    contentDescription = "Player(${player.id})",
                                     modifier = Modifier
-                                        .size(10.dp)
-                                        .offset(x = (-2).dp, y = (-2).dp) // leichte Verschiebung zur Mitte
-                                        .background(playerColors[colorIndex], CircleShape)
+                                        .size(36.dp) // Größer als vorher, für bessere Sichtbarkeit
+                                        .offset(
+                                            x = (-4).dp,
+                                            y = (-4).dp
+                                        ) // Feinjustierung zur Feldmitte
                                         .semantics { contentDescription = "Player(${player.id})" }
-                                        .testTag("playerCircle_${player.id}")
+                                        .testTag("playerImage_${player.id}"),
+                                    contentScale = ContentScale.Crop // oder ContentScale.Fit je nach Bildinhalt
                                 )
                             }
                         }
