@@ -82,7 +82,8 @@ class MainActivity : ComponentActivity() {
                     Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
                 },
                 onChatMessageReceived = { senderId, text ->
-                    chatMessages.add(ChatEntry(senderId, text))
+                    val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
+                    chatMessages.add(ChatEntry(senderId, senderName, text))
                 }
             )
         }
