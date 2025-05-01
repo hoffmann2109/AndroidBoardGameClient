@@ -2,86 +2,108 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.content.res.AssetManager
-import android.util.Log
 import okhttp3.WebSocket
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.*
 import org.mockito.Mockito.*
-import io.mockk.every
-import io.mockk.mockkStatic
 import java.io.ByteArrayInputStream
+import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 
 class GameWebSocketClientTest {
+
     private lateinit var context: Context
     private lateinit var assetManager: AssetManager
 
     @BeforeEach
     fun setUp() {
-        // Erstelle Mocks für Context und AssetManager
-        mockkStatic(Log::class)
-        every { Log.d(any(), any()) } returns 0
         context = mock(Context::class.java)
         assetManager = mock(AssetManager::class.java)
         `when`(context.assets).thenReturn(assetManager)
     }
 
-    @AfterEach
-    fun tearDown() {
-
-    }
-
     @Test
     fun testLoadServerUrl() {
+        // Arrange
         val propertiesContent = "server.url=ws://example.com"
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
+        // Act
         val client = GameWebSocketClient(
             context,
-            onConnected        = { /* unused */ },
-            onMessageReceived  = { /* unused */ },
-            onDiceRolled       = { _, _ -> /* unused */ },
-            onGameStateReceived= { /* unused */ },
-            onPlayerTurn       = { _ -> /* unused */ }
+            onConnected = {},
+            onMessageReceived = {},
+            onDiceRolled = { _, _ -> },
+            onGameStateReceived = {},
+            onPlayerTurn = {},
+            onChatMessageReceived = { _, _ -> }
         )
 
+        // Zugriff auf private Property mittels Reflection
         val field = GameWebSocketClient::class.java.getDeclaredField("serverUrl")
         field.isAccessible = true
         val loadedUrl = field.get(client) as String
 
-
-        assertEquals("ws://example.com", loadedUrl)
+        // Assert
+        Assertions.assertEquals("ws://example.com", loadedUrl)
     }
-
 
     @Test
     fun testSendMessage() {
+        // Arrange
         val propertiesContent = "server.url=ws://example.com"
         val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
-        var onConnectedCalled = false
+        val client = GameWebSocketClient(
+            context,
+            onConnected = {},
+            onMessageReceived = {},
+            onDiceRolled = { _, _ -> },
+            onGameStateReceived = {},
+            onPlayerTurn = {},
+            onChatMessageReceived = { _, _ -> }
+        )
+
+        val mockWebSocket = mock(WebSocket::class.java)
+        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        webSocketField.isAccessible = true
+        webSocketField.set(client, mockWebSocket)
+
+        // Act
+        client.sendMessage("Hello")
+
+        // Assert
+        verify(mockWebSocket, times(1)).send("Hello")
+    }
+
+    @Test
+    fun testSendChatMessage() {
+        // Arrange
+        val propertiesContent = "server.url=ws://example.com"
+        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
+        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
 
         val client = GameWebSocketClient(
             context,
-            onConnected        = { onConnectedCalled = true },
-            onMessageReceived  = { /* unused */ },
-            onDiceRolled       = { _, _ -> /* unused */ },
-            onGameStateReceived= { /* unused */ },
-            onPlayerTurn       = { _ -> /* unused */ }
+            onConnected = {},
+            onMessageReceived = {},
+            onDiceRolled = { _, _ -> },
+            onGameStateReceived = {},
+            onPlayerTurn = {},
+            onChatMessageReceived = { _, _ -> }
         )
 
+        val mockWebSocket = mock(WebSocket::class.java)
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
         webSocketField.isAccessible = true
-        val mockedWebSocket = mock(WebSocket::class.java)
-        webSocketField.set(client, mockedWebSocket)
+        webSocketField.set(client, mockWebSocket)
 
+        // Act
+        client.sendChatMessage("user123", "Hi!")
 
-        client.sendMessage("Hello")
-
-
-        verify(mockedWebSocket, times(1)).send("Hello")
+        // Assert: expected JSON
+        val expectedJson = """{"type":"CHAT_MESSAGE","playerId":"user123","message":"Hi!"}"""
+        verify(mockWebSocket).send(expectedJson)
     }
+
 }
