@@ -30,6 +30,7 @@ class GameWebSocketClient(
     // Use a nullable WebSocket so we can check if it's already connected
     private var webSocket: WebSocket? = null
     private val gson = Gson()
+    private var players: List<PlayerMoney> = emptyList()
 
     // Load the server URL from the config.properties file in the assets folder.
     private val serverUrl: String = loadServerUrl(context)
@@ -99,7 +100,7 @@ class GameWebSocketClient(
                 try {
                     val jsonData = text.substring("GAME_STATE:".length)
                     val type = object : TypeToken<List<PlayerMoney>>() {}.type
-                    val players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
+                    players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
                     onGameStateReceived(players)
                 } catch (e: Exception) {
                     Log.e("WebSocket", "Error parsing game state: ${e.message}", e)

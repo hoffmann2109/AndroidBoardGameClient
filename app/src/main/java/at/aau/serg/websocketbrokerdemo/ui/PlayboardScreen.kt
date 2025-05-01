@@ -61,7 +61,9 @@ fun PlayboardScreen(
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
     dicePlayerId:   String?,
-    webSocketClient: GameWebSocketClient
+    webSocketClient: GameWebSocketClient,
+    showPassedGoAlert: Boolean,
+    passedGoPlayerName: String
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -72,8 +74,6 @@ fun PlayboardScreen(
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
-    var showPassedGoAlert by remember { mutableStateOf(false) }
-    var passedGoPlayerName by remember { mutableStateOf("") }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -98,14 +98,6 @@ fun PlayboardScreen(
             properties.find { it.id == propertyId }?.let { property ->
                 property.ownerId = playerId
             }
-        }
-    }
-
-    // Show passed GO alert for 3 seconds
-    LaunchedEffect(showPassedGoAlert) {
-        if (showPassedGoAlert) {
-            delay(3000)
-            showPassedGoAlert = false
         }
     }
 
@@ -296,7 +288,7 @@ fun PlayboardScreen(
         // Passed GO Alert
         if (showPassedGoAlert) {
             AlertDialog(
-                onDismissRequest = { showPassedGoAlert = false },
+                onDismissRequest = { /* Alert will auto-dismiss after 3 seconds */ },
                 title = {
                     Text(
                         text = "Glückwunsch!",
