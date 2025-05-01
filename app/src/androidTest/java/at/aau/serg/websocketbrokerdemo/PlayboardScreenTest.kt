@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import kotlinx.coroutines.test.runTest
@@ -24,6 +25,8 @@ class PlayboardScreenTest {
 
     private val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
+    private val emptyChat = emptyList<ChatEntry>()
+
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
         val players = listOf(
@@ -40,11 +43,11 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
-                webSocketClient = mockWebSocketClient
+                webSocketClient = mockWebSocketClient,
+                chatMessages = emptyChat
             )
         }
 
-        // Check if player names are displayed
         composeTestRule.onNodeWithText("Player 1").assertIsDisplayed()
         composeTestRule.onNodeWithText("Player 2").assertIsDisplayed()
     }
@@ -60,11 +63,11 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
-                webSocketClient = mockWebSocketClient
+                webSocketClient = mockWebSocketClient,
+                chatMessages = emptyChat
             )
         }
 
-        // Check if the "Not enough players connected yet" message is displayed
         composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
     }
 
@@ -79,12 +82,12 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
-                webSocketClient = mockWebSocketClient
+                webSocketClient = mockWebSocketClient,
+                chatMessages = emptyChat
             )
         }
 
         composeTestRule.onNodeWithText("Roll Dice").performClick()
-        // Fast‑forward the 1s delay in LaunchedEffect
         composeTestRule.mainClock.advanceTimeBy(1000)
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Roll Dice").assertIsEnabled()
