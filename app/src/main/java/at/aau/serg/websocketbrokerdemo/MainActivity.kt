@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
+import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -39,10 +40,20 @@ class MainActivity : ComponentActivity() {
         var dicePlayer  by remember { mutableStateOf<String?>(null) }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         var localPlayerId by remember { mutableStateOf<String?>(null) }
+        var showPassedGoAlert by remember { mutableStateOf(false) }
+        var passedGoPlayerName by remember { mutableStateOf("") }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
+
+        // Show passed GO alert for 3 seconds
+        LaunchedEffect(showPassedGoAlert) {
+            if (showPassedGoAlert) {
+                delay(3000)
+                showPassedGoAlert = false
+            }
+        }
 
         // Update currentGamePlayerId when game state changes
         LaunchedEffect(playerMoneyList, userId) {
@@ -75,9 +86,13 @@ class MainActivity : ComponentActivity() {
                     currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
                 onPlayerTurn      = { sessionId ->
-                    // here’s where we grab “my” session-id from the server
+                    // here's where we grab "my" session-id from the server
                     localPlayerId = sessionId
-                    Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
+                    Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
+                },
+                onPlayerPassedGo  = { playerName ->
+                    passedGoPlayerName = playerName
+                    showPassedGoAlert = true
                 }
             )
         }
@@ -161,7 +176,9 @@ class MainActivity : ComponentActivity() {
                     diceResult      = diceValue,
                     dicePlayerId    = dicePlayer,
                     webSocketClient = webSocketClient,
-                    localPlayerId    = localPlayerId ?: ""
+                    localPlayerId    = localPlayerId ?: "",
+                    showPassedGoAlert = showPassedGoAlert,
+                    passedGoPlayerName = passedGoPlayerName
                 )
             }
         }

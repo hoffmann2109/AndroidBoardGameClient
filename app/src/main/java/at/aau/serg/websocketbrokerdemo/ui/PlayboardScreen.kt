@@ -61,7 +61,9 @@ fun PlayboardScreen(
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
     dicePlayerId:   String?,
-    webSocketClient: GameWebSocketClient
+    webSocketClient: GameWebSocketClient,
+    showPassedGoAlert: Boolean,
+    passedGoPlayerName: String
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -72,6 +74,7 @@ fun PlayboardScreen(
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+    var showPropertyCard by remember { mutableStateOf(false) }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -81,6 +84,10 @@ fun PlayboardScreen(
             lastPlayerPosition = newPosition
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
+                // If player passed GO, delay showing property card
+                if (showPassedGoAlert) {
+                    delay(3000) // Wait for GO notification to disappear
+                }
                 selectedProperty = landedProperty
                 openedByClick = false
                 canBuy = true
@@ -281,6 +288,40 @@ fun PlayboardScreen(
                 },
                 dismissButton = {}
             )
+        }
+
+        // Passed GO Alert
+        if (showPassedGoAlert) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.3f)
+                    .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Glückwunsch!",
+                        style = TextStyle(
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "$passedGoPlayerName fuhr über los und erhält 200€!",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    )
+                }
+            }
         }
     }
 }
@@ -612,3 +653,4 @@ fun DiceFace(diceValue: Int?) {
         )
     }
 }
+

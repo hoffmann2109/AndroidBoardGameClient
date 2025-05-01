@@ -23,12 +23,14 @@ class GameWebSocketClient(
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (playerId: String) -> Unit,
+    private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
     private var webSocket: WebSocket? = null
     private val gson = Gson()
+    private var players: List<PlayerMoney> = emptyList()
 
     // Load the server URL from the config.properties file in the assets folder.
     private val serverUrl: String = loadServerUrl(context)
@@ -83,6 +85,13 @@ class GameWebSocketClient(
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
 
+            // Check for "passed GO" message
+            if (text.contains("passed GO and collected")) {
+                val playerId = text.substringAfter("Player ").substringBefore(" passed")
+                val playerName = players.find { it.id == playerId }?.name ?: "Unknown Player"
+                onPlayerPassedGo(playerName)
+            }
+
             if (text.contains("PROPERTY_BOUGHT")) {
                 propertyBoughtListener?.invoke(text)
             }
@@ -91,7 +100,7 @@ class GameWebSocketClient(
                 try {
                     val jsonData = text.substring("GAME_STATE:".length)
                     val type = object : TypeToken<List<PlayerMoney>>() {}.type
-                    val players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
+                    players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
                     onGameStateReceived(players)
                 } catch (e: Exception) {
                     Log.e("WebSocket", "Error parsing game state: ${e.message}", e)

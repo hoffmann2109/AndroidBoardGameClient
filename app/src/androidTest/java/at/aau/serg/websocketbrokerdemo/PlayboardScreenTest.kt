@@ -40,7 +40,9 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
-                webSocketClient = mockWebSocketClient
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
             )
         }
 
@@ -60,7 +62,9 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
-                webSocketClient = mockWebSocketClient
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
             )
         }
 
@@ -79,7 +83,9 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
-                webSocketClient = mockWebSocketClient
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
             )
         }
 
@@ -88,5 +94,47 @@ class PlayboardScreenTest {
         composeTestRule.mainClock.advanceTimeBy(1000)
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Roll Dice").assertIsEnabled()
+    }
+
+    @Test
+    fun testPlayboardScreenDisplaysNoPlayersMessageWithNewParameters() {
+        composeTestRule.setContent {
+            PlayboardScreen(
+                players = emptyList(),
+                currentPlayerId = "",
+                localPlayerId = "",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = null,
+                dicePlayerId = null,
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
+            )
+        }
+
+        // Check if the "Not enough players connected yet" message is displayed
+        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
+    }
+
+    @Test
+    fun testPlayboardScreenDisplaysNoPlayersMessageWithNewParametersAgain() {
+        composeTestRule.setContent {
+            PlayboardScreen(
+                players = emptyList(),
+                currentPlayerId = "",
+                localPlayerId = "",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = null,
+                dicePlayerId = null,
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
+            )
+        }
+
+        // Check if the "Not enough players connected yet" message is displayed
+        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
     }
 }

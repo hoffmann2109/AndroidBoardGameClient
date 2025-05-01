@@ -44,7 +44,8 @@ class GameWebSocketClientTest {
             onMessageReceived  = { /* unused */ },
             onDiceRolled       = { _, _ -> /* unused */ },
             onGameStateReceived= { /* unused */ },
-            onPlayerTurn       = { _ -> /* unused */ }
+            onPlayerTurn       = { _ -> /* unused */ },
+            onPlayerPassedGo   = { _ -> /* unused */ }
         )
 
         val field = GameWebSocketClient::class.java.getDeclaredField("serverUrl")
@@ -70,7 +71,8 @@ class GameWebSocketClientTest {
             onMessageReceived  = { /* unused */ },
             onDiceRolled       = { _, _ -> /* unused */ },
             onGameStateReceived= { /* unused */ },
-            onPlayerTurn       = { _ -> /* unused */ }
+            onPlayerTurn       = { _ -> /* unused */ },
+            onPlayerPassedGo   = { _ -> /* unused */ }
         )
 
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
