@@ -3,6 +3,7 @@ package at.aau.serg.websocketbrokerdemo.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -23,7 +24,7 @@ import coil.compose.rememberAsyncImagePainter
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
-    outerTileColor: Color = Color.DarkGray,
+    outerTileColor: Color = Color(0xFFE7FFC9),
     innerTileColor: Color = Color.LightGray,
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
@@ -38,11 +39,12 @@ fun Gameboard(
         Color.Yellow
     )
 
-    val centerPainter = rememberAsyncImagePainter("file:///android_asset/Center.png")
+    val centerPainter = rememberAsyncImagePainter("file:///android_asset/Center2.png")
 
     Box(
         modifier = modifier
-            .background(Color.Gray)
+            .padding(8.dp)
+            .background(outerTileColor)
             .testTag("gameboard")
     ) {
         // Center image inside the board
@@ -50,10 +52,15 @@ fun Gameboard(
             painter = centerPainter,
             contentDescription = "Monopoly Center",
             modifier = Modifier
-                .fillMaxSize(0.82f)
-                .align(Alignment.Center),
+                .fillMaxSize(0.88f)
+                .align(Alignment.Center)
+                .border(
+                    width = 2.dp,
+                    color = Color.Black,
+                ),
             contentScale = ContentScale.Fit
         )
+
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -80,57 +87,52 @@ fun Gameboard(
                                 .weight(1f)
                                 .aspectRatio(1f)
                                 .background(if (isOuter) outerTileColor else Color.Transparent)
-                                .clickable(enabled = tilePosition >= 0) {
+                                .clickable(enabled = tilePosition in 0..39) {
                                     onTileClick(tilePosition)
                                 }
                                 .semantics { contentDescription = "Tile($row,$col)" }
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (tilePosition == 0) {
-                                val painter =
-                                    rememberAsyncImagePainter("file:///android_asset/start_0.png")
+                            if (tilePosition in 0..39) {
+                                val imageName = "Feld ${tilePosition + 1}.png"
+                                val tilePainter =
+                                    rememberAsyncImagePainter("file:///android_asset/$imageName")
                                 Image(
-                                    painter = painter,
-                                    contentDescription = "Start Field",
+                                    painter = tilePainter,
+                                    contentDescription = "Field $tilePosition",
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = ContentScale.Fit
                                 )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(if (isOuter) outerTileColor else Color.Transparent)
-                                )
                             }
+                        }
 
-                            if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxSize(0.8f)
-                                        .testTag("players_row_${row}_$col"),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    playersOnTile.forEachIndexed { index, player ->
-                                        val playerIndex =
-                                            players.indexOfFirst { it.id == player.id }
-                                        val colorIndex =
-                                            if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
+                        if (isOuter && playersOnTile.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize(0.8f)
+                                    .testTag("players_row_${row}_$col"),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                playersOnTile.forEachIndexed { index, player ->
+                                    val playerIndex =
+                                        players.indexOfFirst { it.id == player.id }
+                                    val colorIndex =
+                                        if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
 
-                                        Box(
-                                            modifier = Modifier
-                                                .size(12.dp)
-                                                .background(
-                                                    playerColors[colorIndex],
-                                                    CircleShape
-                                                )
-                                                .semantics {
-                                                    contentDescription = "Player(${player.id})"
-                                                }
-                                                .testTag("playerCircle_${player.id}")
-                                        )
-                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .size(12.dp)
+                                            .background(
+                                                playerColors[colorIndex],
+                                                CircleShape
+                                            )
+                                            .semantics {
+                                                contentDescription = "Player(${player.id})"
+                                            }
+                                            .testTag("playerCircle_${player.id}")
+                                    )
                                 }
                             }
                         }
@@ -140,6 +142,7 @@ fun Gameboard(
         }
     }
 }
+
 
 /**
  * 0 = Start-Tile
