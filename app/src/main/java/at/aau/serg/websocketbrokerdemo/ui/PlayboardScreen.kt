@@ -287,28 +287,36 @@ fun PlayboardScreen(
 
         // Passed GO Alert
         if (showPassedGoAlert) {
-            AlertDialog(
-                onDismissRequest = { /* Alert will auto-dismiss after 3 seconds */ },
-                title = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.3f)
+                    .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Text(
                         text = "Glückwunsch!",
                         style = TextStyle(
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                     )
-                },
-                text = {
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "$passedGoPlayerName fuhr über los und erhält 200€!",
                         style = TextStyle(
-                            fontSize = 18.sp
+                            fontSize = 20.sp,
+                            color = Color.White
                         )
                     )
-                },
-                confirmButton = {},
-                dismissButton = {}
-            )
+                }
+            }
         }
     }
 }
@@ -640,3 +648,4 @@ fun DiceFace(diceValue: Int?) {
         )
     }
 }
+
