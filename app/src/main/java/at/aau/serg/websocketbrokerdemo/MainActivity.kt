@@ -75,9 +75,12 @@ class MainActivity : ComponentActivity() {
                     currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
                 onPlayerTurn      = { sessionId ->
-                    // here’s where we grab “my” session-id from the server
+                    // here's where we grab "my" session-id from the server
                     localPlayerId = sessionId
-                    Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
+                    Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
+                },
+                onPlayerPassedGo  = { playerName ->
+                    // This will be handled in the PlayboardScreen
                 }
             )
         }
