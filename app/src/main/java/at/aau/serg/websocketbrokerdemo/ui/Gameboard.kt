@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
 import coil.compose.rememberAsyncImagePainter
 
+
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
@@ -27,16 +29,35 @@ fun Gameboard(
     players: List<PlayerMoney> = emptyList(),
     properties: List<Property>
 ) {
-    val playerColors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow)
+    // TODO: Add images of the game pieces instead of the circles
+    // Simple colors for all the 4 players
+    val playerColors = listOf(
+        Color.Red,
+        Color.Blue,
+        Color.Green,
+        Color.Yellow
+    )
+
+    val centerPainter = rememberAsyncImagePainter("file:///android_asset/Center.png")
 
     Box(
         modifier = modifier
             .background(Color.Gray)
             .testTag("gameboard")
     ) {
+        // Center image inside the board
+        Image(
+            painter = centerPainter,
+            contentDescription = "Monopoly Center",
+            modifier = Modifier
+                .fillMaxSize(0.82f)
+                .align(Alignment.Center),
+            contentScale = ContentScale.Fit
+        )
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            // TODO: Add a list of properties instead of the blank tiles later
             repeat(11) { row ->
                 Row(
                     modifier = Modifier
@@ -45,13 +66,20 @@ fun Gameboard(
                 ) {
                     repeat(11) { col ->
                         val isOuter = row == 0 || row == 10 || col == 0 || col == 10
+
+                        // Calculate position 0 - 39 clockwise:
                         val tilePosition = calculateTilePosition(row, col)
+
+                        // Search for all players on a tile:
                         val playersOnTile = players.filter { it.position == tilePosition }
+
+                        val property = properties.find { it.position == tilePosition }
 
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
+                                .background(if (isOuter) outerTileColor else Color.Transparent)
                                 .clickable(enabled = tilePosition >= 0) {
                                     onTileClick(tilePosition)
                                 }
@@ -60,7 +88,8 @@ fun Gameboard(
                             contentAlignment = Alignment.Center
                         ) {
                             if (tilePosition == 0) {
-                                val painter = rememberAsyncImagePainter("file:///android_asset/start_0.png")
+                                val painter =
+                                    rememberAsyncImagePainter("file:///android_asset/start_0.png")
                                 Image(
                                     painter = painter,
                                     contentDescription = "Start Field",
@@ -71,20 +100,23 @@ fun Gameboard(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(if (isOuter) outerTileColor else innerTileColor)
+                                        .background(if (isOuter) outerTileColor else Color.Transparent)
                                 )
                             }
 
                             if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
                                 Row(
-                                    modifier = Modifier.fillMaxSize(0.8f)
+                                    modifier = Modifier
+                                        .fillMaxSize(0.8f)
                                         .testTag("players_row_${row}_$col"),
                                     horizontalArrangement = Arrangement.SpaceEvenly,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     playersOnTile.forEachIndexed { index, player ->
-                                        val playerIndex = players.indexOfFirst { it.id == player.id }
-                                        val colorIndex = if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
+                                        val playerIndex =
+                                            players.indexOfFirst { it.id == player.id }
+                                        val colorIndex =
+                                            if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
 
                                         Box(
                                             modifier = Modifier
@@ -93,7 +125,9 @@ fun Gameboard(
                                                     playerColors[colorIndex],
                                                     CircleShape
                                                 )
-                                                .semantics { contentDescription = "Player(${player.id})" }
+                                                .semantics {
+                                                    contentDescription = "Player(${player.id})"
+                                                }
                                                 .testTag("playerCircle_${player.id}")
                                         )
                                     }
@@ -107,16 +141,24 @@ fun Gameboard(
     }
 }
 
+/**
+ * 0 = Start-Tile
+ * Indices are increased clockwise (0-39)
+ */
 fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
-        row == 10 && col == 10 -> 0
-        row == 10 && col == 0 -> 10
-        row == 0 && col == 0 -> 20
-        row == 0 && col == 10 -> 30
-        row == 10 -> if (col in 1..9) 10 - col else -1
-        col == 0 -> if (row in 1..9) 10 + (10 - row) else -1
-        row == 0 -> if (col in 1..9) 20 + col else -1
-        col == 10 -> if (row in 1..9) 30 + row else -1
-        else -> -1
+        // Corners:
+        row == 10 && col == 10 -> 0  // Bottom-right corner (Start)
+        row == 10 && col == 0 -> 10  // Bottom-left corner
+        row == 0 && col == 0 -> 20   // Top-left corner
+        row == 0 && col == 10 -> 30  // Top-right corner
+
+        // Normal Tiles:
+        row == 10 -> if (col > 0 && col < 10) 10 - col else -1  // Bottom row (1-9)
+        col == 0 -> if (row > 0 && row < 10) 10 + (10 - row) else -1  // Left column (11-19)
+        row == 0 -> if (col > 0 && col < 10) 20 + col else -1  // Top row (21-29)
+        col == 10 -> if (row > 0 && row < 10) 30 + row else -1  // Right column (31-39)
+
+        else -> -1  // Inner or invalid positions
     }
 }
