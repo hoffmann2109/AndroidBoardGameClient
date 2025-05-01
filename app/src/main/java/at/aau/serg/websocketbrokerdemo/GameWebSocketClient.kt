@@ -194,4 +194,14 @@ class GameWebSocketClient(
         return properties.getProperty("server.url")
     }
 
+    fun rollDice() {
+        webSocket?.send("Roll")
+    }
+
+    fun manualRollDice(value: Int) {
+        if (value in 1..39) {
+            webSocket?.send("MANUAL_ROLL:$value")
+        }
+    }
+
 }
