@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
+import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -41,10 +42,20 @@ class MainActivity : ComponentActivity() {
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         val chatMessages = remember { mutableStateListOf<ChatEntry>() }
         var localPlayerId by remember { mutableStateOf<String?>(null) }
+        var showPassedGoAlert by remember { mutableStateOf(false) }
+        var passedGoPlayerName by remember { mutableStateOf("") }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
+
+        // Show passed GO alert for 3 seconds
+        LaunchedEffect(showPassedGoAlert) {
+            if (showPassedGoAlert) {
+                delay(3000)
+                showPassedGoAlert = false
+            }
+        }
 
         // Update currentGamePlayerId when game state changes
         LaunchedEffect(playerMoneyList, userId) {
@@ -68,9 +79,9 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected = { log += "Connected to server\n" },
+                onConnected       = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled      = { pid, value -> dicePlayer = pid; diceValue = value },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
@@ -84,10 +95,14 @@ class MainActivity : ComponentActivity() {
                 onChatMessageReceived = { senderId, text ->
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
+
+                },
+                onPlayerPassedGo  = { playerName ->
+                    passedGoPlayerName = playerName
+                    showPassedGoAlert = true
                 }
             )
         }
-
 
         LaunchedEffect(webSocketClient) {
             val currentUser = FirebaseAuth.getInstance().currentUser
@@ -157,22 +172,21 @@ class MainActivity : ComponentActivity() {
             }
             composable("playerInfo") {
                 // Add debug logging for player ID
-                android.util.Log.d(
-                    "MainActivity",
-                    "Passing current game player ID to PlayboardScreen: $currentGamePlayerId"
-                )
+                android.util.Log.d("MainActivity", "Passing current game player ID to PlayboardScreen: $currentGamePlayerId")
                 android.util.Log.d("MainActivity", "Current game state players: $playerMoneyList")
-
+                
                 PlayboardScreen(
                     players = playerMoneyList,
                     currentPlayerId = currentGamePlayerId ?: "",
-                    onRollDice = { webSocketClient.sendMessage("Roll") },
+                    onRollDice = { webSocketClient.sendMessage("Roll")},
                     onBackToLobby = { navController.navigate("lobby") },
-                    diceResult = diceValue,
-                    dicePlayerId = dicePlayer,
+                    diceResult      = diceValue,
+                    dicePlayerId    = dicePlayer,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
-                    chatMessages = chatMessages
+                    chatMessages = chatMessages,
+                    showPassedGoAlert = showPassedGoAlert,
+                    passedGoPlayerName = passedGoPlayerName
                 )
             }
         }

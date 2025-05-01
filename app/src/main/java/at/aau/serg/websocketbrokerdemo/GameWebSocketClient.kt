@@ -24,13 +24,15 @@ class GameWebSocketClient(
     private val onDiceRolled: (playerId: String, value: Int) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (playerId: String) -> Unit,
+    private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    private val onChatMessageReceived: (playerId: String, message: String) -> Unit
+    private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
     private var webSocket: WebSocket? = null
     private val gson = Gson()
+    private var players: List<PlayerMoney> = emptyList()
 
     // Load the server URL from the config.properties file in the assets folder.
     private val serverUrl: String = loadServerUrl(context)
@@ -85,6 +87,13 @@ class GameWebSocketClient(
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
 
+            // Check for "passed GO" message
+            if (text.contains("passed GO and collected")) {
+                val playerId = text.substringAfter("Player ").substringBefore(" passed")
+                val playerName = players.find { it.id == playerId }?.name ?: "Unknown Player"
+                onPlayerPassedGo(playerName)
+            }
+
             if (text.contains("PROPERTY_BOUGHT")) {
                 propertyBoughtListener?.invoke(text)
             }
@@ -93,7 +102,7 @@ class GameWebSocketClient(
                 try {
                     val jsonData = text.substring("GAME_STATE:".length)
                     val type = object : TypeToken<List<PlayerMoney>>() {}.type
-                    val players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
+                    players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
                     onGameStateReceived(players)
                 } catch (e: Exception) {
                     Log.e("WebSocket", "Error parsing game state: ${e.message}", e)
@@ -200,6 +209,16 @@ class GameWebSocketClient(
         val chat = ChatMessage(playerId = playerId, message = message)
         val json = gson.toJson(chat)
         sendMessage(json)
+    }
+
+    fun rollDice() {
+        webSocket?.send("Roll")
+    }
+
+    fun manualRollDice(value: Int) {
+        if (value in 1..39) {
+            webSocket?.send("MANUAL_ROLL:$value")
+        }
     }
 
 }

@@ -44,7 +44,9 @@ class PlayboardScreenTest {
                 diceResult = 5,
                 dicePlayerId = "",
                 webSocketClient = mockWebSocketClient,
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
             )
         }
 
@@ -64,10 +66,13 @@ class PlayboardScreenTest {
                 diceResult = 5,
                 dicePlayerId = "",
                 webSocketClient = mockWebSocketClient,
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
             )
         }
 
+        // Check if the "Not enough players connected yet" message is displayed
         composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
     }
 
@@ -83,6 +88,8 @@ class PlayboardScreenTest {
                 diceResult = 5,
                 dicePlayerId = "",
                 webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
                 chatMessages = emptyChat
             )
         }
@@ -91,6 +98,50 @@ class PlayboardScreenTest {
         composeTestRule.mainClock.advanceTimeBy(1000)
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Roll Dice").assertIsEnabled()
+    }
+
+    @Test
+    fun testPlayboardScreenDisplaysNoPlayersMessageWithNewParameters() {
+        composeTestRule.setContent {
+            PlayboardScreen(
+                players = emptyList(),
+                currentPlayerId = "",
+                localPlayerId = "",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = null,
+                dicePlayerId = null,
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
+                chatMessages = emptyChat
+            )
+        }
+
+        // Check if the "Not enough players connected yet" message is displayed
+        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
+    }
+
+    @Test
+    fun testPlayboardScreenDisplaysNoPlayersMessageWithNewParametersAgain() {
+        composeTestRule.setContent {
+            PlayboardScreen(
+                players = emptyList(),
+                currentPlayerId = "",
+                localPlayerId = "",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = null,
+                dicePlayerId = null,
+                webSocketClient = mockWebSocketClient,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
+                chatMessages = emptyChat
+            )
+        }
+
+        // Check if the "Not enough players connected yet" message is displayed
+        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
     }
 
     @Test
@@ -109,7 +160,9 @@ class PlayboardScreenTest {
                 diceResult = 2,
                 dicePlayerId = "1",
                 webSocketClient = mockWebSocketClient,
-                chatMessages = listOf()
+                chatMessages = listOf(),
+                showPassedGoAlert = false,
+                passedGoPlayerName = ""
             )
         }
 
@@ -139,7 +192,9 @@ class PlayboardScreenTest {
                 diceResult = 1,
                 dicePlayerId = "1",
                 webSocketClient = mockWebSocketClient,
-                chatMessages = messages
+                chatMessages = messages,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
             )
         }
 

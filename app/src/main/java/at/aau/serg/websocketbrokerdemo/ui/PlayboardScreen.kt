@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
@@ -44,6 +45,8 @@ import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
+
+import androidx.compose.ui.text.input.KeyboardType
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([a-f0-9\-]+) bought""".toRegex()
@@ -65,7 +68,9 @@ fun PlayboardScreen(
     diceResult:     Int?,
     dicePlayerId:   String?,
     webSocketClient: GameWebSocketClient,
-    chatMessages: List<ChatEntry>
+    chatMessages: List<ChatEntry>,
+    showPassedGoAlert: Boolean,
+    passedGoPlayerName: String
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -76,6 +81,8 @@ fun PlayboardScreen(
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+    var showPropertyCard by remember { mutableStateOf(false) }
+    var manualDiceValue by remember { mutableStateOf("") }
     var chatOpen by remember{ mutableStateOf(false)}
     var chatInput by remember { mutableStateOf("") }
     val nameColors = listOf(
@@ -99,6 +106,10 @@ fun PlayboardScreen(
             lastPlayerPosition = newPosition
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
+                // If player passed GO, delay showing property card
+                if (showPassedGoAlert) {
+                    delay(3000) // Wait for GO notification to disappear
+                }
                 selectedProperty = landedProperty
                 openedByClick = false
                 canBuy = true
@@ -161,6 +172,39 @@ fun PlayboardScreen(
                 diceValue = diceResult,
                 enabled   = isMyTurn
             )
+
+            // Manual Dice Roll Section
+            if (isMyTurn) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = manualDiceValue,
+                    onValueChange = { newValue ->
+                        if (newValue.isEmpty() || newValue.toIntOrNull() in 1..39) {
+                            manualDiceValue = newValue
+                        }
+                    },
+                    label = { Text("Manual Dice (1-39)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    singleLine = true
+                )
+
+                Button(
+                    onClick = {
+                        manualDiceValue.toIntOrNull()?.let { value ->
+                            webSocketClient.manualRollDice(value)
+                            manualDiceValue = ""
+                        }
+                    },
+                    enabled = manualDiceValue.toIntOrNull() in 1..39,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Custom Dice")
+                }
+            }
         }
 
         // Player info column on the right (20% of screen width)
@@ -299,6 +343,40 @@ fun PlayboardScreen(
                 },
                 dismissButton = {}
             )
+        }
+
+        // Passed GO Alert
+        if (showPassedGoAlert) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.3f)
+                    .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Glückwunsch!",
+                        style = TextStyle(
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "$passedGoPlayerName fuhr über los und erhält 200€!",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    )
+                }
+            }
         }
 
         // Chat Open/Close Button (immer sichtbar, unten rechts)
