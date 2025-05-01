@@ -1,7 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-
-
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,13 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
-
+import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun Gameboard(
@@ -27,14 +27,7 @@ fun Gameboard(
     players: List<PlayerMoney> = emptyList(),
     properties: List<Property>
 ) {
-    // TODO: Add images of the game pieces instead of the circles
-    // Simple colors for all the 4 players
-    val playerColors = listOf(
-        Color.Red,
-        Color.Blue,
-        Color.Green,
-        Color.Yellow
-    )
+    val playerColors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow)
 
     Box(
         modifier = modifier
@@ -44,7 +37,6 @@ fun Gameboard(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            // TODO: Add a list of properties instead of the blank tiles later
             repeat(11) { row ->
                 Row(
                     modifier = Modifier
@@ -53,30 +45,40 @@ fun Gameboard(
                 ) {
                     repeat(11) { col ->
                         val isOuter = row == 0 || row == 10 || col == 0 || col == 10
-
-                        // Calculate position 0 - 39 clockwise:
                         val tilePosition = calculateTilePosition(row, col)
-
-                        // Search for all players on a tile:
                         val playersOnTile = players.filter { it.position == tilePosition }
-
-                        val property = properties.find { it.position == tilePosition }
 
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
-                                .background(if (isOuter) outerTileColor else innerTileColor)
-                                .clickable (enabled = tilePosition >= 0) {
+                                .clickable(enabled = tilePosition >= 0) {
                                     onTileClick(tilePosition)
                                 }
                                 .semantics { contentDescription = "Tile($row,$col)" }
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
+                            if (tilePosition == 0) {
+                                val painter = rememberAsyncImagePainter("file:///android_asset/start_0.png")
+                                Image(
+                                    painter = painter,
+                                    contentDescription = "Start Field",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Fit
+                                )
+                            } else {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(if (isOuter) outerTileColor else innerTileColor)
+                                )
+                            }
+
                             if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
                                 Row(
-                                    modifier = Modifier.fillMaxSize(0.8f).testTag("players_row_${row}_$col"),
+                                    modifier = Modifier.fillMaxSize(0.8f)
+                                        .testTag("players_row_${row}_$col"),
                                     horizontalArrangement = Arrangement.SpaceEvenly,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -105,24 +107,16 @@ fun Gameboard(
     }
 }
 
-/**
- * 0 = Start-Tile
- * Indices are increased clockwise (0-39)
- */
 fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
-        // Corners:
-        row == 10 && col == 10 -> 0  // Bottom-right corner (Start)
-        row == 10 && col == 0 -> 10  // Bottom-left corner
-        row == 0 && col == 0 -> 20   // Top-left corner
-        row == 0 && col == 10 -> 30  // Top-right corner
-
-        // Normal Tiles:
-        row == 10 -> if (col > 0 && col < 10) 10 - col else -1  // Bottom row (1-9)
-        col == 0 -> if (row > 0 && row < 10) 10 + (10 - row) else -1  // Left column (11-19)
-        row == 0 -> if (col > 0 && col < 10) 20 + col else -1  // Top row (21-29)
-        col == 10 -> if (row > 0 && row < 10) 30 + row else -1  // Right column (31-39)
-
-        else -> -1  // Inner or invalid positions
+        row == 10 && col == 10 -> 0
+        row == 10 && col == 0 -> 10
+        row == 0 && col == 0 -> 20
+        row == 0 && col == 10 -> 30
+        row == 10 -> if (col in 1..9) 10 - col else -1
+        col == 0 -> if (row in 1..9) 10 + (10 - row) else -1
+        row == 0 -> if (col in 1..9) 20 + col else -1
+        col == 10 -> if (row in 1..9) 30 + row else -1
+        else -> -1
     }
 }
