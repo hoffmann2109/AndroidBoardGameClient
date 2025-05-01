@@ -74,6 +74,7 @@ fun PlayboardScreen(
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+    var showPropertyCard by remember { mutableStateOf(false) }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -83,6 +84,10 @@ fun PlayboardScreen(
             lastPlayerPosition = newPosition
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
+                // If player passed GO, delay showing property card
+                if (showPassedGoAlert) {
+                    delay(3000) // Wait for GO notification to disappear
+                }
                 selectedProperty = landedProperty
                 openedByClick = false
                 canBuy = true
