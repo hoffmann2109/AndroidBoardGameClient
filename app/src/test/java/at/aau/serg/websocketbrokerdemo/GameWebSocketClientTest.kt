@@ -86,4 +86,120 @@ class GameWebSocketClientTest {
 
         verify(mockedWebSocket, times(1)).send("Hello")
     }
+
+    @Test
+    fun testRollDice() {
+        val propertiesContent = "server.url=ws://example.com"
+        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
+        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+
+        val client = GameWebSocketClient(
+            context,
+            onConnected        = { /* unused */ },
+            onMessageReceived  = { /* unused */ },
+            onDiceRolled       = { _, _ -> /* unused */ },
+            onGameStateReceived= { /* unused */ },
+            onPlayerTurn       = { _ -> /* unused */ },
+            onPlayerPassedGo   = { _ -> /* unused */ }
+        )
+
+        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        webSocketField.isAccessible = true
+        val mockedWebSocket = mock(WebSocket::class.java)
+        webSocketField.set(client, mockedWebSocket)
+
+        client.rollDice()
+
+        verify(mockedWebSocket, times(1)).send("Roll")
+    }
+
+    @Test
+    fun testManualRollDice_ValidValue() {
+        val propertiesContent = "server.url=ws://example.com"
+        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
+        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+
+        val client = GameWebSocketClient(
+            context,
+            onConnected        = { /* unused */ },
+            onMessageReceived  = { /* unused */ },
+            onDiceRolled       = { _, _ -> /* unused */ },
+            onGameStateReceived= { /* unused */ },
+            onPlayerTurn       = { _ -> /* unused */ },
+            onPlayerPassedGo   = { _ -> /* unused */ }
+        )
+
+        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        webSocketField.isAccessible = true
+        val mockedWebSocket = mock(WebSocket::class.java)
+        webSocketField.set(client, mockedWebSocket)
+
+        client.manualRollDice(20)
+
+        verify(mockedWebSocket, times(1)).send("MANUAL_ROLL:20")
+    }
+
+    @Test
+    fun testManualRollDice_InvalidValue() {
+        val propertiesContent = "server.url=ws://example.com"
+        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
+        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+
+        val client = GameWebSocketClient(
+            context,
+            onConnected        = { /* unused */ },
+            onMessageReceived  = { /* unused */ },
+            onDiceRolled       = { _, _ -> /* unused */ },
+            onGameStateReceived= { /* unused */ },
+            onPlayerTurn       = { _ -> /* unused */ },
+            onPlayerPassedGo   = { _ -> /* unused */ }
+        )
+
+        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        webSocketField.isAccessible = true
+        val mockedWebSocket = mock(WebSocket::class.java)
+        webSocketField.set(client, mockedWebSocket)
+
+        client.manualRollDice(40) // Invalid value
+
+        verify(mockedWebSocket, never()).send(anyString())
+    }
+
+    @Test
+    fun testManualRollDice_BoundaryValues() {
+        val propertiesContent = "server.url=ws://example.com"
+        val inputStream = ByteArrayInputStream(propertiesContent.toByteArray())
+        `when`(assetManager.open("config.properties")).thenReturn(inputStream)
+
+        val client = GameWebSocketClient(
+            context,
+            onConnected        = { /* unused */ },
+            onMessageReceived  = { /* unused */ },
+            onDiceRolled       = { _, _ -> /* unused */ },
+            onGameStateReceived= { /* unused */ },
+            onPlayerTurn       = { _ -> /* unused */ },
+            onPlayerPassedGo   = { _ -> /* unused */ }
+        )
+
+        val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
+        webSocketField.isAccessible = true
+        val mockedWebSocket = mock(WebSocket::class.java)
+        webSocketField.set(client, mockedWebSocket)
+
+        // Test minimum valid value
+        client.manualRollDice(1)
+        verify(mockedWebSocket, times(1)).send("MANUAL_ROLL:1")
+
+        // Test maximum valid value
+        client.manualRollDice(39)
+        verify(mockedWebSocket, times(1)).send("MANUAL_ROLL:39")
+
+        // Test value just below minimum
+        client.manualRollDice(0)
+        verify(mockedWebSocket, never()).send("MANUAL_ROLL:0")
+
+        // Test value just above maximum
+        client.manualRollDice(40)
+        verify(mockedWebSocket, never()).send("MANUAL_ROLL:40")
+    }
 }
