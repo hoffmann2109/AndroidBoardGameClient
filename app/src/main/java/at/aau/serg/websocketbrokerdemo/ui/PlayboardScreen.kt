@@ -33,6 +33,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,8 @@ import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
+
+import androidx.compose.ui.text.input.KeyboardType
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([a-f0-9\-]+) bought""".toRegex()
@@ -75,6 +78,7 @@ fun PlayboardScreen(
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var showPropertyCard by remember { mutableStateOf(false) }
+    var manualDiceValue by remember { mutableStateOf("") }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -150,6 +154,39 @@ fun PlayboardScreen(
                 diceValue = diceResult,
                 enabled   = isMyTurn
             )
+
+            // Manual Dice Roll Section
+            if (isMyTurn) {
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                OutlinedTextField(
+                    value = manualDiceValue,
+                    onValueChange = { newValue ->
+                        if (newValue.isEmpty() || newValue.toIntOrNull() in 1..39) {
+                            manualDiceValue = newValue
+                        }
+                    },
+                    label = { Text("Manual Dice (1-39)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    singleLine = true
+                )
+                
+                Button(
+                    onClick = {
+                        manualDiceValue.toIntOrNull()?.let { value ->
+                            webSocketClient.manualRollDice(value)
+                            manualDiceValue = ""
+                        }
+                    },
+                    enabled = manualDiceValue.toIntOrNull() in 1..39,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Custom Dice")
+                }
+            }
         }
 
         // Player info column on the right (20% of screen width)
