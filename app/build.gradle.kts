@@ -232,6 +232,9 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("io.mockk:mockk:1.13.5")
     testRuntimeOnly (libs.junit.jupiter.engine)
+    // Für MockK (für unit tests)
+    testImplementation("io.mockk:mockk:1.13.7")
+
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

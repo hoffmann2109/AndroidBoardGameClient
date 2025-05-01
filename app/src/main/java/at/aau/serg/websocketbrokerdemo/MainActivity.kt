@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import androidx.navigation.compose.*
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
@@ -36,9 +37,10 @@ class MainActivity : ComponentActivity() {
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
-        var diceValue   by remember { mutableStateOf<Int?>(null) }
-        var dicePlayer  by remember { mutableStateOf<String?>(null) }
+        var diceValue by remember { mutableStateOf<Int?>(null) }
+        var dicePlayer by remember { mutableStateOf<String?>(null) }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
+        val chatMessages = remember { mutableStateListOf<ChatEntry>() }
         var localPlayerId by remember { mutableStateOf<String?>(null) }
         var showPassedGoAlert by remember { mutableStateOf(false) }
         var passedGoPlayerName by remember { mutableStateOf("") }
@@ -61,7 +63,7 @@ class MainActivity : ComponentActivity() {
                 // Find the first player that matches our Firebase ID or assign a new one
                 currentGamePlayerId = playerMoneyList.find { it.id == userId }?.id
                     ?: playerMoneyList.firstOrNull()?.id
-                    ?: userId // Fallback to Firebase ID if no players exist yet
+                            ?: userId // Fallback to Firebase ID if no players exist yet
             }
         }
 
@@ -85,10 +87,15 @@ class MainActivity : ComponentActivity() {
                     // (you already had logic for matching firebase ID → session-ID)
                     currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
-                onPlayerTurn      = { sessionId ->
-                    // here's where we grab "my" session-id from the server
+                onPlayerTurn = { sessionId ->
+                    // here’s where we grab “my” session-id from the server
                     localPlayerId = sessionId
-                    Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
+                    Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
+                },
+                onChatMessageReceived = { senderId, text ->
+                    val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
+                    chatMessages.add(ChatEntry(senderId, senderName, text))
+
                 },
                 onPlayerPassedGo  = { playerName ->
                     passedGoPlayerName = playerName
@@ -176,11 +183,14 @@ class MainActivity : ComponentActivity() {
                     diceResult      = diceValue,
                     dicePlayerId    = dicePlayer,
                     webSocketClient = webSocketClient,
-                    localPlayerId    = localPlayerId ?: "",
+                    localPlayerId = localPlayerId ?: "",
+                    chatMessages = chatMessages,
                     showPassedGoAlert = showPassedGoAlert,
                     passedGoPlayerName = passedGoPlayerName
                 )
             }
         }
     }
-}
+
+        }
+

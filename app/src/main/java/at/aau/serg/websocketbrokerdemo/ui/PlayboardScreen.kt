@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,6 +42,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,6 +68,7 @@ fun PlayboardScreen(
     diceResult:     Int?,
     dicePlayerId:   String?,
     webSocketClient: GameWebSocketClient,
+    chatMessages: List<ChatEntry>,
     showPassedGoAlert: Boolean,
     passedGoPlayerName: String
 ) {
@@ -79,6 +83,20 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var showPropertyCard by remember { mutableStateOf(false) }
     var manualDiceValue by remember { mutableStateOf("") }
+    var chatOpen by remember{ mutableStateOf(false)}
+    var chatInput by remember { mutableStateOf("") }
+    val nameColors = listOf(
+        Color(0xFFE57373), // Rot
+        Color(0xFF64B5F6), // Blau
+        Color(0xFF81C784), // Grün
+        Color(0xFFFFD54F)  // Gelb
+    )
+
+    val playerColorMap = players
+        .mapIndexed { index, player -> player.id to nameColors[index % nameColors.size] }
+        .toMap()
+
+
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -158,7 +176,7 @@ fun PlayboardScreen(
             // Manual Dice Roll Section
             if (isMyTurn) {
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 OutlinedTextField(
                     value = manualDiceValue,
                     onValueChange = { newValue ->
@@ -173,7 +191,7 @@ fun PlayboardScreen(
                         .padding(bottom = 8.dp),
                     singleLine = true
                 )
-                
+
                 Button(
                     onClick = {
                         manualDiceValue.toIntOrNull()?.let { value ->
@@ -360,6 +378,112 @@ fun PlayboardScreen(
                 }
             }
         }
+
+        // Chat Open/Close Button (immer sichtbar, unten rechts)
+        Button(
+
+            onClick = { chatOpen = !chatOpen },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+        ) {
+            Text(if (chatOpen) "Close Chat" else "Open Chat", fontSize = 16.sp)
+        }
+
+// Chat Overlay
+
+        if (chatOpen) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
+                    .padding(32.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .fillMaxWidth()
+                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                        .padding(16.dp)
+                ) {
+                    // Nachrichtenliste
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(8.dp),
+                        reverseLayout = true
+                    ) {
+                        items(chatMessages.reversed()) { entry ->
+                            val isOwnMessage = entry.senderId == currentPlayerId
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = if (isOwnMessage) Arrangement.End else Arrangement.Start
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            if (isOwnMessage) Color(0xFFDCF8C6) else Color.White,
+                                            RoundedCornerShape(12.dp)
+                                        )
+                                        .padding(12.dp)
+                                        .widthIn(max = 240.dp)
+                                ) {
+                                    Column {
+                                        val nameColor = playerColorMap[entry.senderId] ?: Color.Gray
+                                        Text(
+                                            text = entry.senderName,
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 12.sp,
+                                            color = nameColor
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = entry.message,
+                                            color = Color.Black,
+                                            fontSize = 16.sp
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Eingabe und Senden
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TextField(
+                            value = chatInput,
+                            onValueChange = { chatInput = it },
+                            modifier = Modifier.weight(1f),
+                            placeholder = { Text("Type your message...") }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            onClick = {
+                                if (chatInput.isNotBlank()) {
+                                    webSocketClient.sendChatMessage(currentPlayerId, chatInput)
+                                    chatInput = "" // Nach Senden Eingabefeld leeren
+                                }
+                            }
+                        ) {
+                            Text("Send")
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 }
 
@@ -690,4 +814,3 @@ fun DiceFace(diceValue: Int?) {
         )
     }
 }
-

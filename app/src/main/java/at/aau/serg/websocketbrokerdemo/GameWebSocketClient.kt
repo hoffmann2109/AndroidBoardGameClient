@@ -2,6 +2,7 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
+import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
@@ -24,7 +25,8 @@ class GameWebSocketClient(
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (playerId: String) -> Unit,
     private val onPlayerPassedGo: (playerName: String) -> Unit,
-    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
@@ -128,6 +130,15 @@ class GameWebSocketClient(
                 }
             } catch (_: Exception) { /* not a dice‐roll */ }
 
+            try {
+                val chatMessage = gson.fromJson(text, ChatMessage::class.java)
+                if (chatMessage.type == "CHAT_MESSAGE") {
+
+                    onChatMessageReceived(chatMessage.playerId, chatMessage.message)
+                    return
+                }
+            } catch (_: Exception) { /* not a chat-message */ }
+
             // Always call the general message handler
             onMessageReceived(text)
         }
@@ -192,6 +203,12 @@ class GameWebSocketClient(
             properties.load(input)
         }
         return properties.getProperty("server.url")
+    }
+
+    fun sendChatMessage(playerId: String, message: String) {
+        val chat = ChatMessage(playerId = playerId, message = message)
+        val json = gson.toJson(chat)
+        sendMessage(json)
     }
 
     fun rollDice() {

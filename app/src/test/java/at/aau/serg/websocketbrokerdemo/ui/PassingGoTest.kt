@@ -10,13 +10,16 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.delay
 import org.junit.Assert.*
 import android.content.Context
+import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 
 class PassingGoTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private val mockContext = mockk<Context>(relaxed = true)
+    private val emptyChat = emptyList<ChatEntry>()
     private val mockWebSocketClient = GameWebSocketClient(
         context = mockContext,
         onConnected = { /* No-op for testing */ },
@@ -24,7 +27,9 @@ class PassingGoTest {
         onDiceRolled = { _, _ -> /* No-op for testing */ },
         onGameStateReceived = { /* No-op for testing */ },
         onPlayerTurn = { /* No-op for testing */ },
-        onPlayerPassedGo = { /* No-op for testing */ }
+        onPlayerPassedGo = { /* No-op for testing */ },
+        coroutineDispatcher = Dispatchers.IO,
+        onChatMessageReceived = { _, _ -> }
     )
 
     @Test
@@ -43,7 +48,8 @@ class PassingGoTest {
                 dicePlayerId = "test-id",
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
-                passedGoPlayerName = "Test Player"
+                passedGoPlayerName = "Test Player",
+                chatMessages = emptyChat
             )
         }
 
@@ -69,7 +75,8 @@ class PassingGoTest {
                 dicePlayerId = "test-id",
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = showAlert,
-                passedGoPlayerName = "Test Player"
+                passedGoPlayerName = "Test Player",
+                chatMessages =emptyChat,
             )
         }
 
@@ -90,7 +97,8 @@ class PassingGoTest {
                 dicePlayerId = "test-id",
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = showAlert,
-                passedGoPlayerName = "Test Player"
+                passedGoPlayerName = "Test Player",
+                chatMessages = emptyChat,
             )
         }
 
@@ -114,7 +122,8 @@ class PassingGoTest {
                 dicePlayerId = "test-id",
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
-                passedGoPlayerName = "Test Player"
+                passedGoPlayerName = "Test Player",
+                chatMessages = emptyChat
             )
         }
 
@@ -145,7 +154,8 @@ class PassingGoTest {
                 dicePlayerId = "test-id",
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
-                passedGoPlayerName = "Test Player"
+                passedGoPlayerName = "Test Player",
+                chatMessages = emptyChat
             )
         }
 
