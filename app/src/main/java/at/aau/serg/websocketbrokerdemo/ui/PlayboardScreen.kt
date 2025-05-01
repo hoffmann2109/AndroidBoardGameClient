@@ -72,6 +72,8 @@ fun PlayboardScreen(
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
+    var showPassedGoAlert by remember { mutableStateOf(false) }
+    var passedGoPlayerName by remember { mutableStateOf("") }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -96,6 +98,14 @@ fun PlayboardScreen(
             properties.find { it.id == propertyId }?.let { property ->
                 property.ownerId = playerId
             }
+        }
+    }
+
+    // Show passed GO alert for 3 seconds
+    LaunchedEffect(showPassedGoAlert) {
+        if (showPassedGoAlert) {
+            delay(3000)
+            showPassedGoAlert = false
         }
     }
 
@@ -279,6 +289,32 @@ fun PlayboardScreen(
                         }
                     }
                 },
+                dismissButton = {}
+            )
+        }
+
+        // Passed GO Alert
+        if (showPassedGoAlert) {
+            AlertDialog(
+                onDismissRequest = { showPassedGoAlert = false },
+                title = {
+                    Text(
+                        text = "Glückwunsch!",
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                text = {
+                    Text(
+                        text = "$passedGoPlayerName fuhr über los und erhält 200€!",
+                        style = TextStyle(
+                            fontSize = 18.sp
+                        )
+                    )
+                },
+                confirmButton = {},
                 dismissButton = {}
             )
         }
