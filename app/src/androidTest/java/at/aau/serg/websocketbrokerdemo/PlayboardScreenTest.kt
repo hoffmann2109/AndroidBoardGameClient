@@ -92,4 +92,63 @@ class PlayboardScreenTest {
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Roll Dice").assertIsEnabled()
     }
+
+    @Test
+    fun testChatToggleOpensAndClosesChatOverlay() {
+        val players = listOf(
+            PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0)
+        )
+
+        composeTestRule.setContent {
+            PlayboardScreen(
+                players = players,
+                currentPlayerId = "1",
+                localPlayerId = "1",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = 2,
+                dicePlayerId = "1",
+                webSocketClient = mockWebSocketClient,
+                chatMessages = listOf()
+            )
+        }
+
+        // Öffne Chat
+        composeTestRule.onNodeWithText("Open Chat").performClick()
+        composeTestRule.onNodeWithText("Send").assertIsDisplayed()
+
+        // Schließe Chat
+        composeTestRule.onNodeWithText("Close Chat").performClick()
+        composeTestRule.onNodeWithText("Open Chat").assertIsDisplayed()
+    }
+
+    @Test
+    fun testChatMessageDisplayAndInput() {
+        val messages = listOf(
+            ChatEntry(senderId = "1", message = "Hello from me", senderName = "Alex"),
+            ChatEntry(senderId = "2", message = "Hello from another", senderName = "Alex2")
+        )
+
+        composeTestRule.setContent {
+            PlayboardScreen(
+                players = listOf(PlayerMoney("1", "Me", 1500, 0)),
+                currentPlayerId = "1",
+                localPlayerId = "1",
+                onRollDice = {},
+                onBackToLobby = {},
+                diceResult = 1,
+                dicePlayerId = "1",
+                webSocketClient = mockWebSocketClient,
+                chatMessages = messages
+            )
+        }
+
+        // Öffne Chat
+        composeTestRule.onNodeWithText("Open Chat").performClick()
+
+        // Nachrichten sichtbar
+        composeTestRule.onNodeWithText("Hello from me").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Hello from another").assertIsDisplayed()
+    }
+
 }
