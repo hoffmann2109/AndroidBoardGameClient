@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
+import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import kotlinx.coroutines.delay
 
 
@@ -149,7 +150,8 @@ class MainActivity : ComponentActivity() {
                     },
                     onProfileClick = { navController.navigate("profile") },
                     onJoinGame = { navController.navigate("playerInfo") },
-                    onStatisticsClick = { navController.navigate("statistics") }
+                    onStatisticsClick = { navController.navigate("statistics") },
+                    onLeaderboardClick = { navController.navigate("leaderboard") }
                 )
             }
             composable("profile") {
@@ -187,6 +189,11 @@ class MainActivity : ComponentActivity() {
                     chatMessages = chatMessages,
                     showPassedGoAlert = showPassedGoAlert,
                     passedGoPlayerName = passedGoPlayerName
+                )
+            }
+            composable("leaderboard") {
+                LeaderboardScreen(
+                    onBack = { navController.popBackStack() }
                 )
             }
         }

@@ -98,4 +98,19 @@ object FirestoreManager {
             saveGameData(userId, game)
         }
     }
+
+    suspend fun getLeaderboardEntries(leaderboardType: String): List<Map<String, Any>> {
+        return try {
+            db.collection("leaderboard_$leaderboardType")
+                .orderBy("rank", Query.Direction.ASCENDING)
+                .get()
+                .await()
+                .documents
+                .map { it.data ?: emptyMap() }
+        } catch (e: Exception) {
+            Log.e("FirestoreManager", "Error getting leaderboard entries", e)
+            emptyList()
+        }
+    }
+
 }
