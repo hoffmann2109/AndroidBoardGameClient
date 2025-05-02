@@ -149,7 +149,8 @@ class MainActivity : ComponentActivity() {
                     },
                     onProfileClick = { navController.navigate("profile") },
                     onJoinGame = { navController.navigate("playerInfo") },
-                    onStatisticsClick = { navController.navigate("statistics") }
+                    onStatisticsClick = { navController.navigate("statistics") },
+                    onLeaderboardClick = { navController.navigate("leaderboard") }
                 )
             }
             composable("profile") {
@@ -187,6 +188,11 @@ class MainActivity : ComponentActivity() {
                     chatMessages = chatMessages,
                     showPassedGoAlert = showPassedGoAlert,
                     passedGoPlayerName = passedGoPlayerName
+                )
+            }
+            composable("leaderboard") {
+                LeaderboardScreen(
+                    onBack = { navController.popBackStack() }
                 )
             }
         }
