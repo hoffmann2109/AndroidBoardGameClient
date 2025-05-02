@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
+import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import kotlinx.coroutines.delay
 
 
