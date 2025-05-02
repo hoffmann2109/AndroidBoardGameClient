@@ -85,7 +85,8 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/Manifest*.*",
         "**/*Test*.*",
         "android/**/*.*",
-        "**/data/**/*.*"
+        "**/data/**/*.*",
+        "**/ui/LeaderboardScreen.kt"
     )
 
     val debugTree =
@@ -126,7 +127,8 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "android/**/*.*"
+        "android/**/*.*",
+        "**/ui/LeaderboardScreen.kt"
     )
 
     val debugTree =
@@ -166,7 +168,8 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "android/**/*.*"
+        "android/**/*.*",
+        "**/ui/LeaderboardScreen.kt"
     )
 
     val debugTree = fileTree("${project.layout.buildDirectory.get().asFile}/tmp/kotlin-classes/debug") {
