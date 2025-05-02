@@ -30,6 +30,8 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onLogout = {},
                 onProfileClick = {},
+                onOpenSettings = {},
+                onOpenSoundSelection = {},
                 onJoinGame = {}
             )
         }
@@ -56,7 +58,10 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onLogout = {},
                 onProfileClick = {},
+                onOpenSettings = {},
+                onOpenSoundSelection = {},
                 onJoinGame = {}
+
             )
         }
 
@@ -84,6 +89,8 @@ class LobbyScreenTest {
                 onSendMessage = {},
                 onLogout = {},
                 onProfileClick = {},
+                onOpenSettings = {},
+                onOpenSoundSelection = {},
                 onJoinGame = {}
             )
         }
