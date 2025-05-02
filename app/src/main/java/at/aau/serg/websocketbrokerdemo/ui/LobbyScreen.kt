@@ -37,6 +37,7 @@ fun LobbyScreen(
     onLogout: () -> Unit,
     onProfileClick: () -> Unit,
     onStatisticsClick: () -> Unit,
+    onLeaderboardClick: () -> Unit,
     onJoinGame: () -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
@@ -92,6 +93,7 @@ fun LobbyScreen(
                 AnimatedButton("Logout", Color.Red, onLogout)
                 AnimatedButton("Profile", Color.Blue, onProfileClick)
                 AnimatedButton("Statistics", Color.Blue, onStatisticsClick)
+                AnimatedButton("Leaderboard", Color.Blue, onLeaderboardClick)
 
 
                 // Join Game button
