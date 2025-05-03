@@ -45,6 +45,10 @@ class MainActivity : ComponentActivity() {
         var localPlayerId by remember { mutableStateOf<String?>(null) }
         var showPassedGoAlert by remember { mutableStateOf(false) }
         var passedGoPlayerName by remember { mutableStateOf("") }
+        var showTaxPaymentAlert by remember { mutableStateOf(false) }
+        var taxPaymentPlayerName by remember { mutableStateOf("") }
+        var taxPaymentAmount by remember { mutableStateOf(0) }
+        var taxPaymentType by remember { mutableStateOf("") }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -55,6 +59,18 @@ class MainActivity : ComponentActivity() {
             if (showPassedGoAlert) {
                 delay(3000)
                 showPassedGoAlert = false
+                // After GO alert, show tax alert if needed
+                if (showTaxPaymentAlert) {
+                    showTaxPaymentAlert = false
+                }
+            }
+        }
+
+        // Show tax payment alert for 3 seconds (only if not triggered by passing GO)
+        LaunchedEffect(showTaxPaymentAlert) {
+            if (showTaxPaymentAlert && !showPassedGoAlert) {
+                delay(3000)
+                showTaxPaymentAlert = false
             }
         }
 
@@ -89,18 +105,23 @@ class MainActivity : ComponentActivity() {
                     currentGamePlayerId = players.find { it.id == userId }?.id ?: userId
                 },
                 onPlayerTurn = { sessionId ->
-                    // here’s where we grab “my” session-id from the server
+                    // here's where we grab "my" session-id from the server
                     localPlayerId = sessionId
-                    Log.d("WebSocket", "It’s now YOUR turn; session ID = $sessionId")
+                    Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
                 },
                 onChatMessageReceived = { senderId, text ->
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
-
                 },
                 onPlayerPassedGo  = { playerName ->
                     passedGoPlayerName = playerName
                     showPassedGoAlert = true
+                },
+                onTaxPayment = { playerName, amount, taxType ->
+                    taxPaymentPlayerName = playerName
+                    taxPaymentAmount = amount
+                    taxPaymentType = taxType
+                    showTaxPaymentAlert = true
                 }
             )
         }
@@ -188,7 +209,11 @@ class MainActivity : ComponentActivity() {
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
                     showPassedGoAlert = showPassedGoAlert,
-                    passedGoPlayerName = passedGoPlayerName
+                    passedGoPlayerName = passedGoPlayerName,
+                    showTaxPaymentAlert = showTaxPaymentAlert,
+                    taxPaymentPlayerName = taxPaymentPlayerName,
+                    taxPaymentAmount = taxPaymentAmount,
+                    taxPaymentType = taxPaymentType
                 )
             }
             composable("leaderboard") {

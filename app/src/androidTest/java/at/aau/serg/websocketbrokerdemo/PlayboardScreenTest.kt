@@ -46,7 +46,11 @@ class PlayboardScreenTest {
                 webSocketClient = mockWebSocketClient,
                 chatMessages = emptyChat,
                 showPassedGoAlert = false,
-                passedGoPlayerName = ""
+                passedGoPlayerName = "",
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -68,7 +72,11 @@ class PlayboardScreenTest {
                 webSocketClient = mockWebSocketClient,
                 chatMessages = emptyChat,
                 showPassedGoAlert = false,
-                passedGoPlayerName = ""
+                passedGoPlayerName = "",
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -90,7 +98,11 @@ class PlayboardScreenTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -114,7 +126,11 @@ class PlayboardScreenTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -136,7 +152,11 @@ class PlayboardScreenTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -162,7 +182,11 @@ class PlayboardScreenTest {
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
                 showPassedGoAlert = false,
-                passedGoPlayerName = ""
+                passedGoPlayerName = "",
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -195,6 +219,10 @@ class PlayboardScreenTest {
                 chatMessages = messages,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
