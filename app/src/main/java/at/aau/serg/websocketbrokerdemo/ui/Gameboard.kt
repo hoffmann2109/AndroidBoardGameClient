@@ -1,97 +1,94 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-
-
+import com.example.myapplication.R
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
 
-
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
-    outerTileColor: Color = Color.DarkGray,
-    innerTileColor: Color = Color.LightGray,
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
     properties: List<Property>
 ) {
-    // TODO: Add images of the game pieces instead of the circles
-    // Simple colors for all the 4 players
-    val playerColors = listOf(
-        Color.Red,
-        Color.Blue,
-        Color.Green,
-        Color.Yellow
-    )
+    // Make the corners bigger like in a real monopoly board
+    val cornerFactor  = 1.5f
+    val regularFactor = 1f
+
+    // TODO: change the circles to real game pieces later
+    val playerColors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow)
+    val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
         modifier = modifier
-            .background(Color.Gray)
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(0.dp))
             .testTag("gameboard")
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // TODO: Add a list of properties instead of the blank tiles later
+        Image(
+            painter = boardPainter,
+            contentDescription = "Monopoly board",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
+
+        Column(Modifier.fillMaxSize()) {
             repeat(11) { row ->
+                val rowWeight = if (row == 0 || row == 10) cornerFactor else regularFactor
+
                 Row(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .weight(rowWeight),
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     repeat(11) { col ->
-                        val isOuter = row == 0 || row == 10 || col == 0 || col == 10
-
-                        // Calculate position 0 - 39 clockwise:
-                        val tilePosition = calculateTilePosition(row, col)
-
-                        // Search for all players on a tile:
-                        val playersOnTile = players.filter { it.position == tilePosition }
-
-                        val property = properties.find { it.position == tilePosition }
+                        val tilePos       = calculateTilePosition(row, col)
+                        val playersOnTile = players.filter { it.position == tilePos }
+                        val isCorner   = (row == 0 || row == 10) && (col == 0 || col == 10)
+                        val tileWeight = if (isCorner) cornerFactor else regularFactor
 
                         Box(
                             modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .background(if (isOuter) outerTileColor else innerTileColor)
-                                .clickable (enabled = tilePosition >= 0) {
-                                    onTileClick(tilePosition)
-                                }
+                                .weight(tileWeight)
+                                .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                                .background(Color.Transparent)
+                                .clickable(enabled = tilePos >= 0) { onTileClick(tilePos) }
                                 .semantics { contentDescription = "Tile($row,$col)" }
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (isOuter && tilePosition >= 0 && playersOnTile.isNotEmpty()) {
+                            if (playersOnTile.isNotEmpty()) {
                                 Row(
-                                    modifier = Modifier.fillMaxSize(0.8f).testTag("players_row_${row}_$col"),
+                                    modifier = Modifier.fillMaxSize(0.8f),
                                     horizontalArrangement = Arrangement.SpaceEvenly,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    playersOnTile.forEachIndexed { index, player ->
-                                        val playerIndex = players.indexOfFirst { it.id == player.id }
-                                        val colorIndex = if (playerIndex >= 0) playerIndex % playerColors.size else index % playerColors.size
-
+                                    playersOnTile.forEach { player ->
+                                        val idx   = players.indexOfFirst { it.id == player.id }
+                                        val color = playerColors.getOrElse(idx) { playerColors.random() }
                                         Box(
                                             modifier = Modifier
                                                 .size(12.dp)
-                                                .background(
-                                                    playerColors[colorIndex],
-                                                    CircleShape
-                                                )
-                                                .semantics { contentDescription = "Player(${player.id})" }
+                                                .background(color, CircleShape)
                                                 .testTag("playerCircle_${player.id}")
                                         )
                                     }
