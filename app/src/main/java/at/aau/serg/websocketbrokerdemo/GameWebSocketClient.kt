@@ -6,6 +6,7 @@ import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
@@ -27,6 +28,7 @@ class GameWebSocketClient(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
 ) {
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
@@ -86,6 +88,16 @@ class GameWebSocketClient(
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
+
+            // Check for tax payment message
+            try {
+                val taxMessage = gson.fromJson(text, TaxPaymentMessage::class.java)
+                if (taxMessage.type == "TAX_PAYMENT") {
+                    val playerName = players.find { it.id == taxMessage.playerId }?.name ?: "Unknown Player"
+                    onTaxPayment(playerName, taxMessage.amount, taxMessage.taxType)
+                    return
+                }
+            } catch (_: Exception) { /* not a tax payment message */ }
 
             // Check for "passed GO" message
             if (text.contains("passed GO and collected")) {
@@ -219,6 +231,17 @@ class GameWebSocketClient(
         if (value in 1..39) {
             webSocket?.send("MANUAL_ROLL:$value")
         }
+    }
+
+    fun sendTaxPayment(playerId: String, amount: Int, taxType: String) {
+        val taxMessage = TaxPaymentMessage(
+            playerId = playerId,
+            amount = amount,
+            taxType = taxType
+        )
+        val json = gson.toJson(taxMessage)
+        webSocket?.send(json)
+        Log.d("WebSocket", "Sent tax payment message: $json")
     }
 
 }

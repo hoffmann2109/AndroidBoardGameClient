@@ -70,7 +70,11 @@ fun PlayboardScreen(
     webSocketClient: GameWebSocketClient,
     chatMessages: List<ChatEntry>,
     showPassedGoAlert: Boolean,
-    passedGoPlayerName: String
+    passedGoPlayerName: String,
+    showTaxPaymentAlert: Boolean,
+    taxPaymentPlayerName: String,
+    taxPaymentAmount: Int,
+    taxPaymentType: String
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -104,6 +108,31 @@ fun PlayboardScreen(
 
         if (newPosition != null && newPosition != lastPlayerPosition) {
             lastPlayerPosition = newPosition
+            
+            // Check for tax squares
+            when (newPosition) {
+                4 -> { // Einkommensteuer
+                    if (showPassedGoAlert) {
+                        delay(3000) // Wait for GO alert to finish
+                    }
+                    webSocketClient.sendTaxPayment(
+                        playerId = currentPlayer.id,
+                        amount = 200,
+                        taxType = "EINKOMMENSTEUER"
+                    )
+                }
+                38 -> { // Zusatzsteuer
+                    if (showPassedGoAlert) {
+                        delay(3000) // Wait for GO alert to finish
+                    }
+                    webSocketClient.sendTaxPayment(
+                        playerId = currentPlayer.id,
+                        amount = 100,
+                        taxType = "ZUSATZSTEUER"
+                    )
+                }
+            }
+            
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
                 // If player passed GO, delay showing property card
@@ -370,6 +399,40 @@ fun PlayboardScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "$passedGoPlayerName fuhr über los und erhält 200€!",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    )
+                }
+            }
+        }
+
+        // Tax Payment Alert
+        if (showTaxPaymentAlert) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.3f)
+                    .background(Color(0xFFFFA500).copy(alpha = 0.9f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Autsch!",
+                        style = TextStyle(
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "$taxPaymentPlayerName muss ${taxPaymentAmount}€ $taxPaymentType an die Bank zahlen!",
                         style = TextStyle(
                             fontSize = 20.sp,
                             color = Color.White
