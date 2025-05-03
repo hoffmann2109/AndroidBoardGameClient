@@ -1,132 +1,98 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-
+import com.example.myapplication.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
-import coil.compose.rememberAsyncImagePainter
-
 
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
-    outerTileColor: Color = Color(0xFFE7FFC9),
-    innerTileColor: Color = Color.LightGray,
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
     properties: List<Property>
 ) {
-    // TODO: Add images of the game pieces instead of the circles
-    // Simple colors for all the 4 players
-    val playerColors = listOf(
-        Color.Red,
-        Color.Blue,
-        Color.Green,
-        Color.Yellow
-    )
+    // Make the corners bigger like in a real monopoly board
+    val cornerFactor  = 1.5f
+    val regularFactor = 1f
 
-    val centerPainter = rememberAsyncImagePainter("file:///android_asset/Center2.png")
+    // TODO: change the circles to real game pieces later
+    val playerColors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow)
+    val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
         modifier = modifier
-            .padding(8.dp)
-            .background(outerTileColor)
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(0.dp))
             .testTag("gameboard")
     ) {
-        // Center image inside the board
         Image(
-            painter = centerPainter,
-            contentDescription = "Monopoly Center",
-            modifier = Modifier
-                .fillMaxSize(0.88f)
-                .align(Alignment.Center)
-                .border(
-                    width = 2.dp,
-                    color = Color.Black,
-                ),
-            contentScale = ContentScale.Fit
+            painter = boardPainter,
+            contentDescription = "Monopoly board",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
         )
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // TODO: Add a list of properties instead of the blank tiles later
+        Column(Modifier.fillMaxSize()) {
             repeat(11) { row ->
+                val rowWeight = if (row == 0 || row == 10) cornerFactor else regularFactor
+
                 Row(
-                    modifier = Modifier
+                    Modifier
                         .fillMaxWidth()
-                        .weight(1f)
+                        .weight(rowWeight),
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     repeat(11) { col ->
-                        val isOuter = row == 0 || row == 10 || col == 0 || col == 10
-
-                        // Calculate position 0 - 39 clockwise:
-                        val tilePosition = calculateTilePosition(row, col)
-
-                        // Search for all players on a tile:
-                        val playersOnTile = players.filter { it.position == tilePosition }
-
-                        val property = properties.find { it.position == tilePosition }
+                        val tilePos       = calculateTilePosition(row, col)
+                        val playersOnTile = players.filter { it.position == tilePos }
+                        val isCorner   = (row == 0 || row == 10) && (col == 0 || col == 10)
+                        val tileWeight = if (isCorner) cornerFactor else regularFactor
 
                         Box(
                             modifier = Modifier
-                                .weight(1f)
-                                .aspectRatio(1f)
-                                .background(if (isOuter) outerTileColor else Color.Transparent)
-                                .clickable(enabled = tilePosition in 0..39) {
-                                    onTileClick(tilePosition)
-                                }
+                                .weight(tileWeight)
+                                .aspectRatio(1f, matchHeightConstraintsFirst = true)
+                                .background(Color.Transparent)
+                                .clickable(enabled = tilePos >= 0) { onTileClick(tilePos) }
                                 .semantics { contentDescription = "Tile($row,$col)" }
                                 .testTag("tile_${row}_$col"),
                             contentAlignment = Alignment.Center
                         ) {
-                            if (tilePosition in 0..39) {
-                                val imageName = "Feld ${tilePosition + 1}.png"
-                                val tilePainter =
-                                    rememberAsyncImagePainter("file:///android_asset/$imageName")
-                                Image(
-                                    painter = tilePainter,
-                                    contentDescription = "Field $tilePosition",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Fit
-                                )
-                            }
-                        }
-
-                        if (isOuter && playersOnTile.isNotEmpty()) {
-                            playersOnTile.forEachIndexed { index, player ->
-                                val playerIndex = players.indexOfFirst { it.id == player.id }
-                                val imageName = "Player${(playerIndex + 1)}.png"
-                                val playerPainter =
-                                    rememberAsyncImagePainter("file:///android_asset/$imageName")
-
-                                Image(
-                                    painter = playerPainter,
-                                    contentDescription = "Player(${player.id})",
-                                    modifier = Modifier
-                                        .size(36.dp) // Größer als vorher, für bessere Sichtbarkeit
-                                        .offset(
-                                            x = (-4).dp,
-                                            y = (-4).dp
-                                        ) // Feinjustierung zur Feldmitte
-                                        .semantics { contentDescription = "Player(${player.id})" }
-                                        .testTag("playerImage_${player.id}"),
-                                    contentScale = ContentScale.Crop // oder ContentScale.Fit je nach Bildinhalt
-                                )
+                            if (playersOnTile.isNotEmpty()) {
+                                Row(
+                                    modifier = Modifier.fillMaxSize(0.8f),
+                                    horizontalArrangement = Arrangement.SpaceEvenly,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    playersOnTile.forEach { player ->
+                                        val idx   = players.indexOfFirst { it.id == player.id }
+                                        val color = playerColors.getOrElse(idx) { playerColors.random() }
+                                        Box(
+                                            modifier = Modifier
+                                                .size(12.dp)
+                                                .background(color, CircleShape)
+                                                .testTag("playerCircle_${player.id}")
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -134,9 +100,7 @@ fun Gameboard(
             }
         }
     }
-
 }
-
 
 /**
  * 0 = Start-Tile
