@@ -29,7 +29,8 @@ class PassingGoTest {
         onPlayerTurn = { /* No-op for testing */ },
         onPlayerPassedGo = { /* No-op for testing */ },
         coroutineDispatcher = Dispatchers.IO,
-        onChatMessageReceived = { _, _ -> }
+        onChatMessageReceived = { _, _ -> },
+        onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
 
     @Test
@@ -49,7 +50,11 @@ class PassingGoTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -76,7 +81,11 @@ class PassingGoTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = showAlert,
                 passedGoPlayerName = "Test Player",
-                chatMessages =emptyChat,
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -99,6 +108,10 @@ class PassingGoTest {
                 showPassedGoAlert = showAlert,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -123,7 +136,11 @@ class PassingGoTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 
@@ -155,7 +172,11 @@ class PassingGoTest {
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
-                chatMessages = emptyChat
+                chatMessages = emptyChat,
+                showTaxPaymentAlert = false,
+                taxPaymentPlayerName = "",
+                taxPaymentAmount = 0,
+                taxPaymentType = ""
             )
         }
 

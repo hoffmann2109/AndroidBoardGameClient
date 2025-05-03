@@ -6,7 +6,6 @@ import okhttp3.WebSocket
 import org.junit.jupiter.api.*
 import org.mockito.Mockito.*
 import java.io.ByteArrayInputStream
-import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import kotlinx.coroutines.Dispatchers
 
 class GameWebSocketClientTest {
@@ -44,6 +43,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
 
@@ -75,6 +75,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
 
@@ -106,6 +107,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
 
@@ -137,6 +139,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
             
@@ -166,6 +169,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
 
@@ -194,6 +198,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
 
@@ -222,6 +227,7 @@ class GameWebSocketClientTest {
             onPlayerTurn = {},
             onChatMessageReceived = { _, _ -> },
             onPlayerPassedGo = { _ -> },
+            onTaxPayment = { _, _, _ -> },
             coroutineDispatcher = Dispatchers.IO
         )
 
