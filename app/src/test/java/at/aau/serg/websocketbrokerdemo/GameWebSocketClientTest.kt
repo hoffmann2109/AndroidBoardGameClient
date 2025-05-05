@@ -36,15 +36,16 @@ class GameWebSocketClientTest {
         // Act
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
 
         // Zugriff auf private Property mittels Reflection
@@ -68,15 +69,16 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
 
         val mockWebSocket = mock(WebSocket::class.java)
@@ -100,15 +102,16 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
 
         val mockWebSocket = mock(WebSocket::class.java)
@@ -132,15 +135,16 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
             
 
@@ -162,15 +166,16 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
 
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
@@ -191,15 +196,16 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
 
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
@@ -220,15 +226,16 @@ class GameWebSocketClientTest {
 
         val client = GameWebSocketClient(
             context,
-            onConnected = {},
-            onMessageReceived = {},
-            onDiceRolled = { _, _ -> },
-            onGameStateReceived = {},
-            onPlayerTurn = {},
+            onConnected = { /* No-op for testing */ },
+            onMessageReceived = { /* No-op for testing */ },
+            onDiceRolled = { _, _ -> /* No-op for testing */ },
+            onGameStateReceived = { /* No-op for testing */ },
+            onPlayerTurn = { /* No-op for testing */ },
+            onPlayerPassedGo = { /* No-op for testing */ },
+            coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onPlayerPassedGo = { _ -> },
-            onTaxPayment = { _, _, _ -> },
-            coroutineDispatcher = Dispatchers.IO
+            onCardDrawn = {_,_,_-> },
+            onTaxPayment = { _, _, _ -> /* No-op for testing */ }
         )
 
         val webSocketField = GameWebSocketClient::class.java.getDeclaredField("webSocket")
