@@ -2,8 +2,10 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
+import at.aau.serg.websocketbrokerdemo.data.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.PullCardMessage
@@ -29,6 +31,7 @@ class GameWebSocketClient(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
 ) {
     private val client = OkHttpClient()
@@ -142,6 +145,17 @@ class GameWebSocketClient(
                     return  // don't fall through to the generic log handler
                 }
             } catch (_: Exception) { /* not a dice‐roll */ }
+
+            // Try parsing a DrawnCardMessage
+            try {
+                val drawn = gson.fromJson(text, DrawnCardMessage::class.java)
+                if (drawn.type == "CARD_DRAWN") {
+                    val desc = drawn.card.get("description").asString
+
+                    onCardDrawn(drawn.playerId, drawn.cardType, desc)
+                    return
+                }
+            } catch (_: Exception) { /* not a card message */ }
 
             try {
                 val chatMessage = gson.fromJson(text, ChatMessage::class.java)
