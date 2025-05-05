@@ -132,6 +132,12 @@ fun PlayboardScreen(
                     )
                 }
             }
+
+            when (newPosition) {
+                2, 17, 7, 22 -> { // Players lands on a "Gemeinschaftskarten-" or "Ergeigniskartenfeld" -> Pull a card
+                    webSocketClient.sendPullCard(currentPlayer.id, newPosition)
+                }
+            }
             
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {

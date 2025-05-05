@@ -6,6 +6,7 @@ import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
@@ -242,6 +243,18 @@ class GameWebSocketClient(
         val json = gson.toJson(taxMessage)
         webSocket?.send(json)
         Log.d("WebSocket", "Sent tax payment message: $json")
+    }
+
+    fun sendPullCard(playerId: String, field: Int) {
+        val cardType = when (field) {
+            2, 17 -> "COMMUNITY_CHEST"
+            7, 22 -> "CHANCE"
+            else  -> return
+        }
+        val msg = PullCardMessage(playerId = playerId, cardType = cardType)
+        val json = gson.toJson(msg)
+        webSocket?.send(json)
+        Log.d("WebSocket", "Sent PULL_CARD message: $json")
     }
 
 }
