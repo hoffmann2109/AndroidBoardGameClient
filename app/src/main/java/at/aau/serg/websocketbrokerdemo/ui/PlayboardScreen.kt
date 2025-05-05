@@ -108,7 +108,7 @@ fun PlayboardScreen(
 
         if (newPosition != null && newPosition != lastPlayerPosition) {
             lastPlayerPosition = newPosition
-            
+
             // Check for tax squares
             when (newPosition) {
                 4 -> { // Einkommensteuer
@@ -132,7 +132,13 @@ fun PlayboardScreen(
                     )
                 }
             }
-            
+
+                when (newPosition) {
+                    2, 17, 7, 22, 33, 36 -> {
+                        webSocketClient.sendPullCard(currentPlayer.id, newPosition)
+                    }
+                }
+
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
                 // If player passed GO, delay showing property card

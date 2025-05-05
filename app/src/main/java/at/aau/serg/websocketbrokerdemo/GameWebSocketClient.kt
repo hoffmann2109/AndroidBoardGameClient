@@ -2,10 +2,13 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
+import at.aau.serg.websocketbrokerdemo.data.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
 import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
@@ -28,6 +31,7 @@ class GameWebSocketClient(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
 ) {
     private val client = OkHttpClient()
@@ -142,6 +146,17 @@ class GameWebSocketClient(
                 }
             } catch (_: Exception) { /* not a dice‐roll */ }
 
+            // Try parsing a DrawnCardMessage
+            try {
+                val drawn = gson.fromJson(text, DrawnCardMessage::class.java)
+                if (drawn.type == "CARD_DRAWN") {
+                    val desc = drawn.card.get("description").asString
+
+                    onCardDrawn(drawn.playerId, drawn.cardType, desc)
+                    return
+                }
+            } catch (_: Exception) { /* not a card message */ }
+
             try {
                 val chatMessage = gson.fromJson(text, ChatMessage::class.java)
                 if (chatMessage.type == "CHAT_MESSAGE") {
@@ -242,6 +257,18 @@ class GameWebSocketClient(
         val json = gson.toJson(taxMessage)
         webSocket?.send(json)
         Log.d("WebSocket", "Sent tax payment message: $json")
+    }
+
+    fun sendPullCard(playerId: String, field: Int) {
+        val cardType = when (field) {
+            2, 17, 33 -> "COMMUNITY_CHEST"
+            7, 22, 36 -> "CHANCE"
+            else  -> return
+        }
+        val msg = PullCardMessage(playerId = playerId, cardType = cardType)
+        val json = gson.toJson(msg)
+        webSocket?.send(json)
+        Log.d("WebSocket", "Sent PULL_CARD message: $json")
     }
 
 }
