@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
@@ -122,7 +123,19 @@ class MainActivity : ComponentActivity() {
                     taxPaymentAmount = amount
                     taxPaymentType = taxType
                     showTaxPaymentAlert = true
-                }
+                },
+                onCardDrawn      = { playerId, cardType, description ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast
+                            .makeText(
+                                context,
+                                "You drew a $cardType card: $description",
+                                Toast.LENGTH_LONG
+                            )
+                            .show()
+                    }
+                },
+                coroutineDispatcher = Dispatchers.IO
             )
         }
 
