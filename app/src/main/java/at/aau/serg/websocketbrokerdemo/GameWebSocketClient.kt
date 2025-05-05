@@ -261,8 +261,8 @@ class GameWebSocketClient(
 
     fun sendPullCard(playerId: String, field: Int) {
         val cardType = when (field) {
-            2, 17 -> "COMMUNITY_CHEST"
-            7, 22 -> "CHANCE"
+            2, 17, 33 -> "COMMUNITY_CHEST"
+            7, 22, 36 -> "CHANCE"
             else  -> return
         }
         val msg = PullCardMessage(playerId = playerId, cardType = cardType)
