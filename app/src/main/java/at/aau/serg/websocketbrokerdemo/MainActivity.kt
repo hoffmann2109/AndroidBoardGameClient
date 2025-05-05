@@ -23,12 +23,56 @@ import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import kotlinx.coroutines.delay
-
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import kotlin.math.sqrt
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sensorManager: SensorManager
+    private var accelerometer: Sensor? = null
+    private var shakeListener: SensorEventListener? = null
+    private var webSocketClient: GameWebSocketClient? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { MonopolyWebSocketApp() }
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+
+        var lastShakeTime = 0L
+
+        shakeListener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+                val acceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
+                val now = System.currentTimeMillis()
+
+                if (acceleration > 12 && now - lastShakeTime > 1000) {
+                    lastShakeTime = now
+                    runOnUiThread {
+                        Log.d("Sensor", "Shake detected → sending Roll")
+                        webSocketClient?.sendMessage("Roll")
+                    }
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+
+        accelerometer?.also {
+            sensorManager.registerListener(shakeListener, it, SensorManager.SENSOR_DELAY_UI)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        sensorManager.unregisterListener(shakeListener)
     }
 
     @Composable
