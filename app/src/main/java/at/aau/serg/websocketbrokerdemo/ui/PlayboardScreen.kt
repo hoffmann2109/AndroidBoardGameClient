@@ -203,7 +203,7 @@ fun PlayboardScreen(
         ) {
             DiceRollingButton(
                 text = "Roll Dice",
-                color = Color(0xFF3FAF3F),
+                color = if (isMyTurn) Color(0xFF3FAF3F) else Color.Gray,
                 onClick = onRollDice,
                 diceValue = diceResult,
                 enabled = isMyTurn
