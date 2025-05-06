@@ -39,40 +39,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent { MonopolyWebSocketApp() }
 
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-
-        var lastShakeTime = 0L
-
-        shakeListener = object : SensorEventListener {
-            override fun onSensorChanged(event: SensorEvent) {
-                val x = event.values[0]
-                val y = event.values[1]
-                val z = event.values[2]
-                val acceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
-                val now = System.currentTimeMillis()
-
-                if (acceleration > 12 && now - lastShakeTime > 1000) {
-                    lastShakeTime = now
-                    runOnUiThread {
-                        Log.d("Sensor", "Shake detected → sending Roll")
-                        webSocketClient?.sendMessage("Roll")
-                    }
-                }
-            }
-
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-        }
-
-        accelerometer?.also {
-            sensorManager.registerListener(shakeListener, it, SensorManager.SENSOR_DELAY_UI)
-        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        sensorManager.unregisterListener(shakeListener)
     }
 
     @Composable
@@ -140,9 +110,9 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected       = { log += "Connected to server\n" },
+                onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled      = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
@@ -157,7 +127,7 @@ class MainActivity : ComponentActivity() {
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
                 },
-                onPlayerPassedGo  = { playerName ->
+                onPlayerPassedGo = { playerName ->
                     passedGoPlayerName = playerName
                     showPassedGoAlert = true
                 },
@@ -239,16 +209,19 @@ class MainActivity : ComponentActivity() {
             }
             composable("playerInfo") {
                 // Add debug logging for player ID
-                android.util.Log.d("MainActivity", "Passing current game player ID to PlayboardScreen: $currentGamePlayerId")
+                android.util.Log.d(
+                    "MainActivity",
+                    "Passing current game player ID to PlayboardScreen: $currentGamePlayerId"
+                )
                 android.util.Log.d("MainActivity", "Current game state players: $playerMoneyList")
-                
+
                 PlayboardScreen(
                     players = playerMoneyList,
                     currentPlayerId = currentGamePlayerId ?: "",
-                    onRollDice = { webSocketClient.sendMessage("Roll")},
+                    onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
-                    diceResult      = diceValue,
-                    dicePlayerId    = dicePlayer,
+                    diceResult = diceValue,
+                    dicePlayerId = dicePlayer,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
@@ -265,8 +238,57 @@ class MainActivity : ComponentActivity() {
                     onBack = { navController.popBackStack() }
                 )
             }
-        }
-    }
 
         }
+        ShakeDetector(
+            localPlayerId = localPlayerId,
+            currentGamePlayerId = currentGamePlayerId,
+            onShake = { webSocketClient.sendMessage("Roll") }
+        )
+    }
+
+    @Composable
+    fun ShakeDetector(
+        localPlayerId: String?,
+        currentGamePlayerId: String?,
+        onShake: () -> Unit
+    ) {
+        val context = LocalContext.current
+        val sensorManager = remember {
+            context.getSystemService(ComponentActivity.SENSOR_SERVICE) as SensorManager
+        }
+        val sensor = remember { sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
+        val lastShakeTime = remember { mutableStateOf(0L) }
+
+        DisposableEffect(Unit) {
+            val listener = object : SensorEventListener {
+                override fun onSensorChanged(event: SensorEvent) {
+                    val x = event.values[0]
+                    val y = event.values[1]
+                    val z = event.values[2]
+                    val acceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
+                    val now = System.currentTimeMillis()
+
+                    if (acceleration > 12 && now - lastShakeTime.value > 1000) {
+                        lastShakeTime.value = now
+                        if (localPlayerId != null && localPlayerId == currentGamePlayerId) {
+                            Log.d("Sensor", "Shake detected → sending Roll")
+                            onShake()
+                        } else {
+                            Log.d("Sensor", "Shake ignored – not your turn")
+                        }
+                    }
+                }
+
+                override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+            }
+
+            sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)
+            onDispose {
+                sensorManager.unregisterListener(listener)
+            }
+        }
+    }
+}
+
 
