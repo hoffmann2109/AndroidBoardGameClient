@@ -78,8 +78,15 @@ fun PlayboardScreen(
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
-    val properties = remember { mutableStateListOf<Property>().apply { addAll(propertyViewModel.getProperties(context)) } }
+    val properties = remember {
+        mutableStateListOf<Property>().apply {
+            addAll(
+                propertyViewModel.getProperties(context)
+            )
+        }
+    }
     val isMyTurn = currentPlayerId == localPlayerId
+    var turnEnded by remember { mutableStateOf(false) }
 
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
@@ -87,7 +94,7 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var showPropertyCard by remember { mutableStateOf(false) }
     var manualDiceValue by remember { mutableStateOf("") }
-    var chatOpen by remember{ mutableStateOf(false)}
+    var chatOpen by remember { mutableStateOf(false) }
     var chatInput by remember { mutableStateOf("") }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
@@ -101,14 +108,13 @@ fun PlayboardScreen(
         .toMap()
 
 
-
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
         val newPosition = currentPlayer?.position
 
         if (newPosition != null && newPosition != lastPlayerPosition) {
             lastPlayerPosition = newPosition
-            
+
             // Check for tax squares
             when (newPosition) {
                 4 -> { // Einkommensteuer
@@ -121,6 +127,7 @@ fun PlayboardScreen(
                         taxType = "EINKOMMENSTEUER"
                     )
                 }
+
                 38 -> { // Zusatzsteuer
                     if (showPassedGoAlert) {
                         delay(3000) // Wait for GO alert to finish
@@ -132,7 +139,7 @@ fun PlayboardScreen(
                     )
                 }
             }
-            
+
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
                 // If player passed GO, delay showing property card
@@ -199,7 +206,7 @@ fun PlayboardScreen(
                 color = Color(0xFF3FAF3F),
                 onClick = onRollDice,
                 diceValue = diceResult,
-                enabled   = isMyTurn
+                enabled = isMyTurn
             )
 
             // Manual Dice Roll Section
@@ -283,7 +290,31 @@ fun PlayboardScreen(
             ) {
                 Text("Back to Lobby", fontSize = 18.sp)
             }
+            if (isMyTurn && !turnEnded) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = {
+                        webSocketClient.sendMessage("NEXT_TURN")
+                        turnEnded = true
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text("End Turn", fontSize = 16.sp, color = Color.White)
+                }
+            }
         }
+
+        // Reset when it's your turn again
+        LaunchedEffect(currentPlayerId == localPlayerId) {
+            if (currentPlayerId == localPlayerId) {
+                turnEnded = false
+            }
+        }
+
         // Popup für Grundstück
         if (selectedProperty != null) {
             val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
@@ -355,7 +386,7 @@ fun PlayboardScreen(
                         ) {
                             Text("Exit")
                         }
-                        if (canBuy) {
+                        if (canBuy&& localPlayerId == currentPlayerId) {
                             Button(
                                 onClick = {
                                     webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
@@ -363,7 +394,11 @@ fun PlayboardScreen(
                                     openedByClick = false
                                     canBuy = false
                                 },
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(
+                                        0xFF0074cc
+                                    )
+                                )
                             ) {
                                 Text("Buy")
                             }
@@ -441,8 +476,10 @@ fun PlayboardScreen(
                 }
             }
         }
+    }
 
         // Chat Open/Close Button (immer sichtbar, unten rechts)
+    Box(modifier = Modifier.fillMaxSize()) {
         Button(
 
             onClick = { chatOpen = !chatOpen },
@@ -453,6 +490,7 @@ fun PlayboardScreen(
         ) {
             Text(if (chatOpen) "Close Chat" else "Open Chat", fontSize = 16.sp)
         }
+    }
 
 // Chat Overlay
 
@@ -545,10 +583,7 @@ fun PlayboardScreen(
                 }
             }
         }
-
-
     }
-}
 
 @Composable
 fun PlayerCard(
