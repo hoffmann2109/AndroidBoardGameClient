@@ -29,6 +29,7 @@ class PassingGoTest {
         onPlayerTurn = { /* No-op for testing */ },
         onPlayerPassedGo = { /* No-op for testing */ },
         coroutineDispatcher = Dispatchers.IO,
+        onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )

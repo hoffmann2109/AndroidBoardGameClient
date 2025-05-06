@@ -108,6 +108,7 @@ fun PlayboardScreen(
         .toMap()
 
 
+
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
         val newPosition = currentPlayer?.position
@@ -139,6 +140,12 @@ fun PlayboardScreen(
                     )
                 }
             }
+
+                when (newPosition) {
+                    2, 17, 7, 22, 33, 36 -> {
+                        webSocketClient.sendPullCard(currentPlayer.id, newPosition)
+                    }
+                }
 
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
