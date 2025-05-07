@@ -84,8 +84,7 @@ tasks.register<JacocoReport>("jacocoTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "android/**/*.*",
-        "**/data/**/*.*"
+        "android/**/*.*"
     )
 
     val debugTree =
