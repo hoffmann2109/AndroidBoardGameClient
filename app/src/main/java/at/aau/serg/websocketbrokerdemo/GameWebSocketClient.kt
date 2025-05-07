@@ -40,6 +40,7 @@ class GameWebSocketClient(
     private var webSocket: WebSocket? = null
     private val gson = Gson()
     private var players: List<PlayerMoney> = emptyList()
+    private var onPlayerTurnListener: ((String) -> Unit)? = null
 
     // Load the server URL from the config.properties file in the assets folder.
     private val serverUrl: String = loadServerUrl(context)
@@ -134,6 +135,7 @@ class GameWebSocketClient(
                     // drop the prefix, grab everything after the colon
                     val sessionId = text.substringAfter("PLAYER_TURN:")
                     onPlayerTurn(sessionId)
+                    onPlayerTurnListener?.invoke(sessionId)
                     return
                 } catch (e: Exception) {
                     Log.e("WebSocket", "Error parsing PLAYER_TURN: ${e.message}", e)
