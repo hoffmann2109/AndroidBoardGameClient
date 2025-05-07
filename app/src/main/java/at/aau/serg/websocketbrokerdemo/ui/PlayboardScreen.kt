@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,6 +41,7 @@ import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
+import androidx.compose.ui.platform.testTag
 
 import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
@@ -72,7 +72,8 @@ fun PlayboardScreen(
     showTaxPaymentAlert: Boolean,
     taxPaymentPlayerName: String,
     taxPaymentAmount: Int,
-    taxPaymentType: String
+    taxPaymentType: String,
+    onGiveUp: () -> Unit = {} // NEU
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -139,11 +140,11 @@ fun PlayboardScreen(
                 }
             }
 
-                when (newPosition) {
-                    2, 17, 7, 22, 33, 36 -> {
-                        webSocketClient.sendPullCard(currentPlayer.id, newPosition)
-                    }
+            when (newPosition) {
+                2, 17, 7, 22, 33, 36 -> {
+                    webSocketClient.sendPullCard(currentPlayer.id, newPosition)
                 }
+            }
 
             val landedProperty = properties.find { it.position == newPosition }
             if (landedProperty != null) {
@@ -299,6 +300,18 @@ fun PlayboardScreen(
                     .height(56.dp)
             ) {
                 Text("Back to Lobby", fontSize = 18.sp)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onGiveUp,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .testTag("giveUpButton")
+            ) {
+                Text("Give Up", fontSize = 18.sp, color = Color.White)
             }
             if (isMyTurn && !turnEnded) {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -873,7 +886,7 @@ fun DiceRollingButton(
             !enabled      -> Color.Gray
             isPressed     -> color.copy(alpha = 0.7f)
             else          -> color
-            },
+        },
         animationSpec = tween(durationMillis = 150)
     )
 
@@ -883,7 +896,7 @@ fun DiceRollingButton(
             isPressed = true
             rotateAngle += 720f
             onClick()
-            },
+        },
         enabled = enabled,
         modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
         shape = RoundedCornerShape(8.dp),
