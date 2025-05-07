@@ -86,6 +86,7 @@ fun PlayboardScreen(
     }
     val isMyTurn = currentPlayerId == localPlayerId
     var turnEnded by remember { mutableStateOf(false) }
+    var hasRolled by remember { mutableStateOf(false) }
 
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
@@ -217,7 +218,8 @@ fun PlayboardScreen(
                 color = if (isMyTurn) Color(0xFF3FAF3F) else Color.Gray,
                 onClick = onRollDice,
                 diceValue = diceResult,
-                enabled = isMyTurn
+                enabled = isMyTurn && !hasRolled,
+                onRollComplete = { hasRolled = true }
             )
 
             // Manual Dice Roll Section
@@ -335,6 +337,7 @@ fun PlayboardScreen(
         LaunchedEffect(currentPlayerId == localPlayerId) {
             if (currentPlayerId == localPlayerId) {
                 turnEnded = false
+                hasRolled = false
             }
         }
 
@@ -870,7 +873,8 @@ fun DiceRollingButton(
     color: Color,
     onClick: () -> Unit,
     diceValue: Int?,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    onRollComplete: () -> Unit = {}
 ) {
 
     var isPressed by remember { mutableStateOf(false) }
@@ -896,6 +900,7 @@ fun DiceRollingButton(
             isPressed = true
             rotateAngle += 720f
             onClick()
+            onRollComplete()
         },
         enabled = enabled,
         modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
