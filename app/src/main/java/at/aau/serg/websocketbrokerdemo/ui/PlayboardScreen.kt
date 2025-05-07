@@ -1,10 +1,10 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,24 +32,22 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
-import at.aau.serg.websocketbrokerdemo.data.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 
 import androidx.compose.ui.text.input.KeyboardType
+import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
 
 fun extractPlayerId(message: String): String {
-    val regex = """Player ([a-f0-9\-]+) bought""".toRegex()
+    val regex = """Player ([\w-]+) bought""".toRegex()
     return regex.find(message)?.groupValues?.get(1) ?: ""
 }
 
@@ -165,8 +163,13 @@ fun PlayboardScreen(
             val playerId = extractPlayerId(message)
             val propertyId = extractPropertyId(message)
 
-            properties.find { it.id == propertyId }?.let { property ->
-                property.ownerId = playerId
+            val index = properties.indexOfFirst { it.id == propertyId }
+            if (index != -1) {
+                val updated = properties[index].copyWithOwner(playerId)
+                val newList = properties.toMutableList()
+                newList[index] = updated
+                properties.clear()
+                properties.addAll(newList)
             }
         }
     }
@@ -315,7 +318,7 @@ fun PlayboardScreen(
             }
         }
 
-        // Reset when it's your turn again
+        // Reset wenn neuer Zug
         LaunchedEffect(currentPlayerId == localPlayerId) {
             if (currentPlayerId == localPlayerId) {
                 turnEnded = false
@@ -802,7 +805,7 @@ fun PropertySetPopup(
             ) {
                 propertiesInSet.forEach { property ->
                     val imageResId = getDrawableIdFromName(property.image, context)
-
+                    val isOwned = ownedProperties.any { it.id == property.id }
                     Box(
                         modifier = Modifier
                             .width(180.dp)
@@ -820,7 +823,7 @@ fun PropertySetPopup(
                                 contentScale = ContentScale.Fit,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .alpha(if (property.ownerId != null) 1f else 0.4f)
+                                    .alpha(if (isOwned) 1f else 0.4f)
                             )
                         } else {
                             Text(
