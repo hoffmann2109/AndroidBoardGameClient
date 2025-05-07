@@ -5,6 +5,6 @@ fun Property.copyWithOwner(newOwnerId: String?): Property {
         is HouseableProperty -> this.copy(ownerId = newOwnerId)
         is TrainStation -> this.copy(ownerId = newOwnerId)
         is Utility -> this.copy(ownerId = newOwnerId)
-        else -> this
+        is DummyProperty -> this.copy(ownerId = newOwnerId)
     }
 }
