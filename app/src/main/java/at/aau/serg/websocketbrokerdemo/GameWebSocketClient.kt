@@ -32,8 +32,7 @@ class GameWebSocketClient(
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
-    private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
-) {
+    private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit, ) {
     private val client = OkHttpClient()
 
     // Use a nullable WebSocket so we can check if it's already connected
