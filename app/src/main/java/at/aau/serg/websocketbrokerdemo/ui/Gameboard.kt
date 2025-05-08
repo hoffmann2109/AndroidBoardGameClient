@@ -29,11 +29,17 @@ fun Gameboard(
     properties: List<Property>
 ) {
     // Make the corners bigger like in a real monopoly board
-    val cornerFactor  = 1.5f
+    val cornerFactor = 1.5f
     val regularFactor = 1f
 
     // TODO: change the circles to real game pieces later
-    val playerColors = listOf(Color.Red, Color.Blue, Color.Green, Color.Yellow)
+    //Changed the cirles to pictures
+    val playerImages = listOf(
+        R.drawable.player_red,
+        R.drawable.player_blue,
+        R.drawable.player_green,
+        R.drawable.player_yellow
+    )
     val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
@@ -61,9 +67,9 @@ fun Gameboard(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     repeat(11) { col ->
-                        val tilePos       = calculateTilePosition(row, col)
+                        val tilePos = calculateTilePosition(row, col)
                         val playersOnTile = players.filter { it.position == tilePos }
-                        val isCorner   = (row == 0 || row == 10) && (col == 0 || col == 10)
+                        val isCorner = (row == 0 || row == 10) && (col == 0 || col == 10)
                         val tileWeight = if (isCorner) cornerFactor else regularFactor
 
                         Box(
@@ -83,13 +89,17 @@ fun Gameboard(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     playersOnTile.forEach { player ->
-                                        val idx   = players.indexOfFirst { it.id == player.id }
-                                        val color = playerColors.getOrElse(idx) { playerColors.random() }
-                                        Box(
+                                        val idx = players.indexOfFirst { it.id == player.id }
+                                        val imageRes =
+                                            playerImages.getOrElse(idx) { R.drawable.player_red } //fallback
+                                        Image(
+                                            painter = painterResource(id = imageRes),
+                                            contentDescription = "Player ${player.id}",
                                             modifier = Modifier
-                                                .size(12.dp)
-                                                .background(color, CircleShape)
-                                                .testTag("playerCircle_${player.id}")
+                                                .size(11000.dp) // Passt die Größe an das Design an
+                                                .clip(CircleShape) // Runde Bilder
+                                                .testTag("playerImage_${player.id}"),
+                                            contentScale = ContentScale.Fit
                                         )
                                     }
                                 }
