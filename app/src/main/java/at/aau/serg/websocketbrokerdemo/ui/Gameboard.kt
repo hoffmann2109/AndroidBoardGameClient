@@ -83,26 +83,37 @@ fun Gameboard(
                             contentAlignment = Alignment.Center
                         ) {
                             if (playersOnTile.isNotEmpty()) {
-                                Row(
-                                    modifier = Modifier.fillMaxSize(0.8f),
-                                    horizontalArrangement = Arrangement.SpaceEvenly,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    playersOnTile.forEach { player ->
+                                val gridAlignments = listOf(
+                                    Alignment.TopStart,
+                                    Alignment.TopEnd,
+                                    Alignment.BottomStart,
+                                    Alignment.BottomEnd
+                                )
+
+                                Box(modifier = Modifier.fillMaxSize(0.8f)) {
+                                    playersOnTile.forEachIndexed { index, player ->
                                         val idx = players.indexOfFirst { it.id == player.id }
                                         val imageRes =
-                                            playerImages.getOrElse(idx) { R.drawable.player_red } //fallback
-                                        Image(
-                                            painter = painterResource(id = imageRes),
-                                            contentDescription = "Player ${player.id}",
+                                            playerImages.getOrElse(idx) { R.drawable.player_red }
+
+                                        Box(
                                             modifier = Modifier
-                                                .size(11000.dp) // Passt die Größe an das Design an
-                                                .clip(CircleShape) // Runde Bilder
-                                                .testTag("playerImage_${player.id}"),
-                                            contentScale = ContentScale.Fit
-                                        )
+                                                .size(60.dp)
+                                                .align(gridAlignments.getOrElse(index) { Alignment.Center }) // Max. 4 Spieler
+                                        ) {
+                                            Image(
+                                                painter = painterResource(id = imageRes),
+                                                contentDescription = "Player ${player.id}",
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(CircleShape)
+                                                    .testTag("playerImage_${player.id}"),
+                                                contentScale = ContentScale.Fit
+                                            )
+                                        }
                                     }
                                 }
+
                             }
                         }
                     }
