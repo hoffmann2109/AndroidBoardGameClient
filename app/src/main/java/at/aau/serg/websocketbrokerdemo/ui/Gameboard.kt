@@ -19,14 +19,12 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import at.aau.serg.websocketbrokerdemo.data.properties.Property
 
 @Composable
 fun Gameboard(
     modifier: Modifier = Modifier,
     onTileClick: (tilePosition: Int) -> Unit = {},
-    players: List<PlayerMoney> = emptyList(),
-    properties: List<Property>
+    players: List<PlayerMoney> = emptyList()
 ) {
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f

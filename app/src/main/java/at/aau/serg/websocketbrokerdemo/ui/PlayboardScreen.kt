@@ -189,15 +189,14 @@ fun PlayboardScreen(
         ) {
             Gameboard(
                 modifier = Modifier.fillMaxSize(),
-                players = players,
-                properties = properties,
                 onTileClick = { tilePos ->
                     // Find the player who rolled the dice (dicePlayerId)
                     val currentPlayer = players.find { it.id == dicePlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
                     openedByClick = true
                     canBuy = currentPlayer?.position == tilePos
-                }
+                },
+                players = players
             )
         }
 

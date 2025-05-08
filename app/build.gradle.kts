@@ -112,6 +112,9 @@ tasks.register<JacocoReport>("jacocoTestReport") {
 
 
 tasks.register<JacocoReport>("jacocoUnitTestReport") {
+    group = "verification"
+    description = "Generates code coverage report for the test task."
+
     dependsOn("testDebugUnitTest")
 
     reports {
@@ -152,6 +155,10 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
 }
 
 tasks.register<JacocoReport>("jacocoAndroidTestReport") {
+
+    group = "verification-androidtests"
+    description = "Generates code coverage report for the andorid-test task."
+
     dependsOn("connectedDebugAndroidTest")
 
     reports {
@@ -228,12 +235,11 @@ dependencies {
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect")
-    testImplementation("io.mockk:mockk:1.13.5")
-    testRuntimeOnly (libs.junit.jupiter.engine)
-    // Für MockK (für unit tests)
-    testImplementation("io.mockk:mockk:1.13.7")
+    testImplementation(libs.kotlin.reflect)
+    testImplementation(libs.mockk.v1135)
+    testImplementation(libs.mockk.mockk)
 
+    testRuntimeOnly (libs.junit.jupiter.engine)
 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
@@ -246,5 +252,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("io.coil-kt:coil-compose:2.4.0") // oder neuere Version
+    implementation(libs.coil.compose) // oder neuere Version
 }
