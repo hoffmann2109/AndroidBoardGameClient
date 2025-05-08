@@ -30,6 +30,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType.Companion.PrimaryNotEditable
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -292,7 +293,8 @@ private fun MetricDropdown(currentMetric: Metric, onMetricSelected: (Metric) -> 
             value = currentMetric.displayName,
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().width(100.dp)
+            modifier = Modifier.menuAnchor(type = PrimaryNotEditable , enabled = true)
+                .width(100.dp)
         )
 
         ExposedDropdownMenu(
@@ -331,7 +333,8 @@ private fun FilterDropdown(currentFilter: String, onFilterSelected: (String) -> 
             value = filters[currentFilter] ?: "",
             onValueChange = {},
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().width(120.dp)
+            modifier = Modifier.menuAnchor(type = PrimaryNotEditable , enabled = true)
+                .width(120.dp)
         )
 
         ExposedDropdownMenu(
