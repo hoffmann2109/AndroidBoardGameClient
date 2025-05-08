@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
                     taxPaymentType = taxType
                     showTaxPaymentAlert = true
                 },
-                onCardDrawn = { playerId, cardType, description ->
+                onCardDrawn = { _, cardType, description ->
                     CoroutineScope(Dispatchers.Main).launch {
                         Toast
                             .makeText(

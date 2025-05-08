@@ -82,7 +82,7 @@ internal fun registerUser(auth: FirebaseAuth, email: String, password: String, c
                         FirestoreManager.initializeUserStats(userId)
                         (context as? Activity)?.runOnUiThread {
                             context.startActivity(Intent(context, MainActivity::class.java))
-                            (context as? Activity)?.finish()
+                            context.finish()
                         }
                     } catch (e: Exception) {
                         Log.e("RegisterScreen", "Error saving profile: ${e.message}")

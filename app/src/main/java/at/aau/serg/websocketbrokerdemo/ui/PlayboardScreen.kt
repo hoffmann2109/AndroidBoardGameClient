@@ -87,12 +87,10 @@ fun PlayboardScreen(
     val isMyTurn = currentPlayerId == localPlayerId
     var turnEnded by remember { mutableStateOf(false) }
     var hasRolled by remember { mutableStateOf(false) }
-
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
-    var showPropertyCard by remember { mutableStateOf(false) }
     var manualDiceValue by remember { mutableStateOf("") }
     var chatOpen by remember { mutableStateOf(false) }
     var chatInput by remember { mutableStateOf("") }
@@ -191,15 +189,14 @@ fun PlayboardScreen(
         ) {
             Gameboard(
                 modifier = Modifier.fillMaxSize(),
-                players = players,
-                properties = properties,
                 onTileClick = { tilePos ->
                     // Find the player who rolled the dice (dicePlayerId)
                     val currentPlayer = players.find { it.id == dicePlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
                     openedByClick = true
                     canBuy = currentPlayer?.position == tilePos
-                }
+                },
+                players = players
             )
         }
 
@@ -675,10 +672,10 @@ fun PlayerCard(
                 fontSize = 6.sp
             )
 
-            Divider(
-                color = Color.White,
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 4.dp),
                 thickness = 1.dp,
-                modifier = Modifier.padding(vertical = 4.dp)
+                color = Color.White
             )
 
             BesitzkartenGrid(
@@ -705,7 +702,7 @@ fun BesitzkartenGrid(
     allProperties: List<Property>,
     onPropertySetClicked: (PropertyColor) -> Unit
 ) {
-    val propertySets = PropertyColor.values()
+    val propertySets = PropertyColor.entries.toTypedArray()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(5),

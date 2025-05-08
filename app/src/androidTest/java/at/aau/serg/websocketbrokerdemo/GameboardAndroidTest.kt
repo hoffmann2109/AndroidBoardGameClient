@@ -1,7 +1,5 @@
 package at.aau.serg.websocketbrokerdemo
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -26,8 +24,7 @@ class GameboardAndroidTest {
         composeTestRule.setContent {
             Gameboard(
                 onTileClick = { tilePosition -> clickedTilePosition = tilePosition },
-                players = emptyList(),
-                properties = emptyList()
+                players = emptyList()
             )
         }
 
@@ -43,8 +40,7 @@ class GameboardAndroidTest {
         composeTestRule.setContent {
             Gameboard(
                 onTileClick = {},
-                players = emptyList(),
-                properties = emptyList()
+                players = emptyList()
             )
         }
 
@@ -68,8 +64,7 @@ class GameboardAndroidTest {
         composeTestRule.setContent {
             Gameboard(
                 onTileClick = { _ -> },
-                players = players,
-                properties = emptyList()
+                players = players
             )
         }
 
@@ -87,8 +82,7 @@ class GameboardAndroidTest {
 
         composeTestRule.setContent {
             Gameboard(
-                players = players,
-                properties = emptyList()
+                players = players
             )
         }
 
@@ -124,7 +118,7 @@ class GameboardAndroidTest {
     @Test
     fun testGameboardRendersCorrectNumberOfTiles() {
         composeTestRule.setContent {
-            Gameboard(players = emptyList(), properties = emptyList())
+            Gameboard(players = emptyList())
         }
 
         var count = 0
@@ -146,7 +140,7 @@ class GameboardAndroidTest {
         }
 
         composeTestRule.setContent {
-            Gameboard(players = players, properties = emptyList())
+            Gameboard(players = players)
         }
 
         players.forEach {
