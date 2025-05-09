@@ -2,15 +2,11 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import at.aau.serg.websocketbrokerdemo.data.ChatMessage
-import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
-import at.aau.serg.websocketbrokerdemo.data.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
-import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher

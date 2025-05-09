@@ -31,7 +31,9 @@ class MessageParser(
                 onTaxPayment(playerName, taxMessage.amount, taxMessage.taxType)
                 return
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e("WebSocket", "Error parsing TAX_PAYMENT: ${e.message}", e)
+        }
 
         // 2) PASSED GO
         if (text.contains("passed GO and collected")) {
@@ -54,7 +56,9 @@ class MessageParser(
                 val type = object : TypeToken<List<PlayerMoney>>() {}.type
                 val players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
                 onGameStateReceived(players)
-            } catch (_: Exception) { }
+            } catch (e: Exception) {
+                Log.e("WebSocket", "Error parsing GAME_STATE: ${e.message}", e)
+            }
             return
         }
 
@@ -76,7 +80,9 @@ class MessageParser(
                 onDiceRolled(roll.playerId, roll.value)
                 return
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e("WebSocket", "Error parsing DICE_ROLL: ${e.message}", e)
+        }
 
         // 7) CARD_DRAWN
         try {
@@ -86,7 +92,9 @@ class MessageParser(
                 onCardDrawn(drawn.playerId, drawn.cardType, desc)
                 return
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e("WebSocket", "Error parsing CARD_DRAWN: ${e.message}", e)
+        }
 
         // 8) CHAT_MESSAGE
         try {
@@ -95,7 +103,9 @@ class MessageParser(
                 onChatMessageReceived(chat.playerId, chat.message)
                 return
             }
-        } catch (_: Exception) { }
+        } catch (e: Exception) {
+            Log.e("WebSocket", "Error parsing CHAT_MESSAGE: ${e.message}", e)
+        }
 
         // 9) FALLBACK
         onMessageReceived(text)
