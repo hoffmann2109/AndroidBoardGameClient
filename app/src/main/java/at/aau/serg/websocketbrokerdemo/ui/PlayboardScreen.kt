@@ -71,10 +71,8 @@ import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 import androidx.compose.ui.platform.testTag
-
 import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
-import com.google.common.collect.Iterables.addAll
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([\w-]+) bought""".toRegex()
