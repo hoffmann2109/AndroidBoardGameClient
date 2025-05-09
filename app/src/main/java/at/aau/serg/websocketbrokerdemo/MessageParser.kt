@@ -32,7 +32,7 @@ class MessageParser(
                 return
             }
         } catch (e: Exception) {
-            Log.e("WebSocket", "Error parsing TAX_PAYMENT: ${e.message}", e)
+            println("Error parsing TAX_PAYMENT: ${e.message}")
         }
 
         // 2) PASSED GO
@@ -57,7 +57,7 @@ class MessageParser(
                 val players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
                 onGameStateReceived(players)
             } catch (e: Exception) {
-                Log.e("WebSocket", "Error parsing GAME_STATE: ${e.message}", e)
+                println("Error parsing GAME_STATE: ${e.message}")
             }
             return
         }
@@ -69,7 +69,7 @@ class MessageParser(
                 onPlayerTurn(sessionId)
                 return
             } catch (e: Exception) {
-                Log.e("WebSocket", "Error parsing PLAYER_TURN: ${e.message}", e)
+                println("Error parsing PLAYER_TURN: ${e.message}")
             }
         }
 
@@ -81,7 +81,7 @@ class MessageParser(
                 return
             }
         } catch (e: Exception) {
-            Log.e("WebSocket", "Error parsing DICE_ROLL: ${e.message}", e)
+            println("Error parsing DICE_ROLL: ${e.message}")
         }
 
         // 7) CARD_DRAWN
@@ -93,7 +93,7 @@ class MessageParser(
                 return
             }
         } catch (e: Exception) {
-            Log.e("WebSocket", "Error parsing CARD_DRAWN: ${e.message}", e)
+            println("Error parsing CARD_DRAWN: ${e.message}")
         }
 
         // 8) CHAT_MESSAGE
@@ -104,7 +104,7 @@ class MessageParser(
                 return
             }
         } catch (e: Exception) {
-            Log.e("WebSocket", "Error parsing CHAT_MESSAGE: ${e.message}", e)
+            println("Error parsing CHAT_MESSAGE: ${e.message}")
         }
 
         // 9) FALLBACK
