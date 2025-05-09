@@ -230,7 +230,8 @@ dependencies {
     implementation(libs.krossbow.websocket.builtin)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.gson)
-
+    implementation(libs.coil.compose)
+    
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
@@ -252,5 +253,4 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation(libs.coil.compose) // oder neuere Version
 }
