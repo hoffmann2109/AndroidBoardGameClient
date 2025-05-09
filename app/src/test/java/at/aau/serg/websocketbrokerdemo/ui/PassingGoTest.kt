@@ -184,4 +184,4 @@ class PassingGoTest {
         // Verify player's money is updated (1500 + 200)
         composeTestRule.onNodeWithText("EUR ${initialMoney + 200}").assertExists()
     }
-} 
+}
