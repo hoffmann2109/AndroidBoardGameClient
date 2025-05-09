@@ -1,11 +1,11 @@
 package at.aau.serg.websocketbrokerdemo
 
 import at.aau.serg.websocketbrokerdemo.data.GameData
-import at.aau.serg.websocketbrokerdemo.ui.Metric
-import at.aau.serg.websocketbrokerdemo.ui.calculateChartData
-import at.aau.serg.websocketbrokerdemo.ui.cumulativeWins
-import at.aau.serg.websocketbrokerdemo.ui.filterByDate
-import at.aau.serg.websocketbrokerdemo.ui.groupByTime
+import at.aau.serg.websocketbrokerdemo.logic.Metric
+import at.aau.serg.websocketbrokerdemo.logic.calculateChartData
+import at.aau.serg.websocketbrokerdemo.logic.cumulativeWins
+import at.aau.serg.websocketbrokerdemo.logic.filterByDate
+import at.aau.serg.websocketbrokerdemo.logic.groupByTime
 import com.google.firebase.Timestamp
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
