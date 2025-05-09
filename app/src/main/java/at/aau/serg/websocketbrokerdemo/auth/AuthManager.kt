@@ -30,14 +30,14 @@ object AuthManager {
                                 "ERROR_WRONG_PASSWORD" -> "The password is incorrect. Please try again."
                                 "ERROR_INVALID_EMAIL" -> "The email address is invalid. Please check and try again."
                                 "ERROR_USER_NOT_FOUND" -> "No account found with this email. Please register first."
-                                else -> "Login failed: ${error.message ?: "Unknown error."}"
+                                else -> "Login failed:Unknown error."
                             }
                         }
                         is FirebaseException -> {
                             "An error occurred. Please check your credentials."
                         }
                         else -> {
-                            "Unknown error: ${error.message ?: "Unknown error."}"
+                            "Unknown error: Unknown error."
                         }
                     }
                     setErrorMessage(errorMessage)
@@ -60,7 +60,7 @@ object AuthManager {
                                 context.finish()
                             }
                         } catch (e: Exception) {
-                            Log.e("RegisterScreen", "Error saving profile: ${e.message}")
+                            Log.e("RegisterScreen", "Error saving profile")
                             (context as? Activity)?.runOnUiThread {
                                 setErrorMessage("Failed to save profile.")
                             }
@@ -83,7 +83,7 @@ object AuthManager {
                                 "ERROR_WEAK_PASSWORD" -> "The password is too weak. Please choose a stronger password."
                                 "ERROR_INVALID_EMAIL" -> "The email address is invalid."
                                 "ERROR_EMAIL_ALREADY_IN_USE" -> "The email address is already in use. Try another one."
-                                else -> "Registration failed: ${error.message ?: "Unknown error."}"
+                                else -> "Registration failed: Unknown error."
                             }
                         }
                         is FirebaseException -> {
@@ -92,7 +92,7 @@ object AuthManager {
                         }
                         else -> {
                             // Fallback, falls der Fehler ein unerwarteter Typ ist
-                            "Unknown error: ${error.message ?: "Unknown error."}"
+                            "Unknown error: Unknown error."
                         }
                     }
 

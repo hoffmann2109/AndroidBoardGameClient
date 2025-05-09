@@ -20,11 +20,6 @@ class GameWebSocketClientTest {
         `when`(context.assets).thenReturn(assetManager)
     }
 
-    @AfterEach
-    fun tearDown() {
-        // no-op
-    }
-
     private fun createClient(): GameWebSocketClient {
         val props = "server.url=ws://example.com"
         val input = ByteArrayInputStream(props.toByteArray())
