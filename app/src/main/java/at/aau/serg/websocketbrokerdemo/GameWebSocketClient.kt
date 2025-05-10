@@ -3,18 +3,21 @@ package at.aau.serg.websocketbrokerdemo
 import android.content.Context
 import android.util.Log
 import at.aau.serg.websocketbrokerdemo.data.ChatMessage
-import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
-import com.google.common.reflect.TypeToken
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import okio.ByteString
 import java.util.Properties
 
@@ -28,20 +31,44 @@ class GameWebSocketClient(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
 ) {
+
     private val client = OkHttpClient()
     // Use a nullable WebSocket so we can check if it's already connected
     private var webSocket: WebSocket? = null
     private val gson = Gson()
     private var players: List<PlayerMoney> = emptyList()
+    private var onPlayerTurnListener: ((String) -> Unit)? = null
+    private var propertyBoughtListener: ((String) -> Unit)? = null
 
     // Load the server URL from the config.properties file in the assets folder.
     private val serverUrl: String = loadServerUrl(context)
-
     private val request: Request = Request.Builder()
         .url(serverUrl)
         .build()
+
+    // Class for parsing messages:
+    private val messageParser = MessageParser(
+        gson = gson,
+        getPlayers = { players },
+        onTaxPayment = { name, amount, type -> onTaxPayment(name, amount, type) },
+        onPlayerPassedGo = { name -> onPlayerPassedGo(name) },
+        onPropertyBought = { raw -> propertyBoughtListener?.invoke(raw) },
+        onGameStateReceived = { state ->
+            players = state
+            onGameStateReceived(state)
+        },
+        onPlayerTurn = { sessionId ->
+            onPlayerTurn(sessionId)
+            onPlayerTurnListener?.invoke(sessionId)
+        },
+        onDiceRolled = { pid, v -> onDiceRolled(pid, v) },
+        onCardDrawn = { pid, type, desc -> onCardDrawn(pid, type, desc) },
+        onChatMessageReceived = { pid, msg -> onChatMessageReceived(pid, msg) },
+        onMessageReceived = { text -> onMessageReceived(text) }
+    )
 
     /**
      * Connects to the server if not already connected.
@@ -62,9 +89,9 @@ class GameWebSocketClient(
 
     private fun sendInitMessage() {
         CoroutineScope(coroutineDispatcher).launch {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        currentUser?.uid?.let { userId ->
-            CoroutineScope(Dispatchers.IO).launch {
+            val currentUser = FirebaseAuth.getInstance().currentUser
+            currentUser?.uid?.let { userId ->
+                CoroutineScope(Dispatchers.IO).launch {
                     val profile = FirestoreManager.getUserProfile(userId)
                     val name = profile?.name ?: "Unknown"
                     val initMessage = """{
@@ -86,73 +113,9 @@ class GameWebSocketClient(
             onConnected()
         }
 
-        override fun onMessage(webSocket: WebSocket, text: String) {
+        override fun onMessage(ws: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
-
-            // Check for tax payment message
-            try {
-                val taxMessage = gson.fromJson(text, TaxPaymentMessage::class.java)
-                if (taxMessage.type == "TAX_PAYMENT") {
-                    val playerName = players.find { it.id == taxMessage.playerId }?.name ?: "Unknown Player"
-                    onTaxPayment(playerName, taxMessage.amount, taxMessage.taxType)
-                    return
-                }
-            } catch (_: Exception) { /* not a tax payment message */ }
-
-            // Check for "passed GO" message
-            if (text.contains("passed GO and collected")) {
-                val playerId = text.substringAfter("Player ").substringBefore(" passed")
-                val playerName = players.find { it.id == playerId }?.name ?: "Unknown Player"
-                onPlayerPassedGo(playerName)
-            }
-
-            if (text.contains("PROPERTY_BOUGHT")) {
-                propertyBoughtListener?.invoke(text)
-            }
-            // Check if this is a game state message
-            if (text.startsWith("GAME_STATE:")) {
-                try {
-                    val jsonData = text.substring("GAME_STATE:".length)
-                    val type = object : TypeToken<List<PlayerMoney>>() {}.type
-                    players = gson.fromJson<List<PlayerMoney>>(jsonData, type)
-                    onGameStateReceived(players)
-                } catch (e: Exception) {
-                    Log.e("WebSocket", "Error parsing game state: ${e.message}", e)
-                }
-            }
-
-            // Player's turn message:
-            if (text.startsWith("PLAYER_TURN")) {
-                try {
-                    // drop the prefix, grab everything after the colon
-                    val sessionId = text.substringAfter("PLAYER_TURN:")
-                    onPlayerTurn(sessionId)
-                    return
-                } catch (e: Exception) {
-                    Log.e("WebSocket", "Error parsing PLAYER_TURN: ${e.message}", e)
-                }
-            }
-
-            // try to parse dice‐roll JSON first
-            try {
-                val obj = gson.fromJson(text, DiceRollMessage::class.java)
-                if (obj.type == "DICE_ROLL") {
-                    onDiceRolled(obj.playerId, obj.value)
-                    return  // don't fall through to the generic log handler
-                }
-            } catch (_: Exception) { /* not a dice‐roll */ }
-
-            try {
-                val chatMessage = gson.fromJson(text, ChatMessage::class.java)
-                if (chatMessage.type == "CHAT_MESSAGE") {
-
-                    onChatMessageReceived(chatMessage.playerId, chatMessage.message)
-                    return
-                }
-            } catch (_: Exception) { /* not a chat-message */ }
-
-            // Always call the general message handler
-            onMessageReceived(text)
+            messageParser.parse(text)
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
@@ -198,16 +161,17 @@ class GameWebSocketClient(
      */
     fun buyProperty(propertyId: Int) {
         val message = "BUY_PROPERTY:$propertyId"
-        webSocket?.send(message)
+        sendMessage(message)
         Log.d("WebSocket", "Sent: $message")
     }
-
-    private var propertyBoughtListener: ((String) -> Unit)? = null
 
     fun setPropertyBoughtListener(listener: (String) -> Unit) {
         propertyBoughtListener = listener
     }
 
+    fun setOnPlayerTurnListener(listener: (String) -> Unit) {
+        onPlayerTurnListener = listener
+    }
 
     private fun loadServerUrl(context: Context): String {
         val properties = Properties()
@@ -224,12 +188,12 @@ class GameWebSocketClient(
     }
 
     fun rollDice() {
-        webSocket?.send("Roll")
+        sendMessage("Roll")
     }
 
     fun manualRollDice(value: Int) {
         if (value in 1..39) {
-            webSocket?.send("MANUAL_ROLL:$value")
+            sendMessage("MANUAL_ROLL:$value")
         }
     }
 
@@ -240,8 +204,28 @@ class GameWebSocketClient(
             taxType = taxType
         )
         val json = gson.toJson(taxMessage)
-        webSocket?.send(json)
+        sendMessage(json)
         Log.d("WebSocket", "Sent tax payment message: $json")
+    }
+
+    fun sendGiveUpMessage(userId: String) {
+        val payload = mapOf(
+            "type" to "GIVE_UP",
+            "userId" to userId
+        )
+        sendMessage(gson.toJson(payload))
+    }
+
+    fun sendPullCard(playerId: String, field: Int) {
+        val cardType = when (field) {
+            2, 17, 33 -> "COMMUNITY_CHEST"
+            7, 22, 36 -> "CHANCE"
+            else -> return
+        }
+        val msg = PullCardMessage(playerId = playerId, cardType = cardType)
+        val json = gson.toJson(msg)
+        sendMessage(json)
+        Log.d("WebSocket", "Sent PULL_CARD message: $json")
     }
 
 }
