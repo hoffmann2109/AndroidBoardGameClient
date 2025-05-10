@@ -2,7 +2,7 @@ package at.aau.serg.websocketbrokerdemo
 
 import android.content.Context
 import android.util.Log
-import at.aau.serg.websocketbrokerdemo.data.ChatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.PullCardMessage
