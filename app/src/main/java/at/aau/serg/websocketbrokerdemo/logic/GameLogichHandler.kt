@@ -2,7 +2,7 @@ package at.aau.serg.websocketbrokerdemo.logic
 
 import android.content.Context
 import android.util.Log
-import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
+import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
@@ -11,31 +11,37 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class GameLogicHandler(
     private val context: Context,
     private val sendMessage: (String) -> Unit,
     private val gson: Gson = Gson(),
-    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val coroutineDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val userProfileProvider: UserProfileProvider = at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 ) {
 
     fun sendInitMessage() {
         CoroutineScope(coroutineDispatcher).launch {
-            val currentUser = FirebaseAuth.getInstance().currentUser
-            currentUser?.uid?.let { userId ->
-                val profile = FirestoreManager.getUserProfile(userId)
-                val name = profile?.name ?: "Unknown"
-                val initMessage = mapOf(
-                    "type" to "INIT",
-                    "userId" to userId,
-                    "name" to name
-                )
-                val json = gson.toJson(initMessage)
+            val json = getInitPayload()
+            if (json != null) {
                 sendMessage(json)
                 Log.d("GameLogic", "Sent INIT message: $json")
             }
+        }
+    }
+
+    suspend fun getInitPayload(): String? {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        return currentUser?.uid?.let { userId ->
+            val profile: PlayerProfile? = userProfileProvider.getUserProfile(userId)
+            val name = profile?.name ?: "Unknown"
+            val initMessage = mapOf(
+                "type" to "INIT",
+                "userId" to userId,
+                "name" to name
+            )
+            gson.toJson(initMessage)
         }
     }
 
