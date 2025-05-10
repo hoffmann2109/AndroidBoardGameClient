@@ -6,7 +6,7 @@ import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 
 class MessageParser(
     private val gson: Gson,
