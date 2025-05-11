@@ -128,7 +128,6 @@ tasks.register<JacocoReport>("jacocoUnitTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "**/GameWebSocketClient.*",
         "android/**/*.*"
     )
 
@@ -173,7 +172,6 @@ tasks.register<JacocoReport>("jacocoAndroidTestReport") {
         "**/BuildConfig.*",
         "**/Manifest*.*",
         "**/*Test*.*",
-        "**/GameWebSocketClient.*",
         "android/**/*.*"
     )
 
