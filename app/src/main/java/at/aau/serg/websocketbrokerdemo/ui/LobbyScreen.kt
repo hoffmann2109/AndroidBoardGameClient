@@ -121,7 +121,7 @@ fun LobbyScreen(
                     onJoinGame()
                 }
                 AnimatedButton("⚙️ Settings", Color(0xFF4CAF50), onOpenSettings)
-                AnimatedButton("🎵 Sound", Color(0xFF3F51B5), onOpenSoundSelection)
+                // AnimatedButton("🎵 Sound", Color(0xFF3F51B5), onOpenSoundSelection)
             }
 
             // WiFi Icon Animation (Connect)
