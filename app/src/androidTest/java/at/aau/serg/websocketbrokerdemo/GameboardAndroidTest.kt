@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo
 
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -162,5 +163,30 @@ class GameboardAndroidTest {
             composeTestRule.onNodeWithTag("playerImage_${it.id}", useUnmergedTree = true)
                 .assertExists()
         }
+    }
+
+    @Test
+    fun testCheatFlagSwitchesContentDescription() {
+        val players = listOf(
+            PlayerMoney(id = "1", name = "Alice", money = 1500, position = 0),
+            PlayerMoney(id = "2", name = "Bob",   money = 1500, position = 0)
+        )
+        val cheatFlags = mapOf("1" to true, "2" to false)
+
+        composeTestRule.setContent {
+            Gameboard(
+                onTileClick = { _ -> },
+                players = players,
+                cheatFlags = cheatFlags
+            )
+        }
+
+        // Player 1 should have "(cheater)" in its contentDescription
+        composeTestRule.onNodeWithTag("playerImage_1", useUnmergedTree = true)
+            .assertContentDescriptionEquals("Player 1 (cheater)")
+
+        // Player 2 should _not_ have "(cheater)"
+        composeTestRule.onNodeWithTag("playerImage_2", useUnmergedTree = true)
+            .assertContentDescriptionEquals("Player 2")
     }
 }
