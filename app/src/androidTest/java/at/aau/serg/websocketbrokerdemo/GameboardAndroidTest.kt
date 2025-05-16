@@ -24,7 +24,8 @@ class GameboardAndroidTest {
         composeTestRule.setContent {
             Gameboard(
                 onTileClick = { tilePosition -> clickedTilePosition = tilePosition },
-                players = emptyList()
+                players = emptyList(),
+                cheatFlags = emptyMap()
             )
         }
 
@@ -40,7 +41,8 @@ class GameboardAndroidTest {
         composeTestRule.setContent {
             Gameboard(
                 onTileClick = {},
-                players = emptyList()
+                players = emptyList(),
+                cheatFlags = emptyMap()
             )
         }
 
@@ -64,7 +66,8 @@ class GameboardAndroidTest {
         composeTestRule.setContent {
             Gameboard(
                 onTileClick = { _ -> },
-                players = players
+                players = players,
+                cheatFlags = emptyMap()
             )
         }
 
@@ -82,7 +85,9 @@ class GameboardAndroidTest {
 
         composeTestRule.setContent {
             Gameboard(
-                players = players
+                onTileClick = { _ -> },
+                players = players,
+                cheatFlags = emptyMap()
             )
         }
 
@@ -118,7 +123,11 @@ class GameboardAndroidTest {
     @Test
     fun testGameboardRendersCorrectNumberOfTiles() {
         composeTestRule.setContent {
-            Gameboard(players = emptyList())
+            Gameboard(
+                onTileClick = { _ -> },
+                players = emptyList(),
+                cheatFlags = emptyMap()
+            )
         }
 
         var count = 0
@@ -140,7 +149,11 @@ class GameboardAndroidTest {
         }
 
         composeTestRule.setContent {
-            Gameboard(players = players)
+            Gameboard(
+                onTileClick = { _ -> },
+                players = players,
+                cheatFlags = emptyMap()
+            )
         }
 
         players.forEach {
