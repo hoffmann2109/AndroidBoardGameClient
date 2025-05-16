@@ -38,7 +38,7 @@ class MessageParserTest {
             onPropertyBought = { fail("should not hit property bought") },
             onGameStateReceived = { fail("should not hit game state") },
             onPlayerTurn = { fail("should not hit player turn") },
-            onDiceRolled = { _, _ -> fail("should not hit dice roll") },
+            onDiceRolled = { _, _,_ -> fail("should not hit dice roll") },
             onCardDrawn = { _, _, _ -> fail("should not hit card drawn") },
             onChatMessageReceived = { _, _ -> fail("should not hit chat") },
             onMessageReceived = { fail("should not hit fallback") }
@@ -66,7 +66,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onMessageReceived = { fail() }
@@ -92,7 +92,7 @@ class MessageParserTest {
             onPropertyBought = { rawText -> invoked = true; capRaw = rawText },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onMessageReceived = { fail() }
@@ -119,7 +119,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { list -> invoked = true; capList = list },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onMessageReceived = { fail() }
@@ -146,7 +146,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { id -> invoked = true; capId = id },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onMessageReceived = { fail() }
@@ -173,7 +173,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { pid, v -> invoked = true; capPid = pid; capVal = v },
+            onDiceRolled = { pid, v, _ -> invoked = true; capPid = pid; capVal = v },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onMessageReceived = { fail() }
@@ -209,7 +209,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { pid, type, desc ->
                 invoked = true; capPid = pid; capType = type; capDesc = desc
             },
@@ -241,7 +241,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _, _ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { pid, msg ->
                 invoked = true; capPid = pid; capMsg = msg
@@ -270,7 +270,7 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _ -> fail() },
+            onDiceRolled = { _, _, _ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onMessageReceived = { text -> invoked = true; capText = text }
