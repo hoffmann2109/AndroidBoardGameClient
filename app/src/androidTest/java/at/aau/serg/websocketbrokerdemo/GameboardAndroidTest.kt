@@ -1,5 +1,7 @@
 package at.aau.serg.websocketbrokerdemo
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -13,6 +15,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+
 
 @RunWith(AndroidJUnit4::class)
 class GameboardAndroidTest {
@@ -188,5 +191,57 @@ class GameboardAndroidTest {
         // Player 2 should _not_ have "(cheater)"
         composeTestRule.onNodeWithTag("playerImage_2", useUnmergedTree = true)
             .assertContentDescriptionEquals("Player 2")
+    }
+
+    @Test
+    fun testOffsetOnlyAppliedWhenMultiplePlayers() {
+        // two dummy players, same tile
+        val p1 = PlayerMoney(id = "1", name = "Solo", money = 1500, position = 0)
+        val p2 = PlayerMoney(id = "2", name = "Duo",  money = 1500, position = 0)
+
+        lateinit var playersState: androidx.compose.runtime.MutableState<List<PlayerMoney>>
+
+        // 1) set up with only one player
+        composeTestRule.setContent {
+            playersState = remember { mutableStateOf(listOf(p1)) }
+            Gameboard(
+                onTileClick = {},
+                players      = playersState.value,
+                cheatFlags   = emptyMap()
+            )
+        }
+
+        // let compose settle
+        composeTestRule.waitForIdle()
+        val singlePos = composeTestRule
+            .onNodeWithTag("playerImage_1", useUnmergedTree = true)
+            .fetchSemanticsNode()
+            .positionInRoot
+
+        // 2) mutate to two players
+        composeTestRule.runOnIdle {
+            playersState.value = listOf(p1, p2)
+        }
+        composeTestRule.waitForIdle()
+
+        val pos1 = composeTestRule
+            .onNodeWithTag("playerImage_1", useUnmergedTree = true)
+            .fetchSemanticsNode()
+            .positionInRoot
+
+        val pos2 = composeTestRule
+            .onNodeWithTag("playerImage_2", useUnmergedTree = true)
+            .fetchSemanticsNode()
+            .positionInRoot
+
+        // when there's more than one player on the same tile...
+        //  → the first token must move
+        assert(singlePos != pos1) {
+            "Expected first player to be offset once a second player arrives"
+        }
+        //  → and the two tokens must be at different spots
+        assert(pos1 != pos2) {
+            "Expected distinct offsets for two tokens on the same tile"
+        }
     }
 }
