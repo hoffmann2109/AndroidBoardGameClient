@@ -30,7 +30,8 @@ import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 fun Gameboard(
     modifier: Modifier = Modifier,
     onTileClick: (tilePosition: Int) -> Unit = {},
-    players: List<PlayerMoney> = emptyList()
+    players: List<PlayerMoney> = emptyList(),
+    cheatFlags: Map<String, Boolean>
 ) {
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f
@@ -44,6 +45,13 @@ fun Gameboard(
         R.drawable.player_green,
         R.drawable.player_yellow
     )
+    val cheatImages = listOf(
+        R.drawable.player_red_cheat,
+        R.drawable.player_blue_cheat,
+        R.drawable.player_green_cheat,
+        R.drawable.player_yellow_cheat
+    )
+
     val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
@@ -96,25 +104,24 @@ fun Gameboard(
 
                                 Box(modifier = Modifier.fillMaxSize(0.8f)) {
                                     playersOnTile.forEachIndexed { index, player ->
-                                        val idx = players.indexOfFirst { it.id == player.id }
-                                        val imageRes =
-                                            playerImages.getOrElse(idx) { R.drawable.player_red }
+                                        // find which slot this player is in (0–3)
+                                        val slotIndex = players.indexOfFirst { it.id == player.id }
+                                        val isCheater = cheatFlags[player.id] == true
 
-                                        Box(
+                                        val imageRes = if (isCheater)
+                                            cheatImages.getOrElse(slotIndex) { playerImages[slotIndex] }
+                                        else
+                                            playerImages.getOrElse(slotIndex) { R.drawable.player_red }
+
+                                        Image(
+                                            painter = painterResource(id = imageRes),
+                                            contentDescription = "Player ${player.id}${if (isCheater) " (cheater)" else ""}",
                                             modifier = Modifier
-                                                .size(60.dp)
-                                                .align(gridAlignments.getOrElse(index) { Alignment.Center }) // Max. 4 Spieler
-                                        ) {
-                                            Image(
-                                                painter = painterResource(id = imageRes),
-                                                contentDescription = "Player ${player.id}",
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .clip(CircleShape)
-                                                    .testTag("playerImage_${player.id}"),
-                                                contentScale = ContentScale.Fit
-                                            )
-                                        }
+                                                .fillMaxSize()
+                                                .clip(CircleShape)
+                                                .testTag("playerImage_${player.id}"),
+                                            contentScale = ContentScale.Fit
+                                        )
                                     }
                                 }
 
