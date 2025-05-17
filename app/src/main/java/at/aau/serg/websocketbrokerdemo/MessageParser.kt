@@ -16,7 +16,7 @@ class MessageParser(
     private val onPropertyBought: (raw: String) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
-    private val onDiceRolled: (playerId: String, value: Int) -> Unit,
+    private val onDiceRolled: (playerId: String, value: Int, manual: Boolean) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onMessageReceived: (text: String) -> Unit
@@ -76,7 +76,7 @@ class MessageParser(
         try {
             val roll = gson.fromJson(text, DiceRollMessage::class.java)
             if (roll.type == "DICE_ROLL") {
-                onDiceRolled(roll.playerId, roll.value)
+                onDiceRolled(roll.playerId, roll.value, roll.manual)
                 return
             }
         } catch (e: Exception) {

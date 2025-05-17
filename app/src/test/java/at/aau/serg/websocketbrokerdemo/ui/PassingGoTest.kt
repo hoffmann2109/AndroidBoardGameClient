@@ -13,6 +13,7 @@ import android.content.Context
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
+import kotlin.String
 
 class PassingGoTest {
     @get:Rule
@@ -24,13 +25,14 @@ class PassingGoTest {
         context = mockContext,
         onConnected = { /* No-op for testing */ },
         onMessageReceived = { /* No-op for testing */ },
-        onDiceRolled = { _, _ -> /* No-op for testing */ },
+        onDiceRolled = { _, _, _-> /* No-op for testing */ },
         onGameStateReceived = { /* No-op for testing */ },
         onPlayerTurn = { /* No-op for testing */ },
         onPlayerPassedGo = { /* No-op for testing */ },
         coroutineDispatcher = Dispatchers.IO,
         onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
+
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
 
@@ -55,7 +57,8 @@ class PassingGoTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -86,7 +89,8 @@ class PassingGoTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -112,7 +116,8 @@ class PassingGoTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -141,7 +146,8 @@ class PassingGoTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -177,7 +183,8 @@ class PassingGoTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 

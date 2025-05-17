@@ -4,13 +4,7 @@ import com.example.myapplication.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -23,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 
@@ -30,20 +25,36 @@ import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 fun Gameboard(
     modifier: Modifier = Modifier,
     onTileClick: (tilePosition: Int) -> Unit = {},
-    players: List<PlayerMoney> = emptyList()
+    players: List<PlayerMoney> = emptyList(),
+    cheatFlags: Map<String, Boolean>
 ) {
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f
     val regularFactor = 1f
+    val tokenSize: Dp = 100.dp
 
-    // TODO: change the circles to real game pieces later
-    //Changed the cirles to pictures
+    val pullIn = 12.dp
+    val offsets = listOf(
+        pullIn to pullIn,     // TopStart → right/down
+        -pullIn to pullIn,    // TopEnd   → left /down
+        pullIn to -pullIn,    // BottomStart → right/up
+        -pullIn to -pullIn    // BottomEnd → left/up
+    )
+
+    //Changed the circles to pictures
     val playerImages = listOf(
         R.drawable.player_red,
         R.drawable.player_blue,
         R.drawable.player_green,
         R.drawable.player_yellow
     )
+    val cheatImages = listOf(
+        R.drawable.player_red_cheat,
+        R.drawable.player_blue_cheat,
+        R.drawable.player_green_cheat,
+        R.drawable.player_yellow_cheat
+    )
+
     val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
@@ -95,29 +106,35 @@ fun Gameboard(
                                 )
 
                                 Box(modifier = Modifier.fillMaxSize(0.8f)) {
-                                    playersOnTile.forEachIndexed { index, player ->
-                                        val idx = players.indexOfFirst { it.id == player.id }
-                                        val imageRes =
-                                            playerImages.getOrElse(idx) { R.drawable.player_red }
+                                    playersOnTile.forEachIndexed { idxOnTile, player ->
+                                        // find which slot this player is in (0–3)
+                                        val slotIndex = players.indexOfFirst { it.id == player.id }
+                                        val cheated = cheatFlags[player.id] == true
 
-                                        Box(
+                                        val imageRes = if (cheated)
+                                            cheatImages.getOrElse(slotIndex) { playerImages[slotIndex] }
+                                        else
+                                            playerImages.getOrElse(slotIndex) { playerImages[0] }
+
+                                        // Apply offsets only if multiple game pieces are on a tile
+                                        val applyOffset = if (playersOnTile.size > 1)
+                                            offsets.getOrElse(idxOnTile) { 0.dp to 0.dp }
+                                        else
+                                            0.dp to 0.dp
+
+                                        Image(
+                                            painter = painterResource(id = imageRes),
+                                            contentDescription = "Player ${player.id}" + if (cheated) " (cheater)" else "",
                                             modifier = Modifier
-                                                .size(60.dp)
-                                                .align(gridAlignments.getOrElse(index) { Alignment.Center }) // Max. 4 Spieler
-                                        ) {
-                                            Image(
-                                                painter = painterResource(id = imageRes),
-                                                contentDescription = "Player ${player.id}",
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .clip(CircleShape)
-                                                    .testTag("playerImage_${player.id}"),
-                                                contentScale = ContentScale.Fit
-                                            )
-                                        }
+                                                .size(tokenSize)
+                                                .align(gridAlignments[idxOnTile])
+                                                .offset(x = applyOffset.first, y = applyOffset.second)
+                                                .clip(CircleShape)
+                                                .testTag("playerImage_${player.id}"),
+                                            contentScale = ContentScale.Fit
+                                        )
                                     }
                                 }
-
                             }
                         }
                     }
@@ -133,18 +150,16 @@ fun Gameboard(
  */
 fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
-        // Corners:
-        row == 10 && col == 10 -> 0  // Bottom-right corner (Start)
-        row == 10 && col == 0 -> 10  // Bottom-left corner
-        row == 0 && col == 0 -> 20   // Top-left corner
-        row == 0 && col == 10 -> 30  // Top-right corner
+        row == 10 && col == 10 -> 0   // Bottom-right corner (Start)
+        row == 10 && col == 0  -> 10  // Bottom-left corner
+        row == 0  && col == 0  -> 20  // Top-left corner
+        row == 0  && col == 10 -> 30  // Top-right corner
 
-        // Normal Tiles:
-        row == 10 -> if (col > 0 && col < 10) 10 - col else -1  // Bottom row (1-9)
-        col == 0 -> if (row > 0 && row < 10) 10 + (10 - row) else -1  // Left column (11-19)
-        row == 0 -> if (col > 0 && col < 10) 20 + col else -1  // Top row (21-29)
-        col == 10 -> if (row > 0 && row < 10) 30 + row else -1  // Right column (31-39)
+        row == 10 -> if (col in 1..9) 10 - col else -1
+        col == 0  -> if (row in 1..9) 10 + (10 - row) else -1
+        row == 0  -> if (col in 1..9) 20 + col else -1
+        col == 10 -> if (row in 1..9) 30 + row else -1
 
-        else -> -1  // Inner or invalid positions
+        else      -> -1
     }
 }
