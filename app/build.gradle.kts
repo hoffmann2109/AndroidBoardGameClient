@@ -232,7 +232,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.gson)
     implementation(libs.coil.compose)
-    
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
