@@ -10,9 +10,13 @@ import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 object AuthManager {
 
@@ -100,6 +104,36 @@ object AuthManager {
                     setErrorMessage(errorMessage)
                 }
             }
+    }
+    internal fun createUserIfNotExists(
+        user: FirebaseUser,
+        context: Context,
+        setErrorMessage: (String) -> Unit
+    ) {
+        val userId = user.uid
+        val docRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val snapshot = docRef.get().await()
+                if (!snapshot.exists()) {
+                    val profile = PlayerProfile(name = user.displayName ?: "user${userId.takeLast(4)}")
+                    docRef.set(profile).await()
+                    FirestoreManager.saveUserProfile(userId, profile)
+                    FirestoreManager.initializeUserStats(userId)
+                }
+
+                withContext(Dispatchers.Main) {
+                    context.startActivity(Intent(context, MainActivity::class.java))
+                    (context as? Activity)?.finish()
+                }
+            } catch (e: Exception) {
+                Log.e("GoogleLogin", "Error creating or checking user profile", e)
+                withContext(Dispatchers.Main) {
+                    setErrorMessage("Failed to sign in with Google.")
+                }
+            }
+        }
     }
 
 }
