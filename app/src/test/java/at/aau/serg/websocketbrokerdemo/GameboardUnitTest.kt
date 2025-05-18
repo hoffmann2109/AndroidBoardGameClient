@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo
 
+import androidx.compose.ui.unit.dp
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import at.aau.serg.websocketbrokerdemo.ui.*
@@ -118,5 +119,26 @@ class GameboardUnitTest {
         for (i in 0..39) {
             assert(allPositions.contains(i)) { "Position $i is missing" }
         }
+    }
+
+    @Test
+    fun testOffsetListValues() {
+        val pullIn = 12.dp
+        val offsets = listOf(
+            pullIn to pullIn,     // top-start
+            -pullIn to pullIn,    // top-end
+            pullIn to -pullIn,    // bottom-start
+            -pullIn to -pullIn    // bottom-end
+        )
+
+        // We should have exactly 4 offset entries
+        assertEquals(4, offsets.size)
+
+        // Check the first and last entries explicitly
+        assertEquals(pullIn,  offsets[0].first)
+        assertEquals(pullIn,  offsets[0].second)
+
+        assertEquals(-pullIn, offsets[3].first)
+        assertEquals(-pullIn, offsets[3].second)
     }
 }

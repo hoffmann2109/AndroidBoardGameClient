@@ -56,7 +56,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -82,7 +83,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -108,7 +110,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -136,7 +139,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -162,7 +166,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -192,7 +197,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -228,7 +234,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -262,7 +269,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -296,7 +304,8 @@ class PlayboardScreenTest {
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 

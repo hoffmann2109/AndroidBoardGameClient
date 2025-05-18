@@ -101,6 +101,7 @@ fun PlayboardScreen(
     taxPaymentPlayerName: String,
     taxPaymentAmount: Int,
     taxPaymentType: String,
+    cheatFlags: Map<String, Boolean>,
     onGiveUp: () -> Unit = {} // NEU
 ) {
     val context = LocalContext.current
@@ -224,6 +225,7 @@ fun PlayboardScreen(
                     openedByClick = true
                     canBuy = currentPlayer?.position == tilePos
                 },
+                cheatFlags = cheatFlags,
                 players = players
             )
         }

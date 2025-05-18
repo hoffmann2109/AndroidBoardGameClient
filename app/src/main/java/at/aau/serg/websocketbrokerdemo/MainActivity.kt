@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,6 +52,7 @@ class MainActivity : ComponentActivity() {
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
         var diceValue by remember { mutableStateOf<Int?>(null) }
         var dicePlayer by remember { mutableStateOf<String?>(null) }
+        val cheatFlags = remember { mutableStateMapOf<String, Boolean>() }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         val chatMessages = remember { mutableStateListOf<ChatEntry>() }
         var localPlayerId by remember { mutableStateOf<String?>(null) }
@@ -109,7 +111,11 @@ class MainActivity : ComponentActivity() {
                 context = context,
                 onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled = { pid, value, manual ->
+                    dicePlayer = pid
+                    diceValue = value
+                    cheatFlags[pid] = manual
+                },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
@@ -239,6 +245,7 @@ class MainActivity : ComponentActivity() {
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult = diceValue,
                     dicePlayerId = dicePlayer,
+                    cheatFlags = cheatFlags,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
