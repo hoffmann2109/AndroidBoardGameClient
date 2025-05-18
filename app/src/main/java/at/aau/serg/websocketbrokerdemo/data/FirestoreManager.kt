@@ -50,7 +50,7 @@ object FirestoreManager : UserProfileProvider{
     }
 
     //for testing will be deleted when serverside is implemented
-    suspend fun saveGameData(userId: String, gameData: GameData) {
+    private suspend fun saveGameData(userId: String, gameData: GameData) {
         try {
             usersCollection.document(userId)
                 .collection("gameHistory")
