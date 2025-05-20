@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 import com.google.firebase.auth.FirebaseAuth
@@ -50,6 +51,13 @@ class GameLogicHandler(
         val json = gson.toJson(chat)
         sendMessage(json)
         Log.d("GameLogic", "Sent chat message: $json")
+    }
+
+    fun sendCheatMessage(playerId: String, message: String) {
+        val cheat = CheatMessage(playerId = playerId, message = message)
+        val json = gson.toJson(cheat)
+        sendMessage(json)
+        Log.d("GameLogic", "Sent cheat message: $json")
     }
 
     fun rollDice() {
