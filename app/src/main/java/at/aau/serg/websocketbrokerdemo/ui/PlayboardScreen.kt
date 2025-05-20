@@ -540,17 +540,40 @@ fun PlayboardScreen(
         }
     }
 
-        // Chat Open/Close Button (immer sichtbar, unten rechts)
     Box(modifier = Modifier.fillMaxSize()) {
-        Button(
-
-            onClick = { chatOpen = !chatOpen },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(if (chatOpen) "Close Chat" else "Open Chat", fontSize = 16.sp)
+            // Cheat-terminal toggle
+            Button(
+                onClick = { cheatTerminalOpen = !cheatTerminalOpen },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3933cc)),
+                modifier = Modifier
+                    .width(140.dp)
+                    .height(48.dp)
+            ) {
+                Text(
+                    if (cheatTerminalOpen) "Close Terminal" else "Open Terminal",
+                    fontSize = 12.sp
+                )
+            }
+
+            // Chat toggle
+            Button(
+                onClick = { chatOpen = !chatOpen },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                modifier = Modifier
+                    .width(140.dp)
+                    .height(48.dp)
+            ) {
+                Text(
+                    if (chatOpen) "Close Chat" else "Open Chat",
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 
