@@ -7,9 +7,10 @@ import org.junit.jupiter.api.*
 import org.mockito.Mockito.*
 import java.io.ByteArrayInputStream
 import kotlinx.coroutines.Dispatchers
+import kotlin.test.Ignore
 
+@Ignore
 class GameWebSocketClientTest {
-    /*
 
     private lateinit var context: Context
     private lateinit var assetManager: AssetManager
@@ -29,12 +30,13 @@ class GameWebSocketClientTest {
             context,
             onConnected = { /* No-op */ },
             onMessageReceived = { /* No-op */ },
-            onDiceRolled = { _, _ -> /* No-op */ },
+            onDiceRolled = { _, _, _-> /* No-op */ },
             onGameStateReceived = { /* No-op */ },
             onPlayerTurn = { /* No-op */ },
             onPlayerPassedGo = { /* No-op */ },
             coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
+            onCheatMessageReceived = {_, _ -> },
             onCardDrawn = { _, _, _ -> },
             onTaxPayment = { _, _, _ -> }
         )
@@ -168,5 +170,5 @@ class GameWebSocketClientTest {
 
         spyClient.logic().sendPullCard("p3", 1)
         verify(spyClient, never()).sendMessage(anyString())
-    }*/
+    }
 }

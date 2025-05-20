@@ -6,6 +6,7 @@ import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DiceRollMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 
 class MessageParser(
@@ -19,6 +20,7 @@ class MessageParser(
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onMessageReceived: (text: String) -> Unit
 ) {
     fun parse(text: String) {
@@ -106,7 +108,18 @@ class MessageParser(
             println("Error parsing CHAT_MESSAGE: ${e.message}")
         }
 
-        // 9) FALLBACK
+        // 9) CHEAT_MESSAGE
+        try {
+            val cheat = gson.fromJson(text, CheatMessage::class.java)
+            if (cheat.type == "CHEAT_MESSAGE") {
+                onCheatMessageReceived(cheat.playerId, cheat.message)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing CHEAT_MESSAGE: ${e.message}")
+        }
+
+        // 10) FALLBACK
         onMessageReceived(text)
     }
 }

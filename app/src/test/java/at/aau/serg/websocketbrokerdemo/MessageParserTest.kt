@@ -41,6 +41,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail("should not hit dice roll") },
             onCardDrawn = { _, _, _ -> fail("should not hit card drawn") },
             onChatMessageReceived = { _, _ -> fail("should not hit chat") },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail("should not hit fallback") }
         )
 
@@ -69,6 +70,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -95,6 +97,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -122,6 +125,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -149,6 +153,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -176,6 +181,7 @@ class MessageParserTest {
             onDiceRolled = { pid, v, _ -> invoked = true; capPid = pid; capVal = v },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -214,6 +220,7 @@ class MessageParserTest {
                 invoked = true; capPid = pid; capType = type; capDesc = desc
             },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail()
             }
         )
@@ -246,6 +253,7 @@ class MessageParserTest {
             onChatMessageReceived = { pid, msg ->
                 invoked = true; capPid = pid; capMsg = msg
             },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -255,6 +263,40 @@ class MessageParserTest {
         assertEquals("p1", capPid)
         assertEquals("Hey!", capMsg)
     }
+
+    @Test
+    fun testCheatMessage() {
+        val json = """{"type":"CHEAT_MESSAGE","playerId":"p2","message":"kill all"}"""
+        var invoked = false
+        var capPid: String? = null
+        var capMsg: String? = null
+
+        val parser = MessageParser(
+            gson = gson,
+            getPlayers = { dummyPlayers },
+            onTaxPayment = { _, _, _ -> fail() },
+            onPlayerPassedGo = { fail() },
+            onPropertyBought = { fail() },
+            onGameStateReceived = { fail() },
+            onPlayerTurn = { fail() },
+            onDiceRolled = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _ -> fail() },
+            onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { pid, msg ->
+                invoked = true
+                capPid  = pid
+                capMsg  = msg
+            },
+            onMessageReceived = { fail("should not hit fallback") }
+        )
+
+        parser.parse(json)
+
+        assertTrue(invoked, "onCheatMessageReceived must be invoked")
+        assertEquals("p2", capPid)
+        assertEquals("kill all", capMsg)
+    }
+
 
     @Test
     fun testFallback() {
@@ -273,6 +315,7 @@ class MessageParserTest {
             onDiceRolled = { _, _, _ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { text -> invoked = true; capText = text }
         )
 

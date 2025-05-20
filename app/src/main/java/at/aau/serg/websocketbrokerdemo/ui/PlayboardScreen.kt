@@ -72,7 +72,13 @@ import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.font.FontFamily
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([\w-]+) bought""".toRegex()
@@ -95,6 +101,7 @@ fun PlayboardScreen(
     dicePlayerId:   String?,
     webSocketClient: GameWebSocketClient,
     chatMessages: List<ChatEntry>,
+    cheatMessages: List<CheatEntry>,
     showPassedGoAlert: Boolean,
     passedGoPlayerName: String,
     showTaxPaymentAlert: Boolean,
@@ -122,7 +129,9 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var manualDiceValue by remember { mutableStateOf("") }
     var chatOpen by remember { mutableStateOf(false) }
+    var cheatTerminalOpen by remember {mutableStateOf(false)}
     var chatInput by remember { mutableStateOf("") }
+    var cheatInput by remember { mutableStateOf("") }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
         Color(0xFF64B5F6), // Blau
@@ -278,7 +287,7 @@ fun PlayboardScreen(
                     enabled = manualDiceValue.toIntOrNull() in 1..39,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Custom Dice")
+                    Text("Custom Dice", fontSize = 10.sp)
                 }
             }
         }
@@ -531,112 +540,210 @@ fun PlayboardScreen(
         }
     }
 
-        // Chat Open/Close Button (immer sichtbar, unten rechts)
     Box(modifier = Modifier.fillMaxSize()) {
-        Button(
-
-            onClick = { chatOpen = !chatOpen },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+        Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(16.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(if (chatOpen) "Close Chat" else "Open Chat", fontSize = 16.sp)
+            // Cheat-terminal toggle
+            Button(
+                onClick = { cheatTerminalOpen = !cheatTerminalOpen },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3933cc)),
+                modifier = Modifier
+                    .width(140.dp)
+                    .height(48.dp)
+            ) {
+                Text(
+                    if (cheatTerminalOpen) "Close Terminal" else "Open Terminal",
+                    fontSize = 12.sp
+                )
+            }
+
+            // Chat toggle
+            Button(
+                onClick = { chatOpen = !chatOpen },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                modifier = Modifier
+                    .width(140.dp)
+                    .height(48.dp)
+            ) {
+                Text(
+                    if (chatOpen) "Close Chat" else "Open Chat",
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 
-// Chat Overlay
+    // Chat Overlay
 
-        if (chatOpen) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
-                    .padding(32.dp)
+    if (chatOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
+                .padding(32.dp)
+        ) {
+            IconButton(
+                onClick = { chatOpen = false },
+                modifier = Modifier.align(Alignment.TopStart)
             ) {
-                Column(
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                // Nachrichtenliste
+                LazyColumn(
                     modifier = Modifier
-                        .align(Alignment.Center)
                         .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
-                        .padding(16.dp)
+                        .weight(1f)
+                        .padding(8.dp),
+                    reverseLayout = true
                 ) {
-                    // Nachrichtenliste
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(8.dp),
-                        reverseLayout = true
-                    ) {
-                        items(chatMessages.reversed()) { entry ->
-                            val isOwnMessage = entry.senderId == currentPlayerId
+                    items(chatMessages.reversed()) { entry ->
+                        val isOwnMessage = entry.senderId == currentPlayerId
 
-                            Row(
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = if (isOwnMessage) Arrangement.End else Arrangement.Start
+                        ) {
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                horizontalArrangement = if (isOwnMessage) Arrangement.End else Arrangement.Start
+                                    .background(
+                                        if (isOwnMessage) Color(0xFFDCF8C6) else Color.White,
+                                        RoundedCornerShape(12.dp)
+                                    )
+                                    .padding(12.dp)
+                                    .widthIn(max = 240.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .background(
-                                            if (isOwnMessage) Color(0xFFDCF8C6) else Color.White,
-                                            RoundedCornerShape(12.dp)
-                                        )
-                                        .padding(12.dp)
-                                        .widthIn(max = 240.dp)
-                                ) {
-                                    Column {
-                                        val nameColor = playerColorMap[entry.senderId] ?: Color.Gray
-                                        Text(
-                                            text = entry.senderName,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp,
-                                            color = nameColor
-                                        )
-                                        Spacer(modifier = Modifier.height(4.dp))
-                                        Text(
-                                            text = entry.message,
-                                            color = Color.Black,
-                                            fontSize = 16.sp
-                                        )
-                                    }
+                                Column {
+                                    val nameColor = playerColorMap[entry.senderId] ?: Color.Gray
+                                    Text(
+                                        text = entry.senderName,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 12.sp,
+                                        color = nameColor
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = entry.message,
+                                        color = Color.Black,
+                                        fontSize = 16.sp
+                                    )
                                 }
                             }
                         }
-
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
-                    // Eingabe und Senden
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        TextField(
-                            value = chatInput,
-                            onValueChange = { chatInput = it },
-                            modifier = Modifier.weight(1f),
-                            placeholder = { Text("Type your message...") }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Button(
-                            onClick = {
-                                if (chatInput.isNotBlank()) {
-                                    webSocketClient.logic().sendChatMessage(currentPlayerId, chatInput)
-                                    chatInput = "" // Nach Senden Eingabefeld leeren
-                                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Eingabe und Senden
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = chatInput,
+                        onValueChange = { chatInput = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Type your message...") }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            if (chatInput.isNotBlank()) {
+                                webSocketClient.logic().sendChatMessage(currentPlayerId, chatInput)
+                                chatInput = "" // Nach Senden Eingabefeld leeren
                             }
-                        ) {
-                            Text("Send")
                         }
+                    ) {
+                        Text("Send")
                     }
                 }
             }
         }
     }
+
+    // Cheat Terminal Overview
+    if (cheatTerminalOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.65f))
+                .padding(32.dp)
+        ) {
+            // ← Back button in top-left
+            IconButton(
+                onClick = { cheatTerminalOpen = false },
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color(0xFFCCFF90))
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                // Nachrichtenliste
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(8.dp),
+                    reverseLayout = true
+                ) {
+                    items(cheatMessages.reversed()) { entry ->
+                        Text(
+                            text = "${entry.senderName.lowercase()}@monopoly > ${entry.message}",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize   = 14.sp,
+                            color      = Color(0xFF00FF00)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Eingabe und Senden
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = cheatInput,
+                        onValueChange = { cheatInput = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Type your cheat code...") }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            if (cheatInput.isNotBlank()) {
+                                webSocketClient.logic().sendCheatMessage(currentPlayerId, cheatInput)
+                                cheatInput = "" // Nach Senden Eingabefeld leeren
+                            }
+                        }
+                    ) {
+                        Text("Send")
+                    }
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun PlayerCard(

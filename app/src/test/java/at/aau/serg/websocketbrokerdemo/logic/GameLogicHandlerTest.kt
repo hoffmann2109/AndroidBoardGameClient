@@ -52,6 +52,12 @@ class GameLogicHandlerTest {
     }
 
     @Test
+    fun testSendCheatMessage(){
+        handler.sendCheatMessage("player1", "Cheat1")
+        assertTrue(sendLog[0].contains("CHEAT_MESSAGE"))
+    }
+
+    @Test
     fun testRollDice() {
         handler.rollDice()
         assertTrue(sendLog.contains("Roll"))

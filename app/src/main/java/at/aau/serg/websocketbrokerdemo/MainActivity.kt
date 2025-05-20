@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.ui.SettingsScreen
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
         val cheatFlags = remember { mutableStateMapOf<String, Boolean>() }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         val chatMessages = remember { mutableStateListOf<ChatEntry>() }
+        val cheatMessages = remember { mutableStateListOf<CheatEntry>()}
         var localPlayerId by remember { mutableStateOf<String?>(null) }
         var showPassedGoAlert by remember { mutableStateOf(false) }
         var passedGoPlayerName by remember { mutableStateOf("") }
@@ -129,6 +131,10 @@ class MainActivity : ComponentActivity() {
                 onChatMessageReceived = { senderId, text ->
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
+                },
+                onCheatMessageReceived = { senderId, text ->
+                    val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
+                    cheatMessages.add(CheatEntry(senderId, senderName, text))
                 },
                 onPlayerPassedGo = { playerName ->
                     passedGoPlayerName = playerName
@@ -249,6 +255,7 @@ class MainActivity : ComponentActivity() {
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
+                    cheatMessages = cheatMessages,
                     showPassedGoAlert = showPassedGoAlert,
                     passedGoPlayerName = passedGoPlayerName,
                     showTaxPaymentAlert = showTaxPaymentAlert,
