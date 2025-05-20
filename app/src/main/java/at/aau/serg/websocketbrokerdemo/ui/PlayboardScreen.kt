@@ -287,7 +287,7 @@ fun PlayboardScreen(
                     enabled = manualDiceValue.toIntOrNull() in 1..39,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Custom Dice")
+                    Text("Custom Dice", fontSize = 10.sp)
                 }
             }
         }
