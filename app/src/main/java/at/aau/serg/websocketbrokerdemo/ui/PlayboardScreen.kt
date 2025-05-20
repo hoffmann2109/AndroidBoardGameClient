@@ -72,7 +72,13 @@ import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.text.font.FontFamily
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([\w-]+) bought""".toRegex()
@@ -95,6 +101,7 @@ fun PlayboardScreen(
     dicePlayerId:   String?,
     webSocketClient: GameWebSocketClient,
     chatMessages: List<ChatEntry>,
+    cheatMessages: List<CheatEntry>,
     showPassedGoAlert: Boolean,
     passedGoPlayerName: String,
     showTaxPaymentAlert: Boolean,
@@ -122,7 +129,9 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var manualDiceValue by remember { mutableStateOf("") }
     var chatOpen by remember { mutableStateOf(false) }
+    var cheatTerminalOpen by remember {mutableStateOf(false)}
     var chatInput by remember { mutableStateOf("") }
+    var cheatInput by remember { mutableStateOf("") }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
         Color(0xFF64B5F6), // Blau
