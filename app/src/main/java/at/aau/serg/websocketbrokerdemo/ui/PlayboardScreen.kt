@@ -577,32 +577,38 @@ fun PlayboardScreen(
         }
     }
 
-// Chat Overlay
+    // Chat Overlay
 
-        if (chatOpen) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
-                    .padding(32.dp)
+    if (chatOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
+                .padding(32.dp)
+        ) {
+            IconButton(
+                onClick = { chatOpen = false },
+                modifier = Modifier.align(Alignment.TopStart)
             ) {
-                Column(
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                // Nachrichtenliste
+                LazyColumn(
                     modifier = Modifier
-                        .align(Alignment.Center)
                         .fillMaxWidth()
-                        .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
-                        .padding(16.dp)
+                        .weight(1f)
+                        .padding(8.dp),
+                    reverseLayout = true
                 ) {
-                    // Nachrichtenliste
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f)
-                            .padding(8.dp),
-                        reverseLayout = true
-                    ) {
-                        items(chatMessages.reversed()) { entry ->
-                            val isOwnMessage = entry.senderId == currentPlayerId
+                    items(chatMessages.reversed()) { entry ->
+                        val isOwnMessage = entry.senderId == currentPlayerId
 
                             Row(
                                 modifier = Modifier
@@ -638,9 +644,9 @@ fun PlayboardScreen(
                             }
                         }
 
-                    }
+                }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                     // Eingabe und Senden
                     Row(
