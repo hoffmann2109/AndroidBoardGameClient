@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.HouseableProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
@@ -32,6 +33,7 @@ class PlayboardScreenTest {
     private val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
     private val emptyChat = emptyList<ChatEntry>()
+    private val emptyCheat = emptyList<CheatEntry>()
 
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
@@ -51,6 +53,7 @@ class PlayboardScreenTest {
                 dicePlayerId = "",
                 webSocketClient = mockWebSocketClient,
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
@@ -78,6 +81,7 @@ class PlayboardScreenTest {
                 dicePlayerId = "",
                 webSocketClient = mockWebSocketClient,
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
@@ -107,6 +111,7 @@ class PlayboardScreenTest {
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -136,6 +141,7 @@ class PlayboardScreenTest {
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -163,6 +169,7 @@ class PlayboardScreenTest {
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -192,6 +199,7 @@ class PlayboardScreenTest {
                 dicePlayerId = "1",
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
@@ -229,6 +237,7 @@ class PlayboardScreenTest {
                 dicePlayerId = "1",
                 webSocketClient = mockWebSocketClient,
                 chatMessages = messages,
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
@@ -264,6 +273,7 @@ class PlayboardScreenTest {
                 dicePlayerId = null,
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
@@ -299,6 +309,7 @@ class PlayboardScreenTest {
                 dicePlayerId = "p1",
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,

@@ -11,8 +11,10 @@ import kotlinx.coroutines.delay
 import org.junit.Assert.*
 import android.content.Context
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
+import org.junit.jupiter.api.Assertions
 import kotlin.String
 
 class PassingGoTest {
@@ -21,6 +23,7 @@ class PassingGoTest {
 
     private val mockContext = mockk<Context>(relaxed = true)
     private val emptyChat = emptyList<ChatEntry>()
+    private val emptyCheat = emptyList<CheatEntry>()
     private val mockWebSocketClient = GameWebSocketClient(
         context = mockContext,
         onConnected = { /* No-op for testing */ },
@@ -32,7 +35,7 @@ class PassingGoTest {
         coroutineDispatcher = Dispatchers.IO,
         onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
-
+        onCheatMessageReceived = { _, _ -> },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
 
@@ -54,6 +57,7 @@ class PassingGoTest {
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -86,6 +90,7 @@ class PassingGoTest {
                 showPassedGoAlert = showAlert,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -113,6 +118,7 @@ class PassingGoTest {
                 showPassedGoAlert = showAlert,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -143,6 +149,7 @@ class PassingGoTest {
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
@@ -180,6 +187,7 @@ class PassingGoTest {
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,

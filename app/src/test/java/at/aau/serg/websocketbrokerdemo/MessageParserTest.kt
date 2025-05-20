@@ -41,6 +41,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail("should not hit dice roll") },
             onCardDrawn = { _, _, _ -> fail("should not hit card drawn") },
             onChatMessageReceived = { _, _ -> fail("should not hit chat") },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail("should not hit fallback") }
         )
 
@@ -69,6 +70,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -95,6 +97,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -122,6 +125,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -149,6 +153,7 @@ class MessageParserTest {
             onDiceRolled = { _, _,_ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -176,6 +181,7 @@ class MessageParserTest {
             onDiceRolled = { pid, v, _ -> invoked = true; capPid = pid; capVal = v },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -214,6 +220,7 @@ class MessageParserTest {
                 invoked = true; capPid = pid; capType = type; capDesc = desc
             },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail()
             }
         )
@@ -246,6 +253,7 @@ class MessageParserTest {
             onChatMessageReceived = { pid, msg ->
                 invoked = true; capPid = pid; capMsg = msg
             },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { fail() }
         )
 
@@ -273,6 +281,7 @@ class MessageParserTest {
             onDiceRolled = { _, _, _ -> fail() },
             onCardDrawn = { _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onMessageReceived = { text -> invoked = true; capText = text }
         )
 
