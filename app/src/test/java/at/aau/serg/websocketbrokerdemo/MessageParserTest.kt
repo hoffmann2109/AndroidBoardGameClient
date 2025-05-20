@@ -265,6 +265,40 @@ class MessageParserTest {
     }
 
     @Test
+    fun testCheatMessage() {
+        val json = """{"type":"CHEAT_MESSAGE","playerId":"p2","message":"kill all"}"""
+        var invoked = false
+        var capPid: String? = null
+        var capMsg: String? = null
+
+        val parser = MessageParser(
+            gson = gson,
+            getPlayers = { dummyPlayers },
+            onTaxPayment = { _, _, _ -> fail() },
+            onPlayerPassedGo = { fail() },
+            onPropertyBought = { fail() },
+            onGameStateReceived = { fail() },
+            onPlayerTurn = { fail() },
+            onDiceRolled = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _ -> fail() },
+            onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { pid, msg ->
+                invoked = true
+                capPid  = pid
+                capMsg  = msg
+            },
+            onMessageReceived = { fail("should not hit fallback") }
+        )
+
+        parser.parse(json)
+
+        assertTrue(invoked, "onCheatMessageReceived must be invoked")
+        assertEquals("p2", capPid)
+        assertEquals("kill all", capMsg)
+    }
+
+
+    @Test
     fun testFallback() {
         val raw = "SOME_UNRECOGNIZED_MESSAGE"
         var invoked = false
