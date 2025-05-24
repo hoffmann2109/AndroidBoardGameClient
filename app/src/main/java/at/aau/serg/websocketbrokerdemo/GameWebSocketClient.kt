@@ -27,7 +27,8 @@ class GameWebSocketClient(
     private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
-) {
+    private val onClearChat: () -> Unit,
+    ) {
 
     private val client = OkHttpClient()
     private var webSocket: WebSocket? = null
@@ -62,6 +63,7 @@ class GameWebSocketClient(
         onCardDrawn = { pid, type, desc -> onCardDrawn(pid, type, desc) },
         onChatMessageReceived = { pid, msg -> onChatMessageReceived(pid, msg) },
         onCheatMessageReceived = { pid, msg -> onCheatMessageReceived(pid, msg) },
+        onClearChat = onClearChat,
         onMessageReceived = { text -> onMessageReceived(text) }
     )
 

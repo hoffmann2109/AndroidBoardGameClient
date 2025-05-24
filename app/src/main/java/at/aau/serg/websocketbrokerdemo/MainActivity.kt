@@ -164,6 +164,10 @@ class MainActivity : ComponentActivity() {
                             .show()
                     }
                 },
+                onClearChat = {
+                    chatMessages.clear()
+                    cheatMessages.clear()
+                },
                 coroutineDispatcher = Dispatchers.IO
             )
         }
