@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeaderboardScreen(onBack: () -> Unit) {
+fun LeaderboardScreen(onBack: () -> Unit, currentUsername: String?) {
     val leaderboardTypes = listOf("gamesPlayed", "highestMoney", "level", "averageMoney", "wins")
     var selectedLeaderboard by remember { mutableStateOf(leaderboardTypes[0]) }
     var entries by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
