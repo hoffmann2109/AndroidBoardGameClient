@@ -273,8 +273,8 @@ class MainActivity : ComponentActivity() {
             }
             composable("leaderboard") {
                 LeaderboardScreen(
-                    onBack = { navController.popBackStack() }
-                )
+                    onBack = { navController.popBackStack() },
+                    currentUsername = playerProfile?.name)
             }
             composable("settings"){
                 SettingsScreen()
