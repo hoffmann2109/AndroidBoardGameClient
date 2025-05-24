@@ -127,8 +127,6 @@ fun PlayboardScreen(
     }
     val isMyTurn = currentPlayerId == localPlayerId
     var turnEnded by remember { mutableStateOf(false) }
-    var hasRolled by remember { mutableStateOf(false) }
-    var hasPasch by remember { mutableStateOf(false) }
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
@@ -379,8 +377,8 @@ fun PlayboardScreen(
         LaunchedEffect(currentPlayerId == localPlayerId) {
             if (currentPlayerId == localPlayerId) {
                 turnEnded = false
-                hasRolled = false
-                hasPasch = false
+                setHasRolled(false)
+                setHasPasch(false)
             }
         }
 
