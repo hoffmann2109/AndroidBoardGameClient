@@ -10,6 +10,5 @@ enum class PropertyColor {
         GREEN,
         DARK_BLUE,
         RAILROAD,
-        UTILITY,
-        NONE
+        UTILITY
     }

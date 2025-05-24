@@ -912,7 +912,6 @@ fun getColorForSet(colorSet: PropertyColor): Color {
         PropertyColor.DARK_BLUE -> Color(0xFF00008B)
         PropertyColor.RAILROAD -> Color(0xFF8B4513)
         PropertyColor.UTILITY -> Color (0xFF20B2AA)
-        PropertyColor.NONE -> Color (0xFFA9A9A9)
     }
 }
 
@@ -928,7 +927,7 @@ fun getColorForPosition(position: Int): PropertyColor {
         37, 39 -> PropertyColor.DARK_BLUE
         5, 15, 25, 35 -> PropertyColor.RAILROAD
         12, 28 -> PropertyColor.UTILITY
-        else -> PropertyColor.NONE
+        else -> error("Unhandled position: $position")
     }
 }
 
