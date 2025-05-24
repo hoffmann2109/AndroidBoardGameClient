@@ -139,7 +139,11 @@ private fun LeaderboardEntryItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (entry["name"] == currentUsername) MaterialTheme.colorScheme.surfaceVariant
+            else MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
@@ -149,7 +153,9 @@ private fun LeaderboardEntryItem(
         ) {
             Text(
                 text = "#${entry["rank"]}",
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = if (entry["name"] == currentUsername) FontWeight.Bold else FontWeight.Normal
+                )
             )
             Text(
                 text = entry["name"].toString(),
@@ -159,7 +165,9 @@ private fun LeaderboardEntryItem(
             )
             Text(
                 text = "${entry[selectedLeaderboard]}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (entry["name"] == currentUsername) FontWeight.Bold else FontWeight.Normal
+                ),
                 color = MaterialTheme.colorScheme.secondary
             )
         }
