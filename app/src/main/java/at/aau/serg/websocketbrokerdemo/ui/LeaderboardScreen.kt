@@ -119,7 +119,8 @@ fun LeaderboardScreen(onBack: () -> Unit, currentUsername: String?) {
                     items(entries) { entry ->
                         LeaderboardEntryItem(
                             entry = entry,
-                            selectedLeaderboard = selectedLeaderboard
+                            selectedLeaderboard = selectedLeaderboard,
+                            currentUsername = currentUsername
                         )
                     }
                 }
@@ -131,7 +132,8 @@ fun LeaderboardScreen(onBack: () -> Unit, currentUsername: String?) {
 @Composable
 private fun LeaderboardEntryItem(
     entry: Map<String, Any>,
-    selectedLeaderboard: String
+    selectedLeaderboard: String,
+    currentUsername: String?
 ) {
     Card(
         modifier = Modifier
@@ -151,7 +153,9 @@ private fun LeaderboardEntryItem(
             )
             Text(
                 text = entry["name"].toString(),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = if (entry["name"] == currentUsername) FontWeight.Bold else FontWeight.Normal
+                )
             )
             Text(
                 text = "${entry[selectedLeaderboard]}",
