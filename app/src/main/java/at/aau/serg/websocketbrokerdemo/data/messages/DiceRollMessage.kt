@@ -4,5 +4,6 @@ data class DiceRollMessage(
    override val type:String,
     val playerId: String,
     val value:  Int,
-    val manual: Boolean = false
+    val manual: Boolean = false,
+    val isPasch: Boolean = false
 ):GameMessage

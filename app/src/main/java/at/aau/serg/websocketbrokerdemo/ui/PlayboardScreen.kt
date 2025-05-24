@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -99,6 +100,10 @@ fun PlayboardScreen(
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
     dicePlayerId:   String?,
+    hasRolled: Boolean,
+    hasPasch: Boolean,
+    setHasRolled: (Boolean) -> Unit,
+    setHasPasch: (Boolean) -> Unit,
     webSocketClient: GameWebSocketClient,
     chatMessages: List<ChatEntry>,
     cheatMessages: List<CheatEntry>,
@@ -109,7 +114,7 @@ fun PlayboardScreen(
     taxPaymentAmount: Int,
     taxPaymentType: String,
     cheatFlags: Map<String, Boolean>,
-    onGiveUp: () -> Unit = {} // NEU
+    onGiveUp: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -122,7 +127,6 @@ fun PlayboardScreen(
     }
     val isMyTurn = currentPlayerId == localPlayerId
     var turnEnded by remember { mutableStateOf(false) }
-    var hasRolled by remember { mutableStateOf(false) }
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
@@ -249,13 +253,13 @@ fun PlayboardScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val diceEnabled = isMyTurn && (!hasRolled || hasPasch)
             DiceRollingButton(
                 text = "Roll Dice",
-                color = if (isMyTurn) Color(0xFF3FAF3F) else Color.Gray,
+                color = if (diceEnabled) Color(0xFF3FAF3F) else Color.Gray,
                 onClick = onRollDice,
                 diceValue = diceResult,
-                enabled = isMyTurn && !hasRolled,
-                onRollComplete = { hasRolled = true }
+                enabled = diceEnabled,
             )
 
             // Manual Dice Roll Section
@@ -373,12 +377,21 @@ fun PlayboardScreen(
         LaunchedEffect(currentPlayerId == localPlayerId) {
             if (currentPlayerId == localPlayerId) {
                 turnEnded = false
-                hasRolled = false
+                setHasRolled(false)
+                setHasPasch(false)
             }
         }
 
         // Popup für Grundstück
         if (selectedProperty != null) {
+            // Automatisch nach 3 Sekunden schließen – nur für Spieler, die NICHT dran sind
+            LaunchedEffect(selectedProperty, localPlayerId == currentPlayerId) {
+                if (selectedProperty != null && localPlayerId != currentPlayerId && !openedByClick) {
+                    delay(3000)
+                    selectedProperty = null
+                    canBuy = false
+                }
+            }
             val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
 
             AlertDialog(
@@ -899,7 +912,6 @@ fun getColorForSet(colorSet: PropertyColor): Color {
         PropertyColor.DARK_BLUE -> Color(0xFF00008B)
         PropertyColor.RAILROAD -> Color(0xFF8B4513)
         PropertyColor.UTILITY -> Color (0xFF20B2AA)
-        PropertyColor.NONE -> Color (0xFFA9A9A9)
     }
 }
 
@@ -915,7 +927,7 @@ fun getColorForPosition(position: Int): PropertyColor {
         37, 39 -> PropertyColor.DARK_BLUE
         5, 15, 25, 35 -> PropertyColor.RAILROAD
         12, 28 -> PropertyColor.UTILITY
-        else -> PropertyColor.NONE
+        else -> error("Unhandled position: $position")
     }
 }
 

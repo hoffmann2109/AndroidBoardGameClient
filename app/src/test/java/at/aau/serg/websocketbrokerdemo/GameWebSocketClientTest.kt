@@ -30,7 +30,7 @@ class GameWebSocketClientTest {
             context,
             onConnected = { /* No-op */ },
             onMessageReceived = { /* No-op */ },
-            onDiceRolled = { _, _, _-> /* No-op */ },
+            onDiceRolled = { _, _, _, _-> /* No-op */ },
             onGameStateReceived = { /* No-op */ },
             onPlayerTurn = { /* No-op */ },
             onPlayerPassedGo = { /* No-op */ },
