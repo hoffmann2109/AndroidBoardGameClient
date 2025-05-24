@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -99,6 +100,10 @@ fun PlayboardScreen(
     onBackToLobby: () -> Unit,
     diceResult:     Int?,
     dicePlayerId:   String?,
+    hasRolled: Boolean,
+    hasPasch: Boolean,
+    setHasRolled: (Boolean) -> Unit,
+    setHasPasch: (Boolean) -> Unit,
     webSocketClient: GameWebSocketClient,
     chatMessages: List<ChatEntry>,
     cheatMessages: List<CheatEntry>,
@@ -109,7 +114,7 @@ fun PlayboardScreen(
     taxPaymentAmount: Int,
     taxPaymentType: String,
     cheatFlags: Map<String, Boolean>,
-    onGiveUp: () -> Unit = {} // NEU
+    onGiveUp: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -123,6 +128,7 @@ fun PlayboardScreen(
     val isMyTurn = currentPlayerId == localPlayerId
     var turnEnded by remember { mutableStateOf(false) }
     var hasRolled by remember { mutableStateOf(false) }
+    var hasPasch by remember { mutableStateOf(false) }
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
     var openedByClick by remember { mutableStateOf(false) }
@@ -249,13 +255,13 @@ fun PlayboardScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val diceEnabled = isMyTurn && (!hasRolled || hasPasch)
             DiceRollingButton(
                 text = "Roll Dice",
-                color = if (isMyTurn) Color(0xFF3FAF3F) else Color.Gray,
+                color = if (diceEnabled) Color(0xFF3FAF3F) else Color.Gray,
                 onClick = onRollDice,
                 diceValue = diceResult,
-                enabled = isMyTurn && !hasRolled,
-                onRollComplete = { hasRolled = true }
+                enabled = diceEnabled,
             )
 
             // Manual Dice Roll Section
@@ -374,6 +380,7 @@ fun PlayboardScreen(
             if (currentPlayerId == localPlayerId) {
                 turnEnded = false
                 hasRolled = false
+                hasPasch = false
             }
         }
 

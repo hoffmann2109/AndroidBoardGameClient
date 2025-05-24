@@ -53,6 +53,8 @@ class MainActivity : ComponentActivity() {
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
         var diceValue by remember { mutableStateOf<Int?>(null) }
         var dicePlayer by remember { mutableStateOf<String?>(null) }
+        var hasRolled by remember { mutableStateOf(false) }
+        var hasPasch by remember { mutableStateOf(false) }
         val cheatFlags = remember { mutableStateMapOf<String, Boolean>() }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         val chatMessages = remember { mutableStateListOf<ChatEntry>() }
@@ -113,10 +115,15 @@ class MainActivity : ComponentActivity() {
                 context = context,
                 onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled = { pid, value, manual ->
+                onDiceRolled = { pid, value, manual, isPasch ->
                     dicePlayer = pid
                     diceValue = value
                     cheatFlags[pid] = manual
+
+                    if (pid == localPlayerId) {
+                        hasRolled = !isPasch
+                        hasPasch = isPasch
+                    }
                 },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
@@ -251,6 +258,10 @@ class MainActivity : ComponentActivity() {
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult = diceValue,
                     dicePlayerId = dicePlayer,
+                    hasRolled = hasRolled,
+                    hasPasch = hasPasch,
+                    setHasRolled = { hasRolled = it },
+                    setHasPasch = { hasPasch = it },
                     cheatFlags = cheatFlags,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",

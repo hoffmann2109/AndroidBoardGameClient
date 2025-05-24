@@ -18,7 +18,7 @@ class GameWebSocketClient(
     private val context: Context,
     private val onConnected: () -> Unit,
     private var onMessageReceived: (String) -> Unit,
-    private val onDiceRolled: (playerId: String, value: Int, manual: Boolean) -> Unit,
+    private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (playerId: String) -> Unit,
     private val onPlayerPassedGo: (playerName: String) -> Unit,
@@ -58,7 +58,7 @@ class GameWebSocketClient(
             onPlayerTurn(sessionId)
             onPlayerTurnListener?.invoke(sessionId)
         },
-        onDiceRolled = { pid, v, manual -> onDiceRolled(pid, v, manual) },
+        onDiceRolled = { pid, v, manual, isPasch -> onDiceRolled(pid, v, manual, isPasch) },
         onCardDrawn = { pid, type, desc -> onCardDrawn(pid, type, desc) },
         onChatMessageReceived = { pid, msg -> onChatMessageReceived(pid, msg) },
         onCheatMessageReceived = { pid, msg -> onCheatMessageReceived(pid, msg) },
