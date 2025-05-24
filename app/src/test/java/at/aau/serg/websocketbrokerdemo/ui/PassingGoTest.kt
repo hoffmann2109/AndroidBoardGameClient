@@ -36,6 +36,7 @@ class PassingGoTest {
         onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
         onCheatMessageReceived = { _, _ -> },
+        onClearChat = { /* No-op for testing */ },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
 

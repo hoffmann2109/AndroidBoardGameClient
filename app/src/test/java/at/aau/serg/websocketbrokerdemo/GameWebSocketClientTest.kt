@@ -38,6 +38,7 @@ class GameWebSocketClientTest {
             onChatMessageReceived = { _, _ -> },
             onCheatMessageReceived = {_, _ -> },
             onCardDrawn = { _, _, _ -> },
+            onClearChat = {},
             onTaxPayment = { _, _, _ -> }
         )
     }
