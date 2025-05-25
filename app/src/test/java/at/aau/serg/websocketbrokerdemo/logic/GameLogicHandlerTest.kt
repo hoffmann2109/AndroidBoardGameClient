@@ -112,6 +112,43 @@ class GameLogicHandlerTest {
     }
 
     @Test
+    fun testPayRent_withValidUser() {
+        // Mock FirebaseAuth and current user
+        val mockUser = mock(FirebaseUser::class.java)
+        `when`(mockUser.uid).thenReturn("mockUid")
+
+        mockStatic(FirebaseAuth::class.java).use { firebaseAuth ->
+            val mockAuth = mock(FirebaseAuth::class.java)
+            `when`(mockAuth.currentUser).thenReturn(mockUser)
+            `when`(FirebaseAuth.getInstance()).thenReturn(mockAuth)
+
+            handler.payRent(15)
+            
+            // Verify the message was sent
+            assertTrue(sendLog.isNotEmpty())
+            val sentMessage = sendLog[0]
+            assertTrue(sentMessage.contains("RENT_PAYMENT"))
+            assertTrue(sentMessage.contains("mockUid"))
+            assertTrue(sentMessage.contains("15"))
+        }
+    }
+
+    @Test
+    fun testPayRent_withNoUser() {
+        // Mock FirebaseAuth with no current user
+        mockStatic(FirebaseAuth::class.java).use { firebaseAuth ->
+            val mockAuth = mock(FirebaseAuth::class.java)
+            `when`(mockAuth.currentUser).thenReturn(null)
+            `when`(FirebaseAuth.getInstance()).thenReturn(mockAuth)
+
+            handler.payRent(15)
+            
+            // Verify no message was sent
+            assertTrue(sendLog.isEmpty())
+        }
+    }
+
+    @Test
     fun testGetInitPayload() = runTest {
         // Mock FirebaseAuth and current user
         val mockUser = mock(FirebaseUser::class.java)
