@@ -7,6 +7,7 @@ import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.RentPaymentMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
@@ -114,5 +115,20 @@ class GameLogicHandler(
         val message = "BUY_PROPERTY:$propertyId"
         sendMessage(message)
         Log.d("GameLogic", "Sent: $message")
+    }
+
+    fun payRent(propertyId: Int) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.uid?.let { userId ->
+            val rentMessage = RentPaymentMessage(
+                playerId = userId,
+                propertyId = propertyId
+            )
+            val json = gson.toJson(rentMessage)
+            sendMessage(json)
+            Log.d("GameLogic", "Sent rent payment message: $json")
+        } ?: run {
+            Log.e("GameLogic", "Failed to send rent payment: No user ID available")
+        }
     }
 }
