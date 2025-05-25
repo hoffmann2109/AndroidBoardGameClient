@@ -136,6 +136,7 @@ fun PlayboardScreen(
     var cheatTerminalOpen by remember {mutableStateOf(false)}
     var chatInput by remember { mutableStateOf("") }
     var cheatInput by remember { mutableStateOf("") }
+    var rentPaid by remember { mutableStateOf(false) }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
         Color(0xFF64B5F6), // Blau
@@ -379,6 +380,7 @@ fun PlayboardScreen(
                 turnEnded = false
                 setHasRolled(false)
                 setHasPasch(false)
+                rentPaid = false
             }
         }
 
@@ -485,12 +487,15 @@ fun PlayboardScreen(
                             Button(
                                 onClick = {
                                     webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
+                                    rentPaid = true
                                     selectedProperty = null
                                     openedByClick = false
                                     canBuy = false
                                 },
+                                enabled = !rentPaid,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFFE57373) // Red color for rent button
+                                    containerColor = Color(0xFFE57373),
+                                    disabledContainerColor = Color(0xFFBDBDBD)
                                 )
                             ) {
                                 Text("Pay Rent")
