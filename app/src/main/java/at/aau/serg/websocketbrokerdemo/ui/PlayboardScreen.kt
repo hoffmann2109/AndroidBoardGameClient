@@ -478,6 +478,24 @@ fun PlayboardScreen(
                                 Text("Buy")
                             }
                         }
+                        // Add Pay Rent button if property is owned by another player
+                        if (selectedProperty?.ownerId != null &&
+                            selectedProperty?.ownerId != localPlayerId &&
+                            localPlayerId == currentPlayerId) {
+                            Button(
+                                onClick = {
+                                    webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
+                                    selectedProperty = null
+                                    openedByClick = false
+                                    canBuy = false
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFFE57373) // Red color for rent button
+                                )
+                            ) {
+                                Text("Pay Rent")
+                            }
+                        }
                     }
                 },
                 dismissButton = {}
