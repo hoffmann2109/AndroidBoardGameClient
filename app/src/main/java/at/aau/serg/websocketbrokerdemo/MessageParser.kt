@@ -8,6 +8,7 @@ import at.aau.serg.websocketbrokerdemo.data.messages.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.ClearChatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.HasWonMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 
 class MessageParser(
@@ -23,6 +24,7 @@ class MessageParser(
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onClearChat: () -> Unit,
+    private val onHasWon: (winnerId: String) -> Unit,
     private val onMessageReceived: (text: String) -> Unit
 ) {
     fun parse(text: String) {
@@ -121,6 +123,17 @@ class MessageParser(
             println("Error parsing CHEAT_MESSAGE: ${e.message}")
         }
 
+        // 10) HAS_WON
+        try {
+            val won = gson.fromJson(text, HasWonMessage::class.java)
+            if (won.type == "HAS_WON") {
+                onHasWon(won.userId)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing HAS_WON: ${e.message}")
+        }
+
         // 11) CLEAR_CHAT
         try {
             val clearMessage = gson.fromJson(text, ClearChatMessage::class.java)
@@ -132,9 +145,7 @@ class MessageParser(
             println("Error parsing CLEAR_CHAT: ${e.message}")
         }
 
-
-
-        // 10) FALLBACK
+        // 12) FALLBACK
         onMessageReceived(text)
     }
 }
