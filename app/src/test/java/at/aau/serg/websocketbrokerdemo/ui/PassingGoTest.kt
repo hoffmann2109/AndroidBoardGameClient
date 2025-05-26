@@ -37,6 +37,7 @@ class PassingGoTest {
         onChatMessageReceived = { _, _ -> },
         onCheatMessageReceived = { _, _ -> },
         onClearChat = { /* No-op for testing */ },
+        onHasWon = { _ -> },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
 

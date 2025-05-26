@@ -34,6 +34,7 @@ import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
+import at.aau.serg.websocketbrokerdemo.ui.WinScreen
 import kotlinx.coroutines.delay
 
 import kotlinx.coroutines.launch
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
         var taxPaymentPlayerName by remember { mutableStateOf("") }
         var taxPaymentAmount by remember { mutableStateOf(0) }
         var taxPaymentType by remember { mutableStateOf("") }
+        var youWon by remember { mutableStateOf(false) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -123,6 +125,11 @@ class MainActivity : ComponentActivity() {
                     if (pid == localPlayerId) {
                         hasRolled = !isPasch
                         hasPasch = isPasch
+                    }
+                },
+                onHasWon = { winnerId ->
+                    if (winnerId == userId) {
+                        youWon = true           // just set state here
                     }
                 },
                 onGameStateReceived = { players ->
@@ -190,6 +197,13 @@ class MainActivity : ComponentActivity() {
 
         val navController = rememberNavController()
 
+        // 3) When that state flips, actually navigate:
+        LaunchedEffect(youWon) {
+            if (youWon) {
+                navController.navigate("win")
+            }
+        }
+
         NavHost(navController, startDestination = "lobby") {
             composable("lobby") {
                 LobbyScreen(
@@ -224,6 +238,12 @@ class MainActivity : ComponentActivity() {
                     onOpenSoundSelection ={navController.navigate("soundSelection")}
 
                 )
+            }
+            composable("win") {
+                WinScreen(onTimeout = {
+                    navController.popBackStack("lobby", inclusive = false)
+                    youWon = false           // reset so you can play again
+                })
             }
             composable("profile") {
                 UserProfileScreen(
@@ -280,7 +300,6 @@ class MainActivity : ComponentActivity() {
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)
-                            webSocketClient.close()
                             navController.navigate("lobby")
                         }
                     }

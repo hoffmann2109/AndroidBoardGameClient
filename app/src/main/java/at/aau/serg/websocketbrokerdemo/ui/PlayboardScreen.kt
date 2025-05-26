@@ -346,16 +346,26 @@ fun PlayboardScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
 
+            val giveUpEnabled = isMyTurn
+            val giveUpColor   = if (giveUpEnabled) Color.Red else Color.Gray
+            val giveUpTextColor = if (giveUpEnabled) Color.White else Color.DarkGray
+
             Button(
                 onClick = onGiveUp,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                enabled = giveUpEnabled,
+                colors = ButtonDefaults.buttonColors(containerColor = giveUpColor),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
                     .testTag("giveUpButton")
             ) {
-                Text("Give Up", fontSize = 18.sp, color = Color.White)
+                Text(
+                    text = "Give Up",
+                    fontSize = 18.sp,
+                    color = giveUpTextColor
+                )
             }
+
             if (isMyTurn && !turnEnded) {
                 Spacer(modifier = Modifier.height(8.dp))
 

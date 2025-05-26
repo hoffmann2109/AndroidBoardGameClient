@@ -5,6 +5,7 @@ import android.util.Log
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.GiveUpMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.RentPaymentMessage
@@ -86,11 +87,10 @@ class GameLogicHandler(
     }
 
     fun sendGiveUpMessage(userId: String) {
-        val payload = mapOf(
-            "type" to "GIVE_UP",
-            "userId" to userId
+        val giveUpMessage = GiveUpMessage(
+            userId = userId
         )
-        val json = gson.toJson(payload)
+        val json = gson.toJson(giveUpMessage)
         sendMessage(json)
         Log.d("GameLogic", "Sent give-up message: $json")
     }
