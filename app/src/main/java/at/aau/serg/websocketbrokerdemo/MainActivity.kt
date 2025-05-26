@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
+        val playerCount by remember { derivedStateOf { playerMoneyList.size } }
         var diceValue by remember { mutableStateOf<Int?>(null) }
         var dicePlayer by remember { mutableStateOf<String?>(null) }
         var hasRolled by remember { mutableStateOf(false) }
@@ -209,6 +211,7 @@ class MainActivity : ComponentActivity() {
                 LobbyScreen(
                     message = message,
                     log = log,
+                    playerCount = playerCount,
                     onMessageChange = { message = it },
                     onConnect = { webSocketClient.connect() },
                     onDisconnect = {
