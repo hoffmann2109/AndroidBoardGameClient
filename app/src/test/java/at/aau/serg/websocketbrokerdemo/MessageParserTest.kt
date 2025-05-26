@@ -43,6 +43,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail("should not hit chat") },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback")
             }
         )
@@ -74,6 +75,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -102,6 +104,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -131,6 +134,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -160,6 +164,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -189,6 +194,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -229,6 +235,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail()
             }
         )
@@ -263,6 +270,7 @@ class MessageParserTest {
             },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -297,6 +305,7 @@ class MessageParserTest {
                 capMsg  = msg
             },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") }
         )
 
@@ -326,6 +335,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail() },
             onClearChat = { invoked = true },
+            onHasWon = { _ -> },
             onMessageReceived = { fail() }
         )
 
@@ -352,6 +362,7 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = {},
+            onHasWon = { _ -> },
             onMessageReceived = { text -> invoked = true; capText = text }
         )
 
