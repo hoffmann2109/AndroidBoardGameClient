@@ -34,6 +34,7 @@ class LobbyScreenTest {
                 onLeaderboardClick = {},
                 onOpenSettings = {},
                 onOpenSoundSelection = {},
+                playerCount = 1,
                 onJoinGame = {}
             )
         }
@@ -64,6 +65,7 @@ class LobbyScreenTest {
                 onLeaderboardClick = {},
                 onOpenSettings = {},
                 onOpenSoundSelection = {},
+                playerCount = 1,
                 onJoinGame = {}
             )
         }
@@ -96,6 +98,7 @@ class LobbyScreenTest {
                 onLeaderboardClick = {},
                 onOpenSettings = {},
                 onOpenSoundSelection = {},
+                playerCount = 1,
                 onJoinGame = {}
             )
         }
