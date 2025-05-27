@@ -1,27 +1,26 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.foundation.background
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
-
 
 @Composable
 fun WinScreen(onTimeout: () -> Unit) {
@@ -30,12 +29,13 @@ fun WinScreen(onTimeout: () -> Unit) {
     // Zufällige Siegesnachricht
     val messages = listOf(
         "🏆 You are the king of real estate!",
-        "🤑  All opponents are bankrupt!",
+        "🤑 All opponents are bankrupt!",
         "🎉 Megadeal! You've won!",
         "💸 The dice were on your side!"
     )
     val winMessage = remember { messages.random() }
 
+    // Animationen
     val scale by rememberInfiniteTransition().animateFloat(
         initialValue = 1f,
         targetValue = 1.1f,
@@ -45,31 +45,42 @@ fun WinScreen(onTimeout: () -> Unit) {
         )
     )
 
+    val alpha by rememberInfiniteTransition().animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    // Sichtbarkeit und Timeout
     LaunchedEffect(Unit) {
         visible.value = true
         delay(5000)
         onTimeout()
     }
 
+    // UI Layout
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF2196F3), // Dunkelblau oben
-                        Color(0xFFBBDEFB)  // Hellblau unten
+                        Color(0xFF2196F3), // Dunkelblau
+                        Color(0xFFBBDEFB)  // Hellblau
                     )
                 )
             ),
         contentAlignment = Alignment.Center
     ) {
-
-        // 💸 Geldschein-Regen (im Hintergrund)
+        // 💸 Fallende Symbole im Hintergrund
         repeat(50) {
             FallingSymbol()
         }
 
+        // 🎉 Siegtext, Glitzer und Nachricht
         AnimatedVisibility(
             visible = visible.value,
             enter = fadeIn()
@@ -77,6 +88,17 @@ fun WinScreen(onTimeout: () -> Unit) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                // ✨ Glitzer oben
+                Text(
+                    text = "✨",
+                    fontSize = 28.sp,
+                    color = Color.White,
+                    modifier = Modifier.alpha(alpha)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 🎉 Haupttext
                 Text(
                     modifier = Modifier.scale(scale),
                     text = "🎉 Congratulations, you have won! 🎉",
@@ -88,6 +110,7 @@ fun WinScreen(onTimeout: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // 💬 Zufällige Nachricht
                 Text(
                     text = winMessage,
                     fontSize = 18.sp,
@@ -95,7 +118,15 @@ fun WinScreen(onTimeout: () -> Unit) {
                     textAlign = TextAlign.Center
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // ✨ Glitzer unten
+                Text(
+                    text = "✨",
+                    fontSize = 28.sp,
+                    color = Color.White,
+                    modifier = Modifier.alpha(alpha)
+                )
             }
         }
     }
@@ -110,7 +141,6 @@ fun FallingSymbol() {
     val randomX = remember { Random.nextInt(0, screenWidth).dp }
     val duration = remember { Random.nextInt(3000, 6000) }
 
-    // Fallbewegung (Y)
     val offsetY by rememberInfiniteTransition().animateFloat(
         initialValue = -50f,
         targetValue = screenHeight.toFloat(),
@@ -120,7 +150,6 @@ fun FallingSymbol() {
         )
     )
 
-    // 🎵 Tanzbewegung (Rotation)
     val rotation by rememberInfiniteTransition().animateFloat(
         initialValue = -10f,
         targetValue = 10f,
@@ -130,7 +159,6 @@ fun FallingSymbol() {
         )
     )
 
-    // 🎲 Zufälliges Symbol
     val symbols = listOf("💵", "🏠", "🎲", "🏦", "🤑")
     val symbol = remember { symbols.random() }
 
