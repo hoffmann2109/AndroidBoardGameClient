@@ -15,6 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 
 
 @Composable
@@ -28,9 +32,19 @@ fun WinScreen(onTimeout: () -> Unit) {
     }
 
     Box(
-        Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF2196F3), // Dunkelblau oben
+                        Color(0xFFBBDEFB)  // Hellblau unten
+                    )
+                )
+            ),
         contentAlignment = Alignment.Center
     ) {
+
         // 💸 Geldschein-Regen (im Hintergrund)
         repeat(10) {
             FallingMoney()
@@ -52,8 +66,11 @@ fun WinScreen(onTimeout: () -> Unit) {
 
 @Composable
 fun FallingMoney(modifier: Modifier = Modifier) {
-    val screenHeight = 800
-    val randomX = remember { Random.nextInt(0, 300).dp }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+    val screenHeight = configuration.screenHeightDp
+
+    val randomX = remember { Random.nextInt(0, screenWidth).dp }
     val duration = remember { Random.nextInt(3000, 6000) }
 
     val offsetY by rememberInfiniteTransition().animateFloat(
