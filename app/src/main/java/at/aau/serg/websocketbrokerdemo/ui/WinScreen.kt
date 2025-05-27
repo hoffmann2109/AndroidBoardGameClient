@@ -46,8 +46,8 @@ fun WinScreen(onTimeout: () -> Unit) {
     ) {
 
         // 💸 Geldschein-Regen (im Hintergrund)
-        repeat(10) {
-            FallingMoney()
+        repeat(50) {
+            FallingSymbol()
         }
 
         AnimatedVisibility(
@@ -58,14 +58,15 @@ fun WinScreen(onTimeout: () -> Unit) {
                 text = "🎉 Congratulations, you have won! 🎉",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = Color.White
             )
         }
     }
 }
 
 @Composable
-fun FallingMoney(modifier: Modifier = Modifier) {
+fun FallingSymbol() {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val screenHeight = configuration.screenHeightDp
@@ -82,12 +83,16 @@ fun FallingMoney(modifier: Modifier = Modifier) {
         )
     )
 
-    Text(
-        text = "💵",
-        fontSize = 24.sp,
-        modifier = modifier
-            .offset(x = randomX, y = offsetY.dp)
-    )
+    // 🎲 Liste mit möglichen Symbolen
+    val symbols = listOf("💵", "🏠", "🎲", "🏦", "🤑")
+    val symbol = remember { symbols.random() }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = symbol,
+            fontSize = 24.sp,
+            modifier = Modifier
+                .absoluteOffset(x = randomX, y = offsetY.dp)
+        )
+    }
 }
-
-
