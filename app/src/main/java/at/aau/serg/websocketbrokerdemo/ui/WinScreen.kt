@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 @Composable
 fun WinScreen(onTimeout: () -> Unit) {
     val visible = remember { mutableStateOf(false) }
+    val showGiftBox = remember { mutableStateOf(true) }
 
     // Zufällige Siegesnachricht
     val messages = listOf(
@@ -62,6 +63,15 @@ fun WinScreen(onTimeout: () -> Unit) {
         onTimeout()
     }
 
+    LaunchedEffect(Unit) {
+        visible.value = false
+        delay(4000) // Geschenk zeigen
+        showGiftBox.value = false
+        visible.value = true
+        delay(8000) // Nach Gesamtzeit zur Lobby zurück
+        onTimeout()
+    }
+
     // UI Layout
     Box(
         modifier = Modifier
@@ -81,11 +91,15 @@ fun WinScreen(onTimeout: () -> Unit) {
             FallingSymbol()
         }
 
-        // 🎉 Siegtext, Glitzer und Nachricht
-        AnimatedVisibility(
-            visible = visible.value,
-            enter = fadeIn()
-        ) {
+        if (showGiftBox.value) {
+            Text(
+                text = "🎁",
+                fontSize = 64.sp,
+                modifier = Modifier
+                    .scale(scale)
+                    .alpha(alpha)
+            )
+        } else if (visible.value) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
