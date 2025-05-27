@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import androidx.compose.material3.Button
 
 @Composable
 fun WinScreen(onTimeout: () -> Unit) {
@@ -57,7 +58,7 @@ fun WinScreen(onTimeout: () -> Unit) {
     // Sichtbarkeit und Timeout
     LaunchedEffect(Unit) {
         visible.value = true
-        delay(5000)
+        delay(10000)
         onTimeout()
     }
 
@@ -127,6 +128,12 @@ fun WinScreen(onTimeout: () -> Unit) {
                     color = Color.White,
                     modifier = Modifier.alpha(alpha)
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Button(onClick = { onTimeout() }) {
+                    Text("🔁 Back to Lobby")
+                }
             }
         }
     }
