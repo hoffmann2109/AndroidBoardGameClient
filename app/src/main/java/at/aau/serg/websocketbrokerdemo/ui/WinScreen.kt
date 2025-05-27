@@ -17,13 +17,24 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 
 
 @Composable
 fun WinScreen(onTimeout: () -> Unit) {
     val visible = remember { mutableStateOf(false) }
+
+    val scale by rememberInfiniteTransition().animateFloat(
+        initialValue = 1f,
+        targetValue = 1.1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
     LaunchedEffect(Unit) {
         visible.value = true
@@ -55,6 +66,7 @@ fun WinScreen(onTimeout: () -> Unit) {
             enter = fadeIn()
         ) {
             Text(
+                modifier = Modifier.scale(scale),
                 text = "🎉 Congratulations, you have won! 🎉",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
@@ -74,6 +86,7 @@ fun FallingSymbol() {
     val randomX = remember { Random.nextInt(0, screenWidth).dp }
     val duration = remember { Random.nextInt(3000, 6000) }
 
+    // Fallbewegung (Y)
     val offsetY by rememberInfiniteTransition().animateFloat(
         initialValue = -50f,
         targetValue = screenHeight.toFloat(),
@@ -83,16 +96,29 @@ fun FallingSymbol() {
         )
     )
 
-    // 🎲 Liste mit möglichen Symbolen
+    // 🎵 Tanzbewegung (Rotation)
+    val rotation by rememberInfiniteTransition().animateFloat(
+        initialValue = -10f,
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    // 🎲 Zufälliges Symbol
     val symbols = listOf("💵", "🏠", "🎲", "🏦", "🤑")
     val symbol = remember { symbols.random() }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Text(
             text = symbol,
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             modifier = Modifier
                 .absoluteOffset(x = randomX, y = offsetY.dp)
+                .graphicsLayer {
+                    rotationZ = rotation
+                }
         )
     }
 }
