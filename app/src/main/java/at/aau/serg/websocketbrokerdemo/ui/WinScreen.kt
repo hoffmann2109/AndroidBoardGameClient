@@ -27,6 +27,15 @@ import androidx.compose.ui.graphics.graphicsLayer
 fun WinScreen(onTimeout: () -> Unit) {
     val visible = remember { mutableStateOf(false) }
 
+    // Zufällige Siegesnachricht
+    val messages = listOf(
+        "🏆 You are the king of real estate!",
+        "🤑  All opponents are bankrupt!",
+        "🎉 Megadeal! You've won!",
+        "💸 The dice were on your side!"
+    )
+    val winMessage = remember { messages.random() }
+
     val scale by rememberInfiniteTransition().animateFloat(
         initialValue = 1f,
         targetValue = 1.1f,
@@ -65,14 +74,29 @@ fun WinScreen(onTimeout: () -> Unit) {
             visible = visible.value,
             enter = fadeIn()
         ) {
-            Text(
-                modifier = Modifier.scale(scale),
-                text = "🎉 Congratulations, you have won! 🎉",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = Color.White
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    modifier = Modifier.scale(scale),
+                    text = "🎉 Congratulations, you have won! 🎉",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = Color.White
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = winMessage,
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
     }
 }
