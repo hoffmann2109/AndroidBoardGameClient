@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -80,6 +79,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.text.font.FontFamily
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
+import com.google.gson.Gson
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([\w-]+) bought""".toRegex()
@@ -114,6 +117,10 @@ fun PlayboardScreen(
     taxPaymentAmount: Int,
     taxPaymentType: String,
     cheatFlags: Map<String, Boolean>,
+    currentDealProposal: DealProposalMessage?,
+    setCurrentDealProposal: (DealProposalMessage?) -> Unit,
+    currentDealResponse: DealResponseMessage?,
+    setCurrentDealResponse: (DealResponseMessage?) -> Unit,
     onGiveUp: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -147,8 +154,22 @@ fun PlayboardScreen(
     val playerColorMap = players
         .mapIndexed { index, player -> player.id to nameColors[index % nameColors.size] }
         .toMap()
+    var showDealDialog by remember { mutableStateOf(false) }
+    var selectedReceiver by remember { mutableStateOf<PlayerMoney?>(null) }
+    var offeredProperties by remember { mutableStateOf(listOf<Int>()) }
+    var requestedProperties by remember { mutableStateOf(listOf<Int>()) }
+    var offeredMoney by remember { mutableStateOf(0) }
 
+    var incomingDeal by remember { mutableStateOf<DealProposalMessage?>(null) }
+    var showIncomingDialog by remember { mutableStateOf(false) }
+    var isCountering by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        webSocketClient.setDealProposalListener {
+            incomingDeal = it
+            showIncomingDialog = true
+        }
+    }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -719,6 +740,105 @@ fun PlayboardScreen(
                 }
             }
         }
+    }
+
+    // DEALS
+
+    Button(
+        onClick = { showDealDialog = true },
+        enabled = localPlayerId == currentPlayerId
+    ) {
+        Text("Start Deal")
+    }
+
+    if (showDealDialog) {
+        DealDialog(
+            players = players.filter { it.id != localPlayerId },
+            senderId = localPlayerId,
+            allProperties = properties,
+            receiver = selectedReceiver,
+            onReceiverChange = { selectedReceiver = it },
+            onSendDeal = { deal ->
+                val json = Gson().toJson(deal)
+                webSocketClient.sendMessage(json)
+                showDealDialog = false
+                selectedReceiver = null
+            },
+            onDismiss = {
+                showDealDialog = false
+                selectedReceiver = null
+            }
+        )
+    }
+
+    if (showIncomingDialog && incomingDeal != null) {
+        val receiverProps = properties.filter { it.ownerId == localPlayerId }.map { it.id }
+
+        IncomingDealDialog(
+            proposal = incomingDeal!!,
+            senderName = players.find { it.id == incomingDeal!!.fromPlayerId }?.name ?: "???",
+            allProperties = properties,
+            receiverProperties = receiverProps,
+            onAccept = {
+                val response = DealResponseMessage(
+                    type = "DEAL_RESPONSE",
+                    fromPlayerId = localPlayerId,
+                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    responseType = DealResponseType.ACCEPT,
+                    counterPropertyIds = listOf(),
+                    counterMoney = 0
+                )
+                webSocketClient.sendMessage(Gson().toJson(response))
+                showIncomingDialog = false
+                incomingDeal = null
+            },
+            onDecline = {
+                val response = DealResponseMessage(
+                    type = "DEAL_RESPONSE",
+                    fromPlayerId = localPlayerId,
+                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    responseType = DealResponseType.DECLINE,
+                    counterPropertyIds = listOf(),
+                    counterMoney = 0
+                )
+                webSocketClient.sendMessage(Gson().toJson(response))
+                showIncomingDialog = false
+                incomingDeal = null
+            },
+            onCounter = {
+                isCountering = true
+                showIncomingDialog = false
+            }
+        )
+    }
+
+    if (isCountering && incomingDeal != null) {
+        DealDialog(
+            players = players.filter { it.id != localPlayerId },
+            senderId = localPlayerId,
+            allProperties = properties,
+            receiver = players.find { it.id == incomingDeal!!.fromPlayerId },
+            initialRequested = incomingDeal!!.offeredPropertyIds,
+            initialOffered = incomingDeal!!.requestedPropertyIds,
+            initialMoney = incomingDeal!!.offeredMoney,
+            onSendDeal = { counter ->
+                val response = DealResponseMessage(
+                    type = "DEAL_RESPONSE",
+                    fromPlayerId = localPlayerId,
+                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    responseType = DealResponseType.COUNTER,
+                    counterPropertyIds = counter.requestedPropertyIds,
+                    counterMoney = counter.offeredMoney
+                )
+                webSocketClient.sendMessage(Gson().toJson(response))
+                isCountering = false
+                incomingDeal = null
+            },
+            onDismiss = {
+                isCountering = false
+                incomingDeal = null
+            }
+        )
     }
 
     // Cheat Terminal Overview
