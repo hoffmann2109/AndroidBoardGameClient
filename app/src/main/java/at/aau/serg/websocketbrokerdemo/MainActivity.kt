@@ -33,6 +33,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
@@ -70,6 +72,8 @@ class MainActivity : ComponentActivity() {
         var taxPaymentAmount by remember { mutableStateOf(0) }
         var taxPaymentType by remember { mutableStateOf("") }
         var youWon by remember { mutableStateOf(false) }
+        var currentDealProposal by remember { mutableStateOf<DealProposalMessage?>(null) }
+        var currentDealResponse by remember { mutableStateOf<DealResponseMessage?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -177,6 +181,8 @@ class MainActivity : ComponentActivity() {
                     chatMessages.clear()
                     cheatMessages.clear()
                 },
+                onDealProposal = { proposal -> currentDealProposal = proposal },
+                onDealResponse = { response -> currentDealResponse = response },
                 coroutineDispatcher = Dispatchers.IO
             )
         }

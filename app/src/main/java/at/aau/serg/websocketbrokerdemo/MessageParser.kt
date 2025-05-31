@@ -28,8 +28,10 @@ class MessageParser(
     private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onClearChat: () -> Unit,
     private val onHasWon: (winnerId: String) -> Unit,
-    private val onMessageReceived: (text: String) -> Unit
-) {
+    private val onMessageReceived: (text: String) -> Unit,
+    private val onDealProposal: (DealProposalMessage) -> Unit,
+    private val onDealResponse: (DealResponseMessage) -> Unit,
+    ) {
     fun parse(text: String) {
         // 1) TAX_PAYMENT
         try {

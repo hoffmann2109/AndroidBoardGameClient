@@ -3,6 +3,8 @@ package at.aau.serg.websocketbrokerdemo
 import android.content.Context
 import android.util.Log
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.logic.GameLogicHandler
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
@@ -29,6 +31,8 @@ class GameWebSocketClient(
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
     private val onClearChat: () -> Unit,
+    private val onDealProposal: (DealProposalMessage) -> Unit,
+    private val onDealResponse: (DealResponseMessage) -> Unit,
     ) {
 
     private val client = OkHttpClient()
@@ -66,7 +70,9 @@ class GameWebSocketClient(
         onCheatMessageReceived = { pid, msg -> onCheatMessageReceived(pid, msg) },
         onClearChat = onClearChat,
         onHasWon = { winnerId -> onHasWon(winnerId) },
-        onMessageReceived = { text -> onMessageReceived(text) }
+        onMessageReceived = { text -> onMessageReceived(text) },
+        onDealProposal = { dealProposal -> onDealProposal(dealProposal) },
+        onDealResponse = { dealResponse -> onDealResponse(dealResponse) }
     )
 
     private val serverUrl: String = loadServerUrl(context)
