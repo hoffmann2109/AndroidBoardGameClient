@@ -10,6 +10,9 @@ import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.ClearChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.HasWonMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+
 
 class MessageParser(
     private val gson: Gson,
@@ -122,8 +125,30 @@ class MessageParser(
         } catch (e: Exception) {
             println("Error parsing CHEAT_MESSAGE: ${e.message}")
         }
+        // 10) DEAL_PROPOSAL
+        try {
+            val proposal = gson.fromJson(text, DealProposalMessage::class.java)
+            if (proposal.type == "DEAL_PROPOSAL") {
+                // TODO: Callback aufrufen (z. B. um UI zu öffnen)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing DEAL_PROPOSAL: ${e.message}")
+        }
 
-        // 10) HAS_WON
+        // 11) DEAL_RESPONSE
+        try {
+            val response = gson.fromJson(text, DealResponseMessage::class.java)
+            if (response.type == "DEAL_RESPONSE") {
+                // TODO: Optional – falls du dem anderen Spieler eine Rückmeldung zeigen willst
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing DEAL_RESPONSE: ${e.message}")
+        }
+
+
+        // 12) HAS_WON
         try {
             val won = gson.fromJson(text, HasWonMessage::class.java)
             if (won.type == "HAS_WON") {
@@ -134,7 +159,7 @@ class MessageParser(
             println("Error parsing HAS_WON: ${e.message}")
         }
 
-        // 11) CLEAR_CHAT
+        // 13) CLEAR_CHAT
         try {
             val clearMessage = gson.fromJson(text, ClearChatMessage::class.java)
             if (clearMessage.type == "CLEAR_CHAT") {
@@ -145,7 +170,7 @@ class MessageParser(
             println("Error parsing CLEAR_CHAT: ${e.message}")
         }
 
-        // 12) FALLBACK
+        // 14) FALLBACK
         onMessageReceived(text)
     }
 }

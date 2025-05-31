@@ -1,4 +1,4 @@
-package at.aau.serg.websocketbrokerdemo.data.deals
+package at.aau.serg.websocketbrokerdemo.data.messages
 
 data class DealResponseMessage(
     val type: String = "DEAL_RESPONSE",
