@@ -142,6 +142,16 @@ class GameWebSocketClient(
     fun setOnPlayerTurnListener(listener: (String) -> Unit) {
         onPlayerTurnListener = listener
     }
+    private var dealProposalListener: ((DealProposalMessage) -> Unit)? = null
+    private var dealResponseListener: ((DealResponseMessage) -> Unit)? = null
+
+    fun setDealProposalListener(callback: (DealProposalMessage) -> Unit) {
+        dealProposalListener = callback
+    }
+
+    fun setDealResponseListener(callback: (DealResponseMessage) -> Unit) {
+        dealResponseListener = callback
+    }
 
     // Zugriffe auf GameLogicHandler – optional von außen nutzbar
     fun logic(): GameLogicHandler = logicHandler

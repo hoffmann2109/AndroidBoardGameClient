@@ -131,7 +131,7 @@ class MessageParser(
         try {
             val proposal = gson.fromJson(text, DealProposalMessage::class.java)
             if (proposal.type == "DEAL_PROPOSAL") {
-                // TODO: Callback aufrufen (z. B. um UI zu öffnen)
+                onDealProposal?.invoke(proposal)
                 return
             }
         } catch (e: Exception) {
@@ -142,7 +142,7 @@ class MessageParser(
         try {
             val response = gson.fromJson(text, DealResponseMessage::class.java)
             if (response.type == "DEAL_RESPONSE") {
-                // TODO: Optional – falls du dem anderen Spieler eine Rückmeldung zeigen willst
+                onDealResponse?.invoke(response)
                 return
             }
         } catch (e: Exception) {
