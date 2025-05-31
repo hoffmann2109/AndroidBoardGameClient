@@ -121,6 +121,10 @@ fun PlayboardScreen(
     setCurrentDealProposal: (DealProposalMessage?) -> Unit,
     currentDealResponse: DealResponseMessage?,
     setCurrentDealResponse: (DealResponseMessage?) -> Unit,
+    incomingDeal: DealProposalMessage?,
+    showIncomingDialog: Boolean,
+    setIncomingDeal: (DealProposalMessage?) -> Unit,
+    setShowIncomingDialog: (Boolean) -> Unit,
     onGiveUp: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -160,14 +164,12 @@ fun PlayboardScreen(
     var requestedProperties by remember { mutableStateOf(listOf<Int>()) }
     var offeredMoney by remember { mutableStateOf(0) }
 
-    var incomingDeal by remember { mutableStateOf<DealProposalMessage?>(null) }
-    var showIncomingDialog by remember { mutableStateOf(false) }
     var isCountering by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         webSocketClient.setDealProposalListener {
-            incomingDeal = it
-            showIncomingDialog = true
+            setIncomingDeal(it)
+            setShowIncomingDialog(true)
         }
     }
 
@@ -355,6 +357,20 @@ fun PlayboardScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if (isMyTurn && !turnEnded) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = { showDealDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text("Start Deal", color = Color.White)
+                }
+            }
 
             Button(
                 onClick = onBackToLobby,
@@ -744,13 +760,6 @@ fun PlayboardScreen(
 
     // DEALS
 
-    Button(
-        onClick = { showDealDialog = true },
-        enabled = localPlayerId == currentPlayerId
-    ) {
-        Text("Start Deal")
-    }
-
     if (showDealDialog) {
         DealDialog(
             players = players.filter { it.id != localPlayerId },
@@ -789,8 +798,8 @@ fun PlayboardScreen(
                     counterMoney = 0
                 )
                 webSocketClient.sendMessage(Gson().toJson(response))
-                showIncomingDialog = false
-                incomingDeal = null
+                setShowIncomingDialog(false)
+                setIncomingDeal(null)
             },
             onDecline = {
                 val response = DealResponseMessage(
@@ -802,12 +811,12 @@ fun PlayboardScreen(
                     counterMoney = 0
                 )
                 webSocketClient.sendMessage(Gson().toJson(response))
-                showIncomingDialog = false
-                incomingDeal = null
+                setShowIncomingDialog(false)
+                setIncomingDeal(null)
             },
             onCounter = {
                 isCountering = true
-                showIncomingDialog = false
+                setShowIncomingDialog(false)
             }
         )
     }
@@ -832,11 +841,11 @@ fun PlayboardScreen(
                 )
                 webSocketClient.sendMessage(Gson().toJson(response))
                 isCountering = false
-                incomingDeal = null
+                setIncomingDeal(null)
             },
             onDismiss = {
                 isCountering = false
-                incomingDeal = null
+                setIncomingDeal(null)
             }
         )
     }

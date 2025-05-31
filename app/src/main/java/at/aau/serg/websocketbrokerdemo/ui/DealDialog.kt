@@ -28,7 +28,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -54,17 +53,31 @@ fun DealDialog(
     onSendDeal: (DealProposalMessage) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var offeredProperties by remember { mutableStateOf(initialOffered.toMutableList()) }
-    var requestedProperties by remember { mutableStateOf(initialRequested.toMutableList()) }
+    val offeredProperties = remember { mutableStateListOf<Int>() }
+    val requestedProperties = remember { mutableStateListOf<Int>() }
+
+    LaunchedEffect(initialOffered) {
+        offeredProperties.clear()
+        offeredProperties.addAll(initialOffered)
+    }
+    LaunchedEffect(initialRequested) {
+        requestedProperties.clear()
+        requestedProperties.addAll(initialRequested)
+    }
+
     var offeredMoney by remember { mutableStateOf(initialMoney.toString()) }
 
-    val offeredTotalValue = allProperties
-        .filter { it.id in offeredProperties }
-        .sumOf { it.purchasePrice }
+    val offeredTotalValue by remember {
+        derivedStateOf {
+            allProperties.filter { it.id in offeredProperties }.sumOf { it.purchasePrice }
+        }
+    }
 
-    val requestedTotalValue = allProperties
-        .filter { it.id in requestedProperties }
-        .sumOf { it.purchasePrice }
+    val requestedTotalValue by remember {
+        derivedStateOf {
+            allProperties.filter { it.id in requestedProperties }.sumOf { it.purchasePrice }
+        }
+    }
 
     val context = LocalContext.current
 
@@ -112,7 +125,8 @@ fun DealDialog(
 
                     // Eigene Grundstücke (Bilder mit Checkbox)
                     Text("Your properties:")
-                    val senderProperties = allProperties.filter { it.ownerId == senderId }
+                    val senderProperties = allProperties.filter { it.ownerId == senderId || it.id in initialOffered
+                    }
                     DealPropertyRow(
                         properties = senderProperties,
                         selectedIds = offeredProperties,
@@ -123,8 +137,11 @@ fun DealDialog(
                     )
 
                     Spacer(Modifier.height(12.dp))
+
+                    //Empfänger
                     Text("${receiver.name}'s properties:")
-                    val receiverProperties = allProperties.filter { it.ownerId == receiver.id }
+                    val receiverProperties = allProperties.filter { it.ownerId == receiver.id || it.id in initialRequested
+                    }
                     DealPropertyRow(
                         properties = receiverProperties,
                         selectedIds = requestedProperties,
@@ -164,8 +181,8 @@ fun DealDialog(
                             type = "DEAL_PROPOSAL",
                             fromPlayerId = senderId,
                             toPlayerId = receiver.id,
-                            offeredPropertyIds = offeredProperties,
-                            requestedPropertyIds = requestedProperties,
+                            offeredPropertyIds = offeredProperties.toList(),
+                            requestedPropertyIds = requestedProperties.toList(),
                             offeredMoney = offeredMoney.toIntOrNull() ?: 0
                         )
                     )
@@ -185,7 +202,7 @@ fun DealDialog(
 @Composable
 fun DealPropertyRow(
     properties: List<Property>,
-    selectedIds: List<Int>,
+    selectedIds: MutableList<Int>,
     onToggle: (Int, Boolean) -> Unit,
     context: Context
 ) {
@@ -193,7 +210,7 @@ fun DealPropertyRow(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         properties.forEach { property ->
             val isSelected = selectedIds.contains(property.id)
@@ -202,7 +219,7 @@ fun DealPropertyRow(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(100.dp)
                         .clip(RoundedCornerShape(10.dp))
                         .background(Color.LightGray)
                         .clickable { onToggle(property.id, !isSelected) }
@@ -216,7 +233,7 @@ fun DealPropertyRow(
                             alpha = if (isSelected) 1f else 0.4f
                         )
                     } else {
-                        Text(property.name, fontSize = 10.sp)
+                        Text(property.name, fontSize = 10.sp, modifier = Modifier.align(Alignment.Center))
                     }
                 }
                 Checkbox(

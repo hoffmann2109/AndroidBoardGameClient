@@ -74,6 +74,7 @@ class MainActivity : ComponentActivity() {
         var youWon by remember { mutableStateOf(false) }
         var currentDealProposal by remember { mutableStateOf<DealProposalMessage?>(null) }
         var currentDealResponse by remember { mutableStateOf<DealResponseMessage?>(null) }
+        var showIncomingDialog by remember { mutableStateOf(false) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -181,7 +182,10 @@ class MainActivity : ComponentActivity() {
                     chatMessages.clear()
                     cheatMessages.clear()
                 },
-                onDealProposal = { proposal -> currentDealProposal = proposal },
+                onDealProposal = { proposal ->
+                    currentDealProposal = proposal
+                    showIncomingDialog = true
+                },
                 onDealResponse = { response -> currentDealResponse = response },
                 coroutineDispatcher = Dispatchers.IO
             )
@@ -310,6 +314,10 @@ class MainActivity : ComponentActivity() {
                     setCurrentDealProposal = { currentDealProposal = it },
                     currentDealResponse = currentDealResponse,
                     setCurrentDealResponse = { currentDealResponse = it },
+                    incomingDeal = currentDealProposal,
+                    setIncomingDeal = { currentDealProposal = it },
+                    showIncomingDialog = showIncomingDialog,
+                    setShowIncomingDialog = { showIncomingDialog = it },
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)
