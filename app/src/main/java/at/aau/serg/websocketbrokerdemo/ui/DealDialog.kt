@@ -55,6 +55,14 @@ fun DealDialog(
     var requestedProperties by remember { mutableStateOf(initialRequested.toMutableList()) }
     var offeredMoney by remember { mutableStateOf(initialMoney.toString()) }
 
+    val offeredTotalValue = allProperties
+        .filter { it.id in offeredProperties }
+        .sumOf { it.purchasePrice }
+
+    val requestedTotalValue = allProperties
+        .filter { it.id in requestedProperties }
+        .sumOf { it.purchasePrice }
+
     val context = LocalContext.current
 
     AlertDialog(
@@ -102,6 +110,12 @@ fun DealDialog(
                         },
                         context = context
                     )
+
+                    Spacer(Modifier.height(8.dp))
+                    Text("Your selected properties total: €$offeredTotalValue")
+
+                    Spacer(Modifier.height(8.dp))
+                    Text("${receiver.name}'s selected properties total: €$requestedTotalValue")
 
                     Spacer(Modifier.height(12.dp))
                     OutlinedTextField(
