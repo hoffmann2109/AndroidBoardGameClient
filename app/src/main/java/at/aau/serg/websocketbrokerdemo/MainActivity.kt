@@ -306,6 +306,10 @@ class MainActivity : ComponentActivity() {
                     taxPaymentPlayerName = taxPaymentPlayerName,
                     taxPaymentAmount = taxPaymentAmount,
                     taxPaymentType = taxPaymentType,
+                    currentDealProposal = currentDealProposal,
+                    setCurrentDealProposal = { currentDealProposal = it },
+                    currentDealResponse = currentDealResponse,
+                    setCurrentDealResponse = { currentDealResponse = it },
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)
