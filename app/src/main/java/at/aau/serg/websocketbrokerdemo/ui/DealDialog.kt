@@ -25,8 +25,10 @@ import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.sp
 import at.aau.serg.websocketbrokerdemo.data.properties.Property
 import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+import com.example.myapplication.R
 
 
 @Composable
@@ -73,14 +76,34 @@ fun DealDialog(
                 if (receiver == null) {
                     Text("Choose a player:")
                     Spacer(Modifier.height(8.dp))
-                    players.forEach { player ->
-                        Button(
-                            onClick = { onReceiverChange(player) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
-                            Text(player.name)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        val playerImages = listOf(
+                            R.drawable.player_red,
+                            R.drawable.player_blue,
+                            R.drawable.player_green,
+                            R.drawable.player_yellow
+                        )
+
+                        players.forEachIndexed { index, player ->
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(player.name)
+
+                                Spacer(Modifier.height(4.dp))
+
+                                Image(
+                                    painter = painterResource(id = playerImages.getOrElse(index) { playerImages[0] }),
+                                    contentDescription = "${player.name}'s figure",
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clip(CircleShape)
+                                        .clickable { onReceiverChange(player) }
+                                )
+                            }
                         }
                     }
                 } else {
