@@ -170,6 +170,15 @@ fun PlayboardScreen(
 
     var isCountering by remember { mutableStateOf(false) }
 
+    var selectedColorSet by remember { mutableStateOf<PropertyColor?>(null) }
+    var ownedProperties by remember { mutableStateOf<List<Property>>(emptyList()) }
+
+    // Update owned properties when properties or players change
+    LaunchedEffect(properties, players) {
+        val localPlayer = players.find { it.id == localPlayerId }
+        ownedProperties = properties.filter { it.ownerId == localPlayerId }
+    }
+
     LaunchedEffect(Unit) {
         webSocketClient.setDealProposalListener {
             setIncomingDeal(it)
@@ -349,12 +358,13 @@ fun PlayboardScreen(
                         PlayerCard(
                             player = player,
                             ownedProperties = properties.filter { it.ownerId == player.id },
+                            allProperties = properties,
                             isCurrentPlayer = player.id == currentPlayerId,
                             playerIndex = players.indexOf(player),
                             onPropertySetClicked = { colorSet ->
                                 println("Clicked on color set: $colorSet")
                             },
-                            allProperties = properties,
+                            webSocketClient = webSocketClient
                         )
                     }
                 }
@@ -982,7 +992,8 @@ fun PlayerCard(
     allProperties: List<Property>,
     isCurrentPlayer: Boolean,
     playerIndex: Int,
-    onPropertySetClicked: (PropertyColor) -> Unit
+    onPropertySetClicked: (PropertyColor) -> Unit,
+    webSocketClient: GameWebSocketClient
 ) {
     val playerColors = listOf(
         Color(0x80FF0000), // Less saturated Red
@@ -1054,9 +1065,12 @@ fun PlayerCard(
             if (selectedColorSet != null) {
                 PropertySetPopup(
                     colorSet = selectedColorSet!!,
-                    ownedProperties = ownedProperties,
-                    allProperties = allProperties,
-                    onDismiss = { selectedColorSet = null }
+                    ownedProperties = ownedProperties.filter { getColorForPosition(it.position) == selectedColorSet },
+                    allProperties = allProperties.filter { getColorForPosition(it.position) == selectedColorSet },
+                    onDismiss = { selectedColorSet = null },
+                    onSellProperty = { propertyId ->
+                        webSocketClient.logic().sellProperty(propertyId)
+                    }
                 )
             }
         }
@@ -1153,7 +1167,8 @@ fun PropertySetPopup(
     colorSet: PropertyColor,
     ownedProperties: List<Property>,
     allProperties: List<Property>,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onSellProperty: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val propertiesInSet = allProperties.filter { getColorForPosition(it.position) == colorSet }
@@ -1161,7 +1176,7 @@ fun PropertySetPopup(
     AlertDialog(
         modifier = Modifier
             .width(420.dp)
-            .height(400.dp),
+            .height(550.dp),
         onDismissRequest = onDismiss,
         title = {
             Text(
@@ -1216,13 +1231,36 @@ fun PropertySetPopup(
             }
         },
         confirmButton = {
-            Button(
-                onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.padding(8.dp)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text("Exit", color = Color.White)
+                ownedProperties.forEach { property ->
+                    Button(
+                        onClick = { 
+                            onSellProperty(property.id)
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Text("Sell ${property.name}", color = Color.White)
+                    }
+                }
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Text("Exit", color = Color.White)
+                }
             }
         },
         dismissButton = {}
