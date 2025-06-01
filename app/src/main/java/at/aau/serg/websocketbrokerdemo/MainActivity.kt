@@ -1,10 +1,12 @@
 package at.aau.serg.websocketbrokerdemo
 
 import android.app.Activity
+import android.content.Context.SENSOR_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -41,11 +43,6 @@ import androidx.compose.runtime.DisposableEffect
 import kotlin.math.sqrt
 
 class MainActivity : ComponentActivity() {
-    private lateinit var sensorManager: SensorManager
-    private var accelerometer: Sensor? = null
-    private var shakeListener: SensorEventListener? = null
-    private var webSocketClient: GameWebSocketClient? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { MonopolyWebSocketApp() }
@@ -121,9 +118,9 @@ class MainActivity : ComponentActivity() {
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
-                onConnected       = { log += "Connected to server\n" },
+                onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled      = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
@@ -138,7 +135,7 @@ class MainActivity : ComponentActivity() {
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
                 },
-                onPlayerPassedGo  = { playerName ->
+                onPlayerPassedGo = { playerName ->
                     passedGoPlayerName = playerName
                     showPassedGoAlert = true
                 },
@@ -241,14 +238,14 @@ class MainActivity : ComponentActivity() {
                     "Passing current game player ID to PlayboardScreen: $currentGamePlayerId"
                 )
                 android.util.Log.d("MainActivity", "Current game state players: $playerMoneyList")
-                
+
                 PlayboardScreen(
                     players = playerMoneyList,
                     currentPlayerId = currentGamePlayerId ?: "",
-                    onRollDice = { webSocketClient.sendMessage("Roll")},
+                    onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
-                    diceResult      = diceValue,
-                    dicePlayerId    = dicePlayer,
+                    diceResult = diceValue,
+                    dicePlayerId = dicePlayer,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
@@ -273,26 +270,38 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-        ShakeDetector(
-            localPlayerId = localPlayerId,
-            currentGamePlayerId = currentGamePlayerId,
-            onShake = { webSocketClient.sendMessage("Roll") }
-        )
+        if (
+            localPlayerId != null &&
+            currentGamePlayerId != null &&
+            playerMoneyList.size >= 2
+        ) {
+            ShakeDetector(
+                localPlayerId = localPlayerId,
+                currentGamePlayerId = currentGamePlayerId,
+                onShake = { webSocketClient.sendMessage("Roll") }
+            )
+        }
     }
+
 
     @Composable
     fun ShakeDetector(
+
         localPlayerId: String?,
         currentGamePlayerId: String?,
         onShake: () -> Unit
     ) {
         val context = LocalContext.current
         val sensorManager = remember {
-            context.getSystemService(ComponentActivity.SENSOR_SERVICE) as SensorManager
+            context.getSystemService(SENSOR_SERVICE) as SensorManager
         }
-        val sensor = remember { sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
+        val accelerometer = remember { sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
         val lastShakeTime = remember { mutableStateOf(0L) }
-
+        val isMyTurn by rememberUpdatedState(localPlayerId != null && localPlayerId == currentGamePlayerId)
+        if (accelerometer == null) {
+            Log.w("ShakeDetector", "No accelerometer available on device")
+            return
+        }
         DisposableEffect(Unit) {
             val listener = object : SensorEventListener {
                 override fun onSensorChanged(event: SensorEvent) {
@@ -302,9 +311,9 @@ class MainActivity : ComponentActivity() {
                     val acceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
                     val now = System.currentTimeMillis()
 
-                    if (acceleration > 12 && now - lastShakeTime.value > 1000) {
+                    if (acceleration > 12f && now - lastShakeTime.value > 1000) {
                         lastShakeTime.value = now
-                        if (localPlayerId != null && localPlayerId == currentGamePlayerId) {
+                        if (isMyTurn) {
                             Log.d("Sensor", "Shake detected → sending Roll")
                             onShake()
                         } else {
@@ -316,7 +325,7 @@ class MainActivity : ComponentActivity() {
                 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
             }
 
-            sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_UI)
+            sensorManager.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_UI)
             onDispose {
                 sensorManager.unregisterListener(listener)
             }
