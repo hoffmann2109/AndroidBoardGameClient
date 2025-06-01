@@ -433,4 +433,77 @@ class MessageParserTest {
         assertTrue(invoked)
         assertEquals(raw, capText)
     }
+
+    @Test
+    fun testDealProposal() {
+        // Minimal JSON containing only the "type" field → parser should invoke onDealProposal
+        val json = """{"type":"DEAL_PROPOSAL"}"""
+        var invoked = false
+        var captured: DealProposalMessage? = null
+
+        val parser = MessageParser(
+            gson = gson,
+            getPlayers = { dummyPlayers },
+            onTaxPayment = { _, _, _ -> fail() },
+            onPlayerPassedGo = { fail() },
+            onPropertyBought = { fail() },
+            onGameStateReceived = { fail() },
+            onPlayerTurn = { fail() },
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
+            onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail() },
+            onClearChat = { },
+            onHasWon = { _ -> },
+            onMessageReceived = { fail("should not hit fallback") },
+            onDealProposal = { proposal ->
+                invoked = true
+                captured = proposal
+            },
+            onDealResponse = { _: DealResponseMessage -> }
+        )
+
+        parser.parse(json)
+
+        assertTrue(invoked, "onDealProposal must be invoked when type is DEAL_PROPOSAL")
+        assertNotNull(captured)
+        assertEquals("DEAL_PROPOSAL", captured?.type, "DealProposalMessage.type should be parsed as DEAL_PROPOSAL")
+    }
+
+    @Test
+    fun testDealResponse() {
+        // Minimal JSON containing only the "type" field → parser should invoke onDealResponse
+        val json = """{"type":"DEAL_RESPONSE"}"""
+        var invoked = false
+        var captured: DealResponseMessage? = null
+
+        val parser = MessageParser(
+            gson = gson,
+            getPlayers = { dummyPlayers },
+            onTaxPayment = { _, _, _ -> fail() },
+            onPlayerPassedGo = { fail() },
+            onPropertyBought = { fail() },
+            onGameStateReceived = { fail() },
+            onPlayerTurn = { fail() },
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
+            onChatMessageReceived = { _, _ -> fail() },
+            onCheatMessageReceived = { _, _ -> fail() },
+            onClearChat = { },
+            onHasWon = { _ -> },
+            onMessageReceived = { fail("should not hit fallback") },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { response ->
+                invoked = true
+                captured = response
+            }
+        )
+
+        parser.parse(json)
+
+        assertTrue(invoked, "onDealResponse must be invoked when type is DEAL_RESPONSE")
+        assertNotNull(captured)
+        assertEquals("DEAL_RESPONSE", captured?.type, "DealResponseMessage.type should be parsed as DEAL_RESPONSE")
+    }
+
 }
