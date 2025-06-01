@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -807,7 +806,12 @@ fun PlayerCard(
         Color(0x80FFFF00)  // Less saturated Yellow
     )
 
-    val backgroundColor = playerColors[playerIndex].copy(alpha = 0.4f)
+    val backgroundColor = if (player.bot) {
+        Color(0xFFB0BEC5) // z.B. helles Grau für Bots
+    } else {
+        playerColors[playerIndex].copy(alpha = 0.4f)
+    }
+
 
     var selectedColorSet by remember { mutableStateOf<PropertyColor?>(null) }
 
@@ -831,11 +835,12 @@ fun PlayerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = player.name,
+                    text = if (player.bot) "${player.name} [BOT]" else player.name,
                     color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
+
                 Text(
                     text = "EUR ${player.money}",
                     color = Color.White,
