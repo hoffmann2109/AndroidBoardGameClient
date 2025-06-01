@@ -364,7 +364,6 @@ fun PlayboardScreen(
                             onPropertySetClicked = { colorSet ->
                                 println("Clicked on color set: $colorSet")
                             },
-                            allProperties = properties,
                             webSocketClient = webSocketClient
                         )
                     }
