@@ -33,6 +33,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
@@ -70,6 +72,12 @@ class MainActivity : ComponentActivity() {
         var taxPaymentAmount by remember { mutableStateOf(0) }
         var taxPaymentType by remember { mutableStateOf("") }
         var youWon by remember { mutableStateOf(false) }
+        var currentDealProposal by remember { mutableStateOf<DealProposalMessage?>(null) }
+        var currentDealResponse by remember { mutableStateOf<DealResponseMessage?>(null) }
+        var showIncomingDialog by remember { mutableStateOf(false) }
+        var drawnCardType by remember { mutableStateOf<String?>(null) }
+        var drawnCardId   by remember { mutableStateOf<Int?>(null) }
+        var drawnCardDesc by remember { mutableStateOf<String?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -162,21 +170,21 @@ class MainActivity : ComponentActivity() {
                     taxPaymentType = taxType
                     showTaxPaymentAlert = true
                 },
-                onCardDrawn = { _, cardType, description ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast
-                            .makeText(
-                                context,
-                                "You drew a $cardType card: $description",
-                                Toast.LENGTH_LONG
-                            )
-                            .show()
-                    }
+                onCardDrawn = { _, cardType, description, cardId ->
+                    // Open the dialog in Compose
+                    drawnCardType = cardType
+                    drawnCardDesc = description
+                    drawnCardId = cardId
                 },
                 onClearChat = {
                     chatMessages.clear()
                     cheatMessages.clear()
                 },
+                onDealProposal = { proposal ->
+                    currentDealProposal = proposal
+                    showIncomingDialog = true
+                },
+                onDealResponse = { response -> currentDealResponse = response },
                 coroutineDispatcher = Dispatchers.IO
             )
         }
@@ -300,11 +308,27 @@ class MainActivity : ComponentActivity() {
                     taxPaymentPlayerName = taxPaymentPlayerName,
                     taxPaymentAmount = taxPaymentAmount,
                     taxPaymentType = taxPaymentType,
+                    currentDealProposal = currentDealProposal,
+                    setCurrentDealProposal = { currentDealProposal = it },
+                    currentDealResponse = currentDealResponse,
+                    setCurrentDealResponse = { currentDealResponse = it },
+                    incomingDeal = currentDealProposal,
+                    setIncomingDeal = { currentDealProposal = it },
+                    showIncomingDialog = showIncomingDialog,
+                    setShowIncomingDialog = { showIncomingDialog = it },
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)
                             navController.navigate("lobby")
                         }
+                    },
+                    drawnCardType     = drawnCardType,
+                    drawnCardId       = drawnCardId,
+                    drawnCardDesc     = drawnCardDesc,
+                    onCardDialogDismiss = {
+                        drawnCardType = null
+                        drawnCardId = null
+                        drawnCardDesc = null
                     }
                 )
             }

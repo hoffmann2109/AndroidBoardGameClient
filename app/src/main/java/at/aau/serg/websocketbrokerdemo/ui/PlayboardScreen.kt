@@ -1,6 +1,5 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -80,6 +79,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.text.font.FontFamily
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
+import com.google.gson.Gson
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([\w-]+) bought""".toRegex()
@@ -114,7 +117,19 @@ fun PlayboardScreen(
     taxPaymentAmount: Int,
     taxPaymentType: String,
     cheatFlags: Map<String, Boolean>,
-    onGiveUp: () -> Unit = {}
+    currentDealProposal: DealProposalMessage?,
+    setCurrentDealProposal: (DealProposalMessage?) -> Unit,
+    currentDealResponse: DealResponseMessage?,
+    setCurrentDealResponse: (DealResponseMessage?) -> Unit,
+    incomingDeal: DealProposalMessage?,
+    showIncomingDialog: Boolean,
+    setIncomingDeal: (DealProposalMessage?) -> Unit,
+    setShowIncomingDialog: (Boolean) -> Unit,
+    onGiveUp: () -> Unit = {},
+    drawnCardType: String?,         // "CHANCE" or "COMMUNITY_CHEST"
+    drawnCardId:   Int?,            // e.g. 1..8
+    drawnCardDesc: String?,         // the description (fallback) if drawable not found
+    onCardDialogDismiss: () -> Unit // called to clear the popup
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -147,8 +162,20 @@ fun PlayboardScreen(
     val playerColorMap = players
         .mapIndexed { index, player -> player.id to nameColors[index % nameColors.size] }
         .toMap()
+    var showDealDialog by remember { mutableStateOf(false) }
+    var selectedReceiver by remember { mutableStateOf<PlayerMoney?>(null) }
+    var offeredProperties by remember { mutableStateOf(listOf<Int>()) }
+    var requestedProperties by remember { mutableStateOf(listOf<Int>()) }
+    var offeredMoney by remember { mutableStateOf(0) }
 
+    var isCountering by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        webSocketClient.setDealProposalListener {
+            setIncomingDeal(it)
+            setShowIncomingDialog(true)
+        }
+    }
 
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
@@ -334,6 +361,20 @@ fun PlayboardScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
+            if (isMyTurn && !turnEnded) {
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Button(
+                    onClick = { showDealDialog = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                ) {
+                    Text("Start Deal", color = Color.White)
+                }
+            }
 
             Button(
                 onClick = onBackToLobby,
@@ -721,6 +762,98 @@ fun PlayboardScreen(
         }
     }
 
+    // DEALS
+
+    if (showDealDialog) {
+        DealDialog(
+            players = players.filter { it.id != localPlayerId },
+            senderId = localPlayerId,
+            allProperties = properties,
+            receiver = selectedReceiver,
+            onReceiverChange = { selectedReceiver = it },
+            onSendDeal = { deal ->
+                val json = Gson().toJson(deal)
+                webSocketClient.sendMessage(json)
+                showDealDialog = false
+                selectedReceiver = null
+            },
+            onDismiss = {
+                showDealDialog = false
+                selectedReceiver = null
+            }
+        )
+    }
+
+    if (showIncomingDialog && incomingDeal != null) {
+        val receiverProps = properties.filter { it.ownerId == localPlayerId }.map { it.id }
+
+        IncomingDealDialog(
+            proposal = incomingDeal!!,
+            senderName = players.find { it.id == incomingDeal!!.fromPlayerId }?.name ?: "???",
+            allProperties = properties,
+            receiverProperties = receiverProps,
+            onAccept = {
+                val response = DealResponseMessage(
+                    type = "DEAL_RESPONSE",
+                    fromPlayerId = localPlayerId,
+                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    responseType = DealResponseType.ACCEPT,
+                    counterPropertyIds = listOf(),
+                    counterMoney = 0
+                )
+                webSocketClient.sendMessage(Gson().toJson(response))
+                setShowIncomingDialog(false)
+                setIncomingDeal(null)
+            },
+            onDecline = {
+                val response = DealResponseMessage(
+                    type = "DEAL_RESPONSE",
+                    fromPlayerId = localPlayerId,
+                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    responseType = DealResponseType.DECLINE,
+                    counterPropertyIds = listOf(),
+                    counterMoney = 0
+                )
+                webSocketClient.sendMessage(Gson().toJson(response))
+                setShowIncomingDialog(false)
+                setIncomingDeal(null)
+            },
+            onCounter = {
+                isCountering = true
+                setShowIncomingDialog(false)
+            }
+        )
+    }
+
+    if (isCountering && incomingDeal != null) {
+        DealDialog(
+            players = players.filter { it.id != localPlayerId },
+            senderId = localPlayerId,
+            allProperties = properties,
+            receiver = players.find { it.id == incomingDeal!!.fromPlayerId },
+            initialRequested = incomingDeal!!.offeredPropertyIds,
+            initialOffered = incomingDeal!!.requestedPropertyIds,
+            initialMoney = incomingDeal!!.offeredMoney,
+            onSendDeal = { counter ->
+                val response = DealResponseMessage(
+                    type = "DEAL_RESPONSE",
+                    fromPlayerId = localPlayerId,
+                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    responseType = DealResponseType.COUNTER,
+                    counterPropertyIds = counter.requestedPropertyIds,
+                    counterMoney = counter.offeredMoney
+                )
+                webSocketClient.sendMessage(Gson().toJson(response))
+                isCountering = false
+                setIncomingDeal(null)
+            },
+            onDismiss = {
+                isCountering = false
+                setIncomingDeal(null)
+            }
+        )
+    }
+
     // Cheat Terminal Overview
     if (cheatTerminalOpen) {
         Box(
@@ -788,6 +921,57 @@ fun PlayboardScreen(
                 }
             }
         }
+    }
+    // Popup for CHANCE and COMMUNITY_CHEST
+    if (drawnCardType != null && drawnCardId != null) {
+        // Build the resource name, e.g. "chance_2" or "community_chest_7"
+        val resName = "${drawnCardType.lowercase()}_${drawnCardId}"
+        val imageResId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+
+        AlertDialog(
+            onDismissRequest = { onCardDialogDismiss() },
+            title = {
+                Text(
+                    text = if (drawnCardType == "CHANCE") "Ereigniskarte" else "Gemeinschaftskarte",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Show the card image if it exists
+                    if (imageResId != 0) {
+                        Image(
+                            painter = painterResource(id = imageResId),
+                            contentDescription = "Card $resName",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Fit
+                        )
+                    } else {
+                        // Fallback
+                        Text(
+                            text = drawnCardDesc ?: "",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onCardDialogDismiss() }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {}
+        )
     }
 }
 

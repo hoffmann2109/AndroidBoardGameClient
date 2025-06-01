@@ -10,6 +10,9 @@ import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.ClearChatMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.HasWonMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+
 
 class MessageParser(
     private val gson: Gson,
@@ -20,13 +23,15 @@ class MessageParser(
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
-    private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
+    private val onCardDrawn: (playerId: String, cardType: String, description: String, cardId: Int) -> Unit,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onClearChat: () -> Unit,
     private val onHasWon: (winnerId: String) -> Unit,
-    private val onMessageReceived: (text: String) -> Unit
-) {
+    private val onMessageReceived: (text: String) -> Unit,
+    private val onDealProposal: (DealProposalMessage) -> Unit,
+    private val onDealResponse: (DealResponseMessage) -> Unit,
+    ) {
     fun parse(text: String) {
         // 1) TAX_PAYMENT
         try {
@@ -94,7 +99,8 @@ class MessageParser(
             val drawn = gson.fromJson(text, DrawnCardMessage::class.java)
             if (drawn.type == "CARD_DRAWN") {
                 val desc = drawn.card["description"].asString
-                onCardDrawn(drawn.playerId, drawn.cardType, desc)
+                val cardId = drawn.card["id"].asInt
+                onCardDrawn(drawn.playerId, drawn.cardType, desc, cardId)
                 return
             }
         } catch (e: Exception) {
@@ -122,8 +128,30 @@ class MessageParser(
         } catch (e: Exception) {
             println("Error parsing CHEAT_MESSAGE: ${e.message}")
         }
+        // 10) DEAL_PROPOSAL
+        try {
+            val proposal = gson.fromJson(text, DealProposalMessage::class.java)
+            if (proposal.type == "DEAL_PROPOSAL") {
+                onDealProposal?.invoke(proposal)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing DEAL_PROPOSAL: ${e.message}")
+        }
 
-        // 10) HAS_WON
+        // 11) DEAL_RESPONSE
+        try {
+            val response = gson.fromJson(text, DealResponseMessage::class.java)
+            if (response.type == "DEAL_RESPONSE") {
+                onDealResponse?.invoke(response)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing DEAL_RESPONSE: ${e.message}")
+        }
+
+
+        // 12) HAS_WON
         try {
             val won = gson.fromJson(text, HasWonMessage::class.java)
             if (won.type == "HAS_WON") {
@@ -134,7 +162,7 @@ class MessageParser(
             println("Error parsing HAS_WON: ${e.message}")
         }
 
-        // 11) CLEAR_CHAT
+        // 13) CLEAR_CHAT
         try {
             val clearMessage = gson.fromJson(text, ClearChatMessage::class.java)
             if (clearMessage.type == "CLEAR_CHAT") {
@@ -145,7 +173,7 @@ class MessageParser(
             println("Error parsing CLEAR_CHAT: ${e.message}")
         }
 
-        // 12) FALLBACK
+        // 14) FALLBACK
         onMessageReceived(text)
     }
 }
