@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
@@ -48,6 +49,7 @@ fun LobbyScreen(
     message: String,
     log: String,
     onMessageChange: (String) -> Unit,
+    playerCount: Int,
     onConnect: () -> Unit,
     onDisconnect: () -> Unit,
     onSendMessage: () -> Unit,
@@ -56,6 +58,8 @@ fun LobbyScreen(
     onStatisticsClick: () -> Unit,
     onLeaderboardClick: () -> Unit,
     onJoinGame: () -> Unit,
+    onOpenSettings:() -> Unit,
+    onOpenSoundSelection:() -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
@@ -93,31 +97,37 @@ fun LobbyScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AnimatedButton("Connect", Color(0xFFFF9800)) {
+                AnimatedButton(text = "Connect", color = Color(0xFFFF9800)) {
                     showWifiIcon = true
                     showDisconnectIcon = false
                     wifiIconSize = 220.dp // Vergrößern des WiFi-Symbols
                     onConnect()
                 }
-                AnimatedButton("Disconnect", Color.Gray) {
+                AnimatedButton(text = "Disconnect", color = Color.Gray) {
                     showWifiIcon = false
                     showDisconnectIcon = true
                     wifiIconSize = 220.dp // Vergrößern des WiFi-Symbols
                     onDisconnect()
                 }
-                AnimatedButton("Send Message", Color(0xFF0074cc), onSendMessage)
-                AnimatedButton("Logout", Color.Red, onLogout)
-                AnimatedButton("Profile", Color.Blue, onProfileClick)
-                AnimatedButton("Statistics", Color.Blue, onStatisticsClick)
-                AnimatedButton("Leaderboard", Color.Blue, onLeaderboardClick)
+                AnimatedButton(text = "Send Message", color = Color(0xFF0074cc), onClick = onSendMessage)
+                AnimatedButton(text = "Logout", color = Color.Red, onClick = onLogout)
+                AnimatedButton(text = "Profile", color = Color.Blue, onClick = onProfileClick)
+                AnimatedButton(text = "Statistics", color = Color.Blue, onClick = onStatisticsClick)
+                AnimatedButton(text = "Leaderboard", color = Color.Blue, onClick = onLeaderboardClick)
 
 
                 // Join Game button
                 Spacer(modifier = Modifier.height(16.dp))
 
-                AnimatedButton("Join Game", Color(0xFF9C27B0)) {
-                    onJoinGame()
-                }
+                // Only enabled if at least two players are connected:
+                val joinEnabled = playerCount >= 2
+                AnimatedButton(
+                    text = "Join Game",
+                    color = Color(0xFF9C27B0),
+                    enabled = joinEnabled,
+                    onClick = { if (joinEnabled) onJoinGame() }
+                )
+                AnimatedButton(text = "️Settings", color = Color(0xFF4CAF50), onClick = onOpenSettings)
             }
 
             // WiFi Icon Animation (Connect)
@@ -176,7 +186,7 @@ fun LobbyScreen(
 }
 
 @Composable
-fun AnimatedButton(text: String, color: Color, onClick: () -> Unit) {
+fun AnimatedButton(text: String, color: Color, enabled: Boolean = true, onClick: () -> Unit) {
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(if (isPressed) 1.1f else 1f, animationSpec = tween(150))
     val buttonColor by animateColorAsState(
@@ -189,11 +199,17 @@ fun AnimatedButton(text: String, color: Color, onClick: () -> Unit) {
             isPressed = true
             onClick()
         },
+        enabled = enabled,
         modifier = Modifier
             .height(56.dp)
             .scale(scale),
         shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+        colors = ButtonDefaults.buttonColors(
+            containerColor = buttonColor,
+            disabledContainerColor = Color.Gray,
+            contentColor = Color.White,
+            disabledContentColor = Color.DarkGray
+        )
     ) {
         Text(text, fontSize = 18.sp)
     }

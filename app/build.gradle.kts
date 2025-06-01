@@ -210,6 +210,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.constraintlayout)
@@ -231,11 +232,12 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.gson)
     implementation(libs.coil.compose)
-    
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
+    testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.mockk.v1135)
     testImplementation(libs.mockk.mockk)
@@ -252,5 +254,6 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
 
 }

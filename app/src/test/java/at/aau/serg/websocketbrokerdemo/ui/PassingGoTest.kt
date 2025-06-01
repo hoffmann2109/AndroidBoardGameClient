@@ -11,8 +11,11 @@ import kotlinx.coroutines.delay
 import org.junit.Assert.*
 import android.content.Context
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
+import org.junit.jupiter.api.Assertions
+import kotlin.String
 
 class PassingGoTest {
     @get:Rule
@@ -20,17 +23,21 @@ class PassingGoTest {
 
     private val mockContext = mockk<Context>(relaxed = true)
     private val emptyChat = emptyList<ChatEntry>()
+    private val emptyCheat = emptyList<CheatEntry>()
     private val mockWebSocketClient = GameWebSocketClient(
         context = mockContext,
         onConnected = { /* No-op for testing */ },
         onMessageReceived = { /* No-op for testing */ },
-        onDiceRolled = { _, _ -> /* No-op for testing */ },
+        onDiceRolled = { _, _, _, _-> /* No-op for testing */ },
         onGameStateReceived = { /* No-op for testing */ },
         onPlayerTurn = { /* No-op for testing */ },
         onPlayerPassedGo = { /* No-op for testing */ },
         coroutineDispatcher = Dispatchers.IO,
         onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
+        onCheatMessageReceived = { _, _ -> },
+        onClearChat = { /* No-op for testing */ },
+        onHasWon = { _ -> },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ }
     )
 
@@ -48,14 +55,20 @@ class PassingGoTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "test-id",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -79,14 +92,20 @@ class PassingGoTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "test-id",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = showAlert,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -105,14 +124,20 @@ class PassingGoTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "test-id",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = showAlert,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -134,14 +159,20 @@ class PassingGoTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "test-id",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -170,14 +201,20 @@ class PassingGoTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "test-id",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = true,
                 passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 

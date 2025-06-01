@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.HouseableProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
@@ -32,6 +33,7 @@ class PlayboardScreenTest {
     private val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
     private val emptyChat = emptyList<ChatEntry>()
+    private val emptyCheat = emptyList<CheatEntry>()
 
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
@@ -49,14 +51,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -75,14 +83,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -101,14 +115,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 5,
                 dicePlayerId = "",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -129,14 +149,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = null,
                 dicePlayerId = null,
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -155,14 +181,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = null,
                 dicePlayerId = null,
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 chatMessages = emptyChat,
+                cheatMessages = emptyCheat,
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -185,14 +217,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 2,
                 dicePlayerId = "1",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -221,14 +259,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 1,
                 dicePlayerId = "1",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 chatMessages = messages,
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -255,14 +299,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = null,
                 dicePlayerId = null,
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 
@@ -289,14 +339,20 @@ class PlayboardScreenTest {
                 onBackToLobby = {},
                 diceResult = 6,
                 dicePlayerId = "p1",
+                hasRolled = false,
+                hasPasch = false,
+                setHasRolled = {},
+                setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
                 chatMessages = listOf(),
+                cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
-                taxPaymentType = ""
+                taxPaymentType = "",
+                cheatFlags = emptyMap()
             )
         }
 

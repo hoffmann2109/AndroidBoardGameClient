@@ -1,5 +1,7 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
+import at.aau.serg.websocketbrokerdemo.MainActivity
 import at.aau.serg.websocketbrokerdemo.auth.AuthManager
 import com.google.firebase.auth.FirebaseAuth
 
@@ -60,8 +63,14 @@ fun LoginScreen(navController: NavController) {
             Text(it, color = MaterialTheme.colorScheme.error)
         }
 
-        Button(onClick = { AuthManager.loginUser(auth, email, password, context, setErrorMessage) }) {
+        Button(onClick = { AuthManager.loginUser(auth, email, password, context, setErrorMessage)
+        }) {
             Text("Login")
+        }
+
+        GoogleSignInButton {
+            context.startActivity(Intent(context, MainActivity::class.java))
+            (context as? Activity)?.finish()
         }
 
         TextButton(onClick = { navController.navigate("register") }) {
@@ -69,6 +78,7 @@ fun LoginScreen(navController: NavController) {
         }
     }
 }
+
 
 
 

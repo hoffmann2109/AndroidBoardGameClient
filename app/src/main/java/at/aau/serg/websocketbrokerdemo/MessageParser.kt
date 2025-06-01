@@ -2,11 +2,14 @@ package at.aau.serg.websocketbrokerdemo
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import at.aau.serg.websocketbrokerdemo.data.ChatMessage
-import at.aau.serg.websocketbrokerdemo.data.DiceRollMessage
-import at.aau.serg.websocketbrokerdemo.data.DrawnCardMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.ChatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DiceRollMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DrawnCardMessage
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import at.aau.serg.websocketbrokerdemo.data.TaxPaymentMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.CheatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.ClearChatMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.HasWonMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 
 class MessageParser(
     private val gson: Gson,
@@ -16,9 +19,12 @@ class MessageParser(
     private val onPropertyBought: (raw: String) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
-    private val onDiceRolled: (playerId: String, value: Int) -> Unit,
+    private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
+    private val onClearChat: () -> Unit,
+    private val onHasWon: (winnerId: String) -> Unit,
     private val onMessageReceived: (text: String) -> Unit
 ) {
     fun parse(text: String) {
@@ -76,7 +82,7 @@ class MessageParser(
         try {
             val roll = gson.fromJson(text, DiceRollMessage::class.java)
             if (roll.type == "DICE_ROLL") {
-                onDiceRolled(roll.playerId, roll.value)
+                onDiceRolled(roll.playerId, roll.value, roll.manual, roll.isPasch)
                 return
             }
         } catch (e: Exception) {
@@ -106,7 +112,40 @@ class MessageParser(
             println("Error parsing CHAT_MESSAGE: ${e.message}")
         }
 
-        // 9) FALLBACK
+        // 9) CHEAT_MESSAGE
+        try {
+            val cheat = gson.fromJson(text, CheatMessage::class.java)
+            if (cheat.type == "CHEAT_MESSAGE") {
+                onCheatMessageReceived(cheat.playerId, cheat.message)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing CHEAT_MESSAGE: ${e.message}")
+        }
+
+        // 10) HAS_WON
+        try {
+            val won = gson.fromJson(text, HasWonMessage::class.java)
+            if (won.type == "HAS_WON") {
+                onHasWon(won.userId)
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing HAS_WON: ${e.message}")
+        }
+
+        // 11) CLEAR_CHAT
+        try {
+            val clearMessage = gson.fromJson(text, ClearChatMessage::class.java)
+            if (clearMessage.type == "CLEAR_CHAT") {
+                onClearChat()
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing CLEAR_CHAT: ${e.message}")
+        }
+
+        // 12) FALLBACK
         onMessageReceived(text)
     }
 }

@@ -11,8 +11,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,8 +26,11 @@ import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
 import androidx.navigation.compose.*
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
+import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
+import at.aau.serg.websocketbrokerdemo.ui.SettingsScreen
+import at.aau.serg.websocketbrokerdemo.ui.SoundSelectionScreen
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +39,7 @@ import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
+import at.aau.serg.websocketbrokerdemo.ui.WinScreen
 import kotlinx.coroutines.delay
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -41,6 +47,8 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.compose.runtime.DisposableEffect
 import kotlin.math.sqrt
+
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,10 +68,15 @@ class MainActivity : ComponentActivity() {
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
         var playerMoneyList by remember { mutableStateOf<List<PlayerMoney>>(emptyList()) }
+        val playerCount by remember { derivedStateOf { playerMoneyList.size } }
         var diceValue by remember { mutableStateOf<Int?>(null) }
         var dicePlayer by remember { mutableStateOf<String?>(null) }
+        var hasRolled by remember { mutableStateOf(false) }
+        var hasPasch by remember { mutableStateOf(false) }
+        val cheatFlags = remember { mutableStateMapOf<String, Boolean>() }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         val chatMessages = remember { mutableStateListOf<ChatEntry>() }
+        val cheatMessages = remember { mutableStateListOf<CheatEntry>()}
         var localPlayerId by remember { mutableStateOf<String?>(null) }
         var showPassedGoAlert by remember { mutableStateOf(false) }
         var passedGoPlayerName by remember { mutableStateOf("") }
@@ -71,6 +84,7 @@ class MainActivity : ComponentActivity() {
         var taxPaymentPlayerName by remember { mutableStateOf("") }
         var taxPaymentAmount by remember { mutableStateOf(0) }
         var taxPaymentType by remember { mutableStateOf("") }
+        var youWon by remember { mutableStateOf(false) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -120,7 +134,21 @@ class MainActivity : ComponentActivity() {
                 context = context,
                 onConnected = { log += "Connected to server\n" },
                 onMessageReceived = { msg -> log += "Received: $msg\n" },
-                onDiceRolled = { pid, value -> dicePlayer = pid; diceValue = value },
+                onDiceRolled = { pid, value, manual, isPasch ->
+                    dicePlayer = pid
+                    diceValue = value
+                    cheatFlags[pid] = manual
+
+                    if (pid == localPlayerId) {
+                        hasRolled = !isPasch
+                        hasPasch = isPasch
+                    }
+                },
+                onHasWon = { winnerId ->
+                    if (winnerId == userId) {
+                        youWon = true           // just set state here
+                    }
+                },
                 onGameStateReceived = { players ->
                     playerMoneyList = players
                     // (you already had logic for matching firebase ID → session-ID)
@@ -134,6 +162,10 @@ class MainActivity : ComponentActivity() {
                 onChatMessageReceived = { senderId, text ->
                     val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
                     chatMessages.add(ChatEntry(senderId, senderName, text))
+                },
+                onCheatMessageReceived = { senderId, text ->
+                    val senderName = playerMoneyList.find { it.id == senderId }?.name ?: "Unknown"
+                    cheatMessages.add(CheatEntry(senderId, senderName, text))
                 },
                 onPlayerPassedGo = { playerName ->
                     passedGoPlayerName = playerName
@@ -155,6 +187,10 @@ class MainActivity : ComponentActivity() {
                             )
                             .show()
                     }
+                },
+                onClearChat = {
+                    chatMessages.clear()
+                    cheatMessages.clear()
                 },
                 coroutineDispatcher = Dispatchers.IO
             )
@@ -178,11 +214,19 @@ class MainActivity : ComponentActivity() {
 
         val navController = rememberNavController()
 
+        // 3) When that state flips, actually navigate:
+        LaunchedEffect(youWon) {
+            if (youWon) {
+                navController.navigate("win")
+            }
+        }
+
         NavHost(navController, startDestination = "lobby") {
             composable("lobby") {
                 LobbyScreen(
                     message = message,
                     log = log,
+                    playerCount = playerCount,
                     onMessageChange = { message = it },
                     onConnect = { webSocketClient.connect() },
                     onDisconnect = {
@@ -206,8 +250,18 @@ class MainActivity : ComponentActivity() {
                     onProfileClick = { navController.navigate("profile") },
                     onJoinGame = { navController.navigate("playerInfo") },
                     onStatisticsClick = { navController.navigate("statistics") },
-                    onLeaderboardClick = { navController.navigate("leaderboard") }
+                    onLeaderboardClick = { navController.navigate("leaderboard") },
+
+                    onOpenSettings ={navController.navigate("settings")},
+                    onOpenSoundSelection ={navController.navigate("soundSelection")}
+
                 )
+            }
+            composable("win") {
+                WinScreen(onTimeout = {
+                    navController.popBackStack("lobby", inclusive = false)
+                    youWon = false           // reset so you can play again
+                })
             }
             composable("profile") {
                 UserProfileScreen(
@@ -246,9 +300,15 @@ class MainActivity : ComponentActivity() {
                     onBackToLobby = { navController.navigate("lobby") },
                     diceResult = diceValue,
                     dicePlayerId = dicePlayer,
+                    hasRolled = hasRolled,
+                    hasPasch = hasPasch,
+                    setHasRolled = { hasRolled = it },
+                    setHasPasch = { hasPasch = it },
+                    cheatFlags = cheatFlags,
                     webSocketClient = webSocketClient,
                     localPlayerId = localPlayerId ?: "",
                     chatMessages = chatMessages,
+                    cheatMessages = cheatMessages,
                     showPassedGoAlert = showPassedGoAlert,
                     passedGoPlayerName = passedGoPlayerName,
                     showTaxPaymentAlert = showTaxPaymentAlert,
@@ -257,8 +317,7 @@ class MainActivity : ComponentActivity() {
                     taxPaymentType = taxPaymentType,
                     onGiveUp = {
                         localPlayerId?.let {
-                            webSocketClient.sendGiveUpMessage(it)
-                            webSocketClient.close()
+                            webSocketClient.logic().sendGiveUpMessage(it)
                             navController.navigate("lobby")
                         }
                     }
@@ -266,8 +325,14 @@ class MainActivity : ComponentActivity() {
             }
             composable("leaderboard") {
                 LeaderboardScreen(
-                    onBack = { navController.popBackStack() }
-                )
+                    onBack = { navController.popBackStack() },
+                    currentUsername = playerProfile?.name)
+            }
+            composable("settings"){
+                SettingsScreen()
+            }
+            composable("soundSelection"){
+                SoundSelectionScreen()
             }
         }
         if (
@@ -332,5 +397,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 

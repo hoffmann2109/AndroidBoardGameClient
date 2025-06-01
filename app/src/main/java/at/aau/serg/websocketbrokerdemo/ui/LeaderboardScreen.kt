@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LeaderboardScreen(onBack: () -> Unit) {
+fun LeaderboardScreen(onBack: () -> Unit, currentUsername: String?) {
     val leaderboardTypes = listOf("gamesPlayed", "highestMoney", "level", "averageMoney", "wins")
     var selectedLeaderboard by remember { mutableStateOf(leaderboardTypes[0]) }
     var entries by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
@@ -119,7 +119,8 @@ fun LeaderboardScreen(onBack: () -> Unit) {
                     items(entries) { entry ->
                         LeaderboardEntryItem(
                             entry = entry,
-                            selectedLeaderboard = selectedLeaderboard
+                            selectedLeaderboard = selectedLeaderboard,
+                            currentUsername = currentUsername
                         )
                     }
                 }
@@ -131,13 +132,18 @@ fun LeaderboardScreen(onBack: () -> Unit) {
 @Composable
 private fun LeaderboardEntryItem(
     entry: Map<String, Any>,
-    selectedLeaderboard: String
+    selectedLeaderboard: String,
+    currentUsername: String?
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (entry["name"] == currentUsername) MaterialTheme.colorScheme.surfaceVariant
+            else MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
@@ -147,15 +153,21 @@ private fun LeaderboardEntryItem(
         ) {
             Text(
                 text = "#${entry["rank"]}",
-                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = if (entry["name"] == currentUsername) FontWeight.Bold else FontWeight.Normal
+                )
             )
             Text(
                 text = entry["name"].toString(),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = if (entry["name"] == currentUsername) FontWeight.Bold else FontWeight.Normal
+                )
             )
             Text(
                 text = "${entry[selectedLeaderboard]}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (entry["name"] == currentUsername) FontWeight.Bold else FontWeight.Normal
+                ),
                 color = MaterialTheme.colorScheme.secondary
             )
         }

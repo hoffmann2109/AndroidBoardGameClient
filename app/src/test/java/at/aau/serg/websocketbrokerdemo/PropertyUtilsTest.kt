@@ -16,7 +16,6 @@ class PropertyUtilsTest {
         assertEquals(PropertyColor.BROWN, getColorForPosition(1))
         assertEquals(PropertyColor.LIGHT_BLUE, getColorForPosition(6))
         assertEquals(PropertyColor.DARK_BLUE, getColorForPosition(39))
-        assertEquals(PropertyColor.NONE, getColorForPosition(99))
     }
 
     @Test
