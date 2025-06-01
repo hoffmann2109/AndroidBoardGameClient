@@ -27,20 +27,22 @@ class GameWebSocketClientTest {
         val input = ByteArrayInputStream(props.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(input)
         return GameWebSocketClient(
-            context,
+            context = context,
             onConnected = { /* No-op */ },
             onMessageReceived = { /* No-op */ },
-            onDiceRolled = { _, _, _, _-> /* No-op */ },
+            onDiceRolled = { _, _, _, _ -> /* No-op */ },
             onGameStateReceived = { /* No-op */ },
             onPlayerTurn = { /* No-op */ },
             onPlayerPassedGo = { /* No-op */ },
+            onHasWon = { /* No-op */ },
             coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onCheatMessageReceived = {_, _ -> },
-            onCardDrawn = { _, _, _ -> },
-            onClearChat = {},
-            onHasWon = { _ -> },
-            onTaxPayment = { _, _, _ -> }
+            onCheatMessageReceived = { _, _ -> },
+            onCardDrawn = { _, _, _, _ -> },
+            onTaxPayment = { _, _, _ -> },
+            onClearChat = { },
+            onDealProposal = { /* No-op */ },
+            onDealResponse = { /* No-op */ }
         )
     }
 

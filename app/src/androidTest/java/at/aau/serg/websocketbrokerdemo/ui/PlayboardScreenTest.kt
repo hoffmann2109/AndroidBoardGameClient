@@ -16,6 +16,8 @@ import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.HouseableProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
 import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import kotlinx.coroutines.test.runTest
 import org.junit.Ignore
 import org.junit.Rule
@@ -64,7 +66,26 @@ class PlayboardScreenTest {
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                // ── NEW “deal” parameters (all defaults) ──
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                // give-up uses default λ, so we can omit it or pass {}
+                onGiveUp = {},
+
+                // ── NEW “drawn-card” parameters ──
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -77,7 +98,7 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                currentPlayerId = "",
+                currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
@@ -96,12 +117,29 @@ class PlayboardScreenTest {
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
-        // Check if the "Not enough players connected yet" message is displayed
-        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("Not enough players connected yet")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -120,15 +158,31 @@ class PlayboardScreenTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = false,
-                passedGoPlayerName = "",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -143,31 +197,48 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                currentPlayerId = "",
-                localPlayerId = "",
+                currentPlayerId = "1",
+                localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
-                diceResult = null,
-                dicePlayerId = null,
+                diceResult = 5,
+                dicePlayerId = "",
                 hasRolled = false,
                 hasPasch = false,
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = false,
-                passedGoPlayerName = "",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
-        // Check if the "Not enough players connected yet" message is displayed
-        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("Not enough players connected yet")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -175,31 +246,48 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                currentPlayerId = "",
-                localPlayerId = "",
+                currentPlayerId = "1",
+                localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
-                diceResult = null,
-                dicePlayerId = null,
+                diceResult = 5,
+                dicePlayerId = "",
                 hasRolled = false,
                 hasPasch = false,
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = false,
-                passedGoPlayerName = "",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = false,
+                passedGoPlayerName = "",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
-        // Check if the "Not enough players connected yet" message is displayed
-        composeTestRule.onNodeWithText("Not enough players connected yet").assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("Not enough players connected yet")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -210,19 +298,19 @@ class PlayboardScreenTest {
 
         composeTestRule.setContent {
             PlayboardScreen(
-                players = players,
+                players = emptyList(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
-                diceResult = 2,
-                dicePlayerId = "1",
+                diceResult = 5,
+                dicePlayerId = "",
                 hasRolled = false,
                 hasPasch = false,
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                chatMessages = listOf(),
+                chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
@@ -230,7 +318,23 @@ class PlayboardScreenTest {
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -252,19 +356,19 @@ class PlayboardScreenTest {
 
         composeTestRule.setContent {
             PlayboardScreen(
-                players = listOf(PlayerMoney("1", "Me", 1500, 0)),
+                players = emptyList(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
                 onBackToLobby = {},
-                diceResult = 1,
-                dicePlayerId = "1",
+                diceResult = 5,
+                dicePlayerId = "",
                 hasRolled = false,
                 hasPasch = false,
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                chatMessages = messages,
+                chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
@@ -272,7 +376,23 @@ class PlayboardScreenTest {
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -283,6 +403,7 @@ class PlayboardScreenTest {
         composeTestRule.onNodeWithText("Hello from me").assertIsDisplayed()
         composeTestRule.onNodeWithText("Hello from another").assertIsDisplayed()
     }
+
     @Test
     fun endTurnButton_shouldBeVisibleOnlyIfMyTurn() {
         val testPlayers = listOf(
@@ -312,7 +433,23 @@ class PlayboardScreenTest {
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -352,15 +489,33 @@ class PlayboardScreenTest {
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+
+                onGiveUp = {},
+
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
         composeTestRule.runOnIdle {
+            // No additional interactions needed; we just want to see the property name
         }
 
         composeTestRule.onNodeWithText("Some St.").assertIsDisplayed()
     }
+
     @Test
     fun playerCard_showsOwnedProperties() {
         val owned = listOf(
@@ -380,7 +535,9 @@ class PlayboardScreenTest {
                 onPropertySetClicked = {}
             )
         }
+        // No assertion here—this test just ensures no crash when PlayerCard renders.
     }
+
     @Test
     fun propertySetCard_opensPopupOnClick() {
         val owned = listOf(
@@ -401,9 +558,7 @@ class PlayboardScreenTest {
             )
         }
 
-        // überprüfen ob Grundstückskarte angezeigt wird
+        // Verify that a “Property Set” content description is clickable
         composeTestRule.onAllNodesWithContentDescription("Property Set").onFirst().performClick()
     }
-
-
 }

@@ -2,6 +2,8 @@ package at.aau.serg.websocketbrokerdemo
 
 import com.google.gson.Gson
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,14 +40,15 @@ class MessageParserTest {
             onPropertyBought = { fail("should not hit property bought") },
             onGameStateReceived = { fail("should not hit game state") },
             onPlayerTurn = { fail("should not hit player turn") },
-            onDiceRolled = { _, _,_, _ -> fail("should not hit dice roll") },
-            onCardDrawn = { _, _, _ -> fail("should not hit card drawn") },
+            onDiceRolled = { _, _, _, _ -> fail("should not hit dice roll") },
+            onCardDrawn = { _, _, _, _ -> fail("should not hit card drawn") },
             onChatMessageReceived = { _, _ -> fail("should not hit chat") },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail("should not hit fallback")
-            }
+            onMessageReceived = { fail("should not hit fallback") },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -66,17 +69,19 @@ class MessageParserTest {
             gson = gson,
             getPlayers = { dummyPlayers },
             onTaxPayment = { _, _, _ -> fail() },
-            onPlayerPassedGo = { name -> invoked = true; capName = name },
+            onPlayerPassedGo = { name -> invoked = true;capName = name },
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _,_, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(raw)
@@ -99,13 +104,15 @@ class MessageParserTest {
             onPropertyBought = { rawText -> invoked = true; capRaw = rawText },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _,_, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(raw)
@@ -129,13 +136,15 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { list -> invoked = true; capList = list },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _,_, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(raw)
@@ -159,13 +168,15 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { id -> invoked = true; capId = id },
-            onDiceRolled = { _, _,_, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(raw)
@@ -176,7 +187,7 @@ class MessageParserTest {
 
     @Test
     fun testDiceRoll() {
-        val json = """{"type":"DICE_ROLL","playerId":"p1","value":6}"""
+        val json = """{"type":"DICE_ROLL","playerId":"p1","value":6,"manual":false,"isPasch":false}"""
         var invoked = false
         var capPid: String? = null
         var capVal: Int? = null
@@ -190,12 +201,14 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { pid, v, _, _ -> invoked = true; capPid = pid; capVal = v },
-            onCardDrawn = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -212,13 +225,14 @@ class MessageParserTest {
           "type":"CARD_DRAWN",
           "playerId":"p2",
           "cardType":"CHANCE",
-          "card":{"description":"You win!"}
+          "card":{"id":2,"description":"You win!"}
         }
         """.trimIndent()
         var invoked = false
         var capPid: String? = null
         var capType: String? = null
         var capDesc: String? = null
+        var capId: Int? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -228,16 +242,17 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { _, _,_, _ -> fail() },
-            onCardDrawn = { pid, type, desc ->
-                invoked = true; capPid = pid; capType = type; capDesc = desc
+            onDiceRolled = { _, _, _, _ -> fail() },
+            onCardDrawn = { pid, type, desc, id ->
+                invoked = true; capPid = pid; capType = type; capDesc = desc; capId = id
             },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail()
-            }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -246,6 +261,7 @@ class MessageParserTest {
         assertEquals("p2", capPid)
         assertEquals("CHANCE", capType)
         assertEquals("You win!", capDesc)
+        assertEquals(2, capId)
     }
 
     @Test
@@ -264,14 +280,18 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { pid, msg ->
-                invoked = true; capPid = pid; capMsg = msg
+                invoked = true
+                capPid = pid
+                capMsg = msg
             },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -297,16 +317,18 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { pid, msg ->
                 invoked = true
-                capPid  = pid
-                capMsg  = msg
+                capPid = pid
+                capMsg = msg
             },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail("should not hit fallback") }
+            onMessageReceived = { fail("should not hit fallback") },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -315,7 +337,6 @@ class MessageParserTest {
         assertEquals("p2", capPid)
         assertEquals("kill all", capMsg)
     }
-
 
     @Test
     fun testClearChat() {
@@ -331,12 +352,14 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail() },
             onClearChat = { invoked = true },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() }
+            onMessageReceived = { fail() },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -358,15 +381,17 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail() },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { winnerId ->
                 invoked = true
                 capWinner = winnerId
             },
-            onMessageReceived = { fail("should not hit fallback") }
+            onMessageReceived = { fail("should not hit fallback") },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(json)
@@ -374,7 +399,6 @@ class MessageParserTest {
         assertTrue(invoked, "onHasWon must be invoked")
         assertEquals("p2", capWinner)
     }
-
 
     @Test
     fun testFallback() {
@@ -391,12 +415,17 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
-            onCardDrawn = { _, _, _ -> fail() },
+            onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
-            onClearChat = {},
+            onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { text -> invoked = true; capText = text }
+            onMessageReceived = { text ->
+                invoked = true
+                capText = text
+            },
+            onDealProposal = { _: DealProposalMessage -> },
+            onDealResponse = { _: DealResponseMessage -> }
         )
 
         parser.parse(raw)
