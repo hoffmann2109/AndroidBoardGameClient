@@ -23,7 +23,7 @@ class MessageParser(
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
-    private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
+    private val onCardDrawn: (playerId: String, cardType: String, description: String, cardId: Int) -> Unit,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onClearChat: () -> Unit,
@@ -99,7 +99,8 @@ class MessageParser(
             val drawn = gson.fromJson(text, DrawnCardMessage::class.java)
             if (drawn.type == "CARD_DRAWN") {
                 val desc = drawn.card["description"].asString
-                onCardDrawn(drawn.playerId, drawn.cardType, desc)
+                val cardId = drawn.card["id"].asInt
+                onCardDrawn(drawn.playerId, drawn.cardType, desc, cardId)
                 return
             }
         } catch (e: Exception) {

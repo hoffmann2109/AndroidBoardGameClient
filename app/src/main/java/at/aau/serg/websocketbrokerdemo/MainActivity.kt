@@ -75,6 +75,9 @@ class MainActivity : ComponentActivity() {
         var currentDealProposal by remember { mutableStateOf<DealProposalMessage?>(null) }
         var currentDealResponse by remember { mutableStateOf<DealResponseMessage?>(null) }
         var showIncomingDialog by remember { mutableStateOf(false) }
+        var drawnCardType by remember { mutableStateOf<String?>(null) }
+        var drawnCardId   by remember { mutableStateOf<Int?>(null) }
+        var drawnCardDesc by remember { mutableStateOf<String?>(null) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -167,16 +170,11 @@ class MainActivity : ComponentActivity() {
                     taxPaymentType = taxType
                     showTaxPaymentAlert = true
                 },
-                onCardDrawn = { _, cardType, description ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast
-                            .makeText(
-                                context,
-                                "You drew a $cardType card: $description",
-                                Toast.LENGTH_LONG
-                            )
-                            .show()
-                    }
+                onCardDrawn = { _, cardType, description, cardId ->
+                    // Open the dialog in Compose
+                    drawnCardType = cardType
+                    drawnCardDesc = description
+                    drawnCardId = cardId
                 },
                 onClearChat = {
                     chatMessages.clear()
@@ -323,6 +321,14 @@ class MainActivity : ComponentActivity() {
                             webSocketClient.logic().sendGiveUpMessage(it)
                             navController.navigate("lobby")
                         }
+                    },
+                    drawnCardType     = drawnCardType,
+                    drawnCardId       = drawnCardId,
+                    drawnCardDesc     = drawnCardDesc,
+                    onCardDialogDismiss = {
+                        drawnCardType = null
+                        drawnCardId = null
+                        drawnCardDesc = null
                     }
                 )
             }

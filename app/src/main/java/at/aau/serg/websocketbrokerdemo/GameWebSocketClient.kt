@@ -28,7 +28,7 @@ class GameWebSocketClient(
     private val coroutineDispatcher: CoroutineDispatcher,
     private val onChatMessageReceived: (playerId: String, message: String) -> Unit,
     private val onCheatMessageReceived: (playerId: String, message: String) -> Unit,
-    private val onCardDrawn: (playerId: String, cardType: String, description: String) -> Unit,
+    private val onCardDrawn: (playerId: String, cardType: String, description: String, id: Int) -> Unit,
     private val onTaxPayment: (playerName: String, amount: Int, taxType: String) -> Unit,
     private val onClearChat: () -> Unit,
     private val onDealProposal: (DealProposalMessage) -> Unit,
@@ -65,7 +65,7 @@ class GameWebSocketClient(
             onPlayerTurnListener?.invoke(sessionId)
         },
         onDiceRolled = { pid, v, manual, isPasch -> onDiceRolled(pid, v, manual, isPasch) },
-        onCardDrawn = { pid, type, desc -> onCardDrawn(pid, type, desc) },
+        onCardDrawn = { pid, type, desc, cardId -> onCardDrawn(pid, type, desc, cardId) },
         onChatMessageReceived = { pid, msg -> onChatMessageReceived(pid, msg) },
         onCheatMessageReceived = { pid, msg -> onCheatMessageReceived(pid, msg) },
         onClearChat = onClearChat,

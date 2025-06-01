@@ -125,7 +125,11 @@ fun PlayboardScreen(
     showIncomingDialog: Boolean,
     setIncomingDeal: (DealProposalMessage?) -> Unit,
     setShowIncomingDialog: (Boolean) -> Unit,
-    onGiveUp: () -> Unit = {}
+    onGiveUp: () -> Unit = {},
+    drawnCardType: String?,         // "CHANCE" or "COMMUNITY_CHEST"
+    drawnCardId:   Int?,            // e.g. 1..8
+    drawnCardDesc: String?,         // the description (fallback) if drawable not found
+    onCardDialogDismiss: () -> Unit // called to clear the popup
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -917,6 +921,57 @@ fun PlayboardScreen(
                 }
             }
         }
+    }
+    // Popup for CHANCE and COMMUNITY_CHEST
+    if (drawnCardType != null && drawnCardId != null) {
+        // Build the resource name, e.g. "chance_2" or "community_chest_7"
+        val resName = "${drawnCardType.lowercase()}_${drawnCardId}"
+        val imageResId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+
+        AlertDialog(
+            onDismissRequest = { onCardDialogDismiss() },
+            title = {
+                Text(
+                    text = if (drawnCardType == "CHANCE") "Ereigniskarte" else "Gemeinschaftskarte",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Show the card image if it exists
+                    if (imageResId != 0) {
+                        Image(
+                            painter = painterResource(id = imageResId),
+                            contentDescription = "Card $resName",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Fit
+                        )
+                    } else {
+                        // Fallback
+                        Text(
+                            text = drawnCardDesc ?: "",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onCardDialogDismiss() }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {}
+        )
     }
 }
 
