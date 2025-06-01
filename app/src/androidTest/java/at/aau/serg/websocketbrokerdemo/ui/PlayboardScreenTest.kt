@@ -68,7 +68,7 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                // ── NEW “deal” parameters (all defaults) ──
+                // ── NEW "deal" parameters (all defaults) ──
                 currentDealProposal = null,
                 setCurrentDealProposal = {},
                 currentDealResponse = null,
@@ -81,7 +81,7 @@ class PlayboardScreenTest {
                 // give-up uses default λ, so we can omit it or pass {}
                 onGiveUp = {},
 
-                // ── NEW “drawn-card” parameters ──
+                // ── NEW "drawn-card" parameters ──
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
@@ -524,6 +524,7 @@ class PlayboardScreenTest {
         )
 
         val testPlayer = PlayerMoney("p1", "Alice", 1500, 0)
+        val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
         composeTestRule.setContent {
             PlayerCard(
@@ -532,7 +533,8 @@ class PlayboardScreenTest {
                 allProperties = owned,
                 isCurrentPlayer = true,
                 playerIndex = 0,
-                onPropertySetClicked = {}
+                onPropertySetClicked = {},
+                webSocketClient = mockWebSocketClient
             )
         }
         // No assertion here—this test just ensures no crash when PlayerCard renders.
@@ -546,6 +548,7 @@ class PlayboardScreenTest {
         val all = owned + DummyProperty(id = 9, position = 9, color = PropertyColor.LIGHT_BLUE)
 
         val testPlayer = PlayerMoney("p1", "Alice", 1500, 0)
+        val mockWebSocketClient = mock(GameWebSocketClient::class.java)
 
         composeTestRule.setContent {
             PlayerCard(
@@ -554,11 +557,12 @@ class PlayboardScreenTest {
                 allProperties = all,
                 isCurrentPlayer = true,
                 playerIndex = 0,
-                onPropertySetClicked = {}
+                onPropertySetClicked = {},
+                webSocketClient = mockWebSocketClient
             )
         }
 
-        // Verify that a “Property Set” content description is clickable
+        // Verify that a "Property Set" content description is clickable
         composeTestRule.onAllNodesWithContentDescription("Property Set").onFirst().performClick()
     }
 }
