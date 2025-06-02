@@ -9,7 +9,6 @@ import at.aau.serg.websocketbrokerdemo.data.messages.GiveUpMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.PullCardMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.RentPaymentMessage
-import at.aau.serg.websocketbrokerdemo.data.messages.SellPropertyMessage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
