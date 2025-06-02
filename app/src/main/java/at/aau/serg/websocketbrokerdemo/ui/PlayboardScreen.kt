@@ -167,7 +167,6 @@ fun PlayboardScreen(
 
     var isCountering by remember { mutableStateOf(false) }
 
-    var selectedColorSet by remember { mutableStateOf<PropertyColor?>(null) }
     var ownedProperties by remember { mutableStateOf<List<Property>>(emptyList()) }
 
     // Update owned properties when properties or players change
