@@ -138,7 +138,7 @@ class MessageParser(
         try {
             val proposal = gson.fromJson(text, DealProposalMessage::class.java)
             if (proposal.type == "DEAL_PROPOSAL") {
-                onDealProposal?.invoke(proposal)
+                onDealProposal.invoke(proposal)
                 return
             }
         } catch (e: Exception) {
