@@ -171,7 +171,6 @@ fun PlayboardScreen(
 
     // Update owned properties when properties or players change
     LaunchedEffect(properties, players) {
-        val localPlayer = players.find { it.id == localPlayerId }
         ownedProperties = properties.filter { it.ownerId == localPlayerId }
     }
 
