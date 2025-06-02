@@ -244,7 +244,7 @@ dependencies {
     testImplementation(libs.mockk.mockk)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
-    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation(libs.mockito.inline)
     testImplementation(kotlin("test"))
 
     testRuntimeOnly(libs.junit.jupiter.engine)

@@ -68,6 +68,7 @@ mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
 mockk-v1135 = { module = "io.mockk:mockk", version.ref = "mockk" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-auth-v2100 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
+mockito-inline = { module = "org.mockito:mockito-inline", version = "5.2.0" }
 
 
 [plugins]
