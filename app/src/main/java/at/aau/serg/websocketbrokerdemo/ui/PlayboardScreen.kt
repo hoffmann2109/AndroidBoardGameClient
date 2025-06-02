@@ -164,7 +164,6 @@ fun PlayboardScreen(
         .toMap()
     var showDealDialog by remember { mutableStateOf(false) }
     var selectedReceiver by remember { mutableStateOf<PlayerMoney?>(null) }
-    var offeredMoney by remember { mutableStateOf(0) }
 
     var isCountering by remember { mutableStateOf(false) }
 
