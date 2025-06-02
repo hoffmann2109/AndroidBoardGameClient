@@ -149,7 +149,7 @@ class MessageParser(
         try {
             val response = gson.fromJson(text, DealResponseMessage::class.java)
             if (response.type == "DEAL_RESPONSE") {
-                onDealResponse?.invoke(response)
+                onDealResponse.invoke(response)
                 return
             }
         } catch (e: Exception) {
