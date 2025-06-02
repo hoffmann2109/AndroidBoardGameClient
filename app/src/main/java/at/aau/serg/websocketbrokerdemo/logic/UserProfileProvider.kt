@@ -2,6 +2,6 @@ package at.aau.serg.websocketbrokerdemo.logic
 
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
 
-interface UserProfileProvider {
+fun interface UserProfileProvider {
     suspend fun getUserProfile(userId: String): PlayerProfile?
 }
