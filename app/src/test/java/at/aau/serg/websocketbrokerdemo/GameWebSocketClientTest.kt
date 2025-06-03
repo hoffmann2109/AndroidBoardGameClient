@@ -42,6 +42,7 @@ class GameWebSocketClientTest {
             onTaxPayment = { _, _, _ -> },
             onClearChat = { },
             onDealProposal = { /* No-op */ },
+            onGiveUpReceived = {/* No-op */},
             onDealResponse = { /* No-op */ }
         )
     }

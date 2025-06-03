@@ -48,6 +48,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -81,6 +82,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -112,6 +114,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -144,6 +147,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -176,6 +180,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -208,6 +213,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -252,6 +258,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -291,6 +298,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -328,6 +336,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -359,6 +368,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -391,6 +401,7 @@ class MessageParserTest {
             },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -425,6 +436,7 @@ class MessageParserTest {
                 capText = text
             },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -460,6 +472,7 @@ class MessageParserTest {
                 invoked = true
                 captured = proposal
             },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { _: DealResponseMessage -> }
         )
 
@@ -493,6 +506,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
+            onGiveUpReceived = {fail("should not hit onGiveUp")},
             onDealResponse = { response ->
                 invoked = true
                 captured = response
