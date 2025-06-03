@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
         var drawnCardType by remember { mutableStateOf<String?>(null) }
         var drawnCardId   by remember { mutableStateOf<Int?>(null) }
         var drawnCardDesc by remember { mutableStateOf<String?>(null) }
+        var shouldNavigateToLobby by remember { mutableStateOf(false) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -184,6 +185,10 @@ class MainActivity : ComponentActivity() {
                     showIncomingDialog = true
                 },
                 onDealResponse = { response -> currentDealResponse = response },
+                onGiveUpReceived = {
+                    // GIVE_UP message from the server -> go to lobby
+                    shouldNavigateToLobby = true
+                },
                 coroutineDispatcher = Dispatchers.IO
             )
         }
@@ -205,6 +210,16 @@ class MainActivity : ComponentActivity() {
 
 
         val navController = rememberNavController()
+
+        // Go to LobbyScreen
+        LaunchedEffect(shouldNavigateToLobby) {
+            if (shouldNavigateToLobby) {
+                navController.navigate("lobby") {
+                    popUpTo("lobby") { inclusive = false }
+                }
+                shouldNavigateToLobby = false
+            }
+        }
 
         // 3) When that state flips, actually navigate:
         LaunchedEffect(youWon) {
