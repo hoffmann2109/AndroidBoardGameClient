@@ -484,6 +484,40 @@ class MessageParserTest {
     }
 
     @Test
+    fun testGiveUp() {
+        // Arrange
+        val json = """{"type":"GIVE_UP"}"""
+        var invoked = false
+
+        val parser = MessageParser(
+            gson = gson,
+            getPlayers = { dummyPlayers },
+            onTaxPayment = { _, _, _ -> fail("should not hit tax payment") },
+            onPlayerPassedGo = { fail("should not hit passed GO") },
+            onPropertyBought = { fail("should not hit property bought") },
+            onGameStateReceived = { fail("should not hit game state") },
+            onPlayerTurn = { fail("should not hit player turn") },
+            onDiceRolled = { _, _, _, _ -> fail("should not hit dice roll") },
+            onCardDrawn = { _, _, _, _ -> fail("should not hit card drawn") },
+            onChatMessageReceived = { _, _ -> fail("should not hit chat") },
+            onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
+            onClearChat = { fail("should not hit clear chat") },
+            onHasWon = { fail("should not hit has won") },
+            onMessageReceived = { fail("should not hit fallback") },
+            onDealProposal = { _: DealProposalMessage -> fail("should not hit deal proposal") },
+            onGiveUpReceived = { invoked = true },
+            onDealResponse = { _: DealResponseMessage -> fail("should not hit deal response") }
+        )
+
+        // Act
+        parser.parse(json)
+
+        // Assert
+        assertTrue(invoked, "onGiveUpReceived must be invoked when type is GIVE_UP")
+    }
+
+
+    @Test
     fun testDealResponse() {
         // Minimal JSON containing only the "type" field → parser should invoke onDealResponse
         val json = """{"type":"DEAL_RESPONSE"}"""
