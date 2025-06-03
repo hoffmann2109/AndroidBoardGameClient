@@ -40,6 +40,7 @@ class PassingGoTest {
         onHasWon = { _ -> },
         onTaxPayment = { _, _, _ -> /* No-op for testing */ },
         onDealProposal = { /* No-op for testing */ },
+        onGiveUpReceived = {/* No-op for testing */},
         onDealResponse = { /* No-op for testing */ }
     )
 
