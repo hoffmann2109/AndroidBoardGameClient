@@ -58,7 +58,6 @@ object AuthManager {
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
                             FirestoreManager.saveUserProfile(userId, profile)
-                            FirestoreManager.initializeUserStats(userId)
                             (context as? Activity)?.runOnUiThread {
                                 context.startActivity(Intent(context, MainActivity::class.java))
                                 context.finish()
@@ -120,7 +119,6 @@ object AuthManager {
                     val profile = PlayerProfile(name = user.displayName ?: "user${userId.takeLast(4)}")
                     docRef.set(profile).await()
                     FirestoreManager.saveUserProfile(userId, profile)
-                    FirestoreManager.initializeUserStats(userId)
                 }
 
                 withContext(Dispatchers.Main) {
