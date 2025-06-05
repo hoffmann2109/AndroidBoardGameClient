@@ -204,26 +204,41 @@ fun RulesContent() {
 
 @Composable
 fun LobbyHelp() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("🏠 Lobby-Hilfe", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(16.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            "🏠 Lobby-Hilfe",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        listOf(
-            "📡 Klicke auf Connect, um dich mit dem Server zu verbinden.",
-            "🎮 Danach auf Join Game, um einem Spiel beizutreten.",
-            "💬 Du kannst über den Chat Nachrichten schreiben.",
-            "🚀 Wenn genug Spieler verbunden sind, startet das Spiel automatisch."
-        ).forEach {
-            Text(
-                it,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                color = Color.Black,
-                textAlign = TextAlign.Center
-            )
-        }
+        RuleCard(
+            title = "Verbindung",
+            description = "Klicke auf Connect, um dich mit dem Server zu verbinden.",
+            emoji = "📡",
+            backgroundColor = Color(0xFFD1C4E9) // lila
+        )
+        RuleCard(
+            title = "Spiel beitreten",
+            description = "Drücke Join Game, um einem Spiel beizutreten.",
+            emoji = "🎮",
+            backgroundColor = Color(0xFFC8E6C9) // grün
+        )
+        RuleCard(
+            title = "Chat",
+            description = "Du kannst über das Textfeld Nachrichten mit anderen Spielern austauschen.",
+            emoji = "💬",
+            backgroundColor = Color(0xFFFFF9C4) // gelb
+        )
+        RuleCard(
+            title = "Spielstart",
+            description = "Wenn genügend Spieler verbunden sind, startet das Spiel automatisch.",
+            emoji = "🚀",
+            backgroundColor = Color(0xFFFFCCBC) // orange
+        )
     }
 }
 
