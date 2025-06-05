@@ -33,12 +33,15 @@ class PassingGoTest {
         onPlayerTurn = { /* No-op for testing */ },
         onPlayerPassedGo = { /* No-op for testing */ },
         coroutineDispatcher = Dispatchers.IO,
-        onCardDrawn = {_,_,_ ->},
         onChatMessageReceived = { _, _ -> },
         onCheatMessageReceived = { _, _ -> },
+        onCardDrawn = { _, _, _, _ -> },
         onClearChat = { /* No-op for testing */ },
         onHasWon = { _ -> },
-        onTaxPayment = { _, _, _ -> /* No-op for testing */ }
+        onTaxPayment = { _, _, _ -> /* No-op for testing */ },
+        onDealProposal = { /* No-op for testing */ },
+        onGiveUpReceived = {/* No-op for testing */},
+        onDealResponse = { /* No-op for testing */ }
     )
 
     @Test
@@ -60,15 +63,28 @@ class PassingGoTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = true,
-                passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = true,
+                passedGoPlayerName = "Test Player",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+                onGiveUp = {},
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -97,15 +113,28 @@ class PassingGoTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = showAlert,
-                passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = showAlert,
+                passedGoPlayerName = "Test Player",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+                onGiveUp = {},
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -129,15 +158,28 @@ class PassingGoTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = showAlert,
-                passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = showAlert,
+                passedGoPlayerName = "Test Player",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+                onGiveUp = {},
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -164,15 +206,28 @@ class PassingGoTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = true,
-                passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = true,
+                passedGoPlayerName = "Test Player",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+                onGiveUp = {},
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
@@ -206,15 +261,28 @@ class PassingGoTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                showPassedGoAlert = true,
-                passedGoPlayerName = "Test Player",
                 chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
+                showPassedGoAlert = true,
+                passedGoPlayerName = "Test Player",
                 showTaxPaymentAlert = false,
                 taxPaymentPlayerName = "",
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
-                cheatFlags = emptyMap()
+                cheatFlags = emptyMap(),
+                currentDealProposal = null,
+                setCurrentDealProposal = {},
+                currentDealResponse = null,
+                setCurrentDealResponse = {},
+                incomingDeal = null,
+                showIncomingDialog = false,
+                setIncomingDeal = {},
+                setShowIncomingDialog = {},
+                onGiveUp = {},
+                drawnCardType = null,
+                drawnCardId = null,
+                drawnCardDesc = null,
+                onCardDialogDismiss = {}
             )
         }
 
