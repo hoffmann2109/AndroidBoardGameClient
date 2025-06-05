@@ -5,11 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -30,8 +33,14 @@ fun GameHelp(onClose: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth(0.9f)
                 .fillMaxHeight(0.85f)
+                .shadow(16.dp, RoundedCornerShape(24.dp)),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9FB))
         ) {
-            Column(Modifier.padding(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp)
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
@@ -43,13 +52,13 @@ fun GameHelp(onClose: () -> Unit) {
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                                 .clickable { selectedTab = index },
                             color = if (selectedTab == index) Color.Red else Color.DarkGray,
-                            fontSize = 16.sp
+                            fontSize = 18.sp
                         )
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = "✕",
-                        fontSize = 18.sp,
+                        fontSize = 20.sp,
                         modifier = Modifier
                             .clickable { onClose() }
                             .padding(end = 8.dp)
@@ -70,44 +79,64 @@ fun GameHelp(onClose: () -> Unit) {
 
 @Composable
 fun RulesContent() {
-    Column {
-        Text("🎲 Monopoly Spielregeln", fontSize = 20.sp)
-        Spacer(Modifier.height(8.dp))
-        Text("• Ziel: Bringe alle anderen Spieler in den Bankrott.")
-        Text("• Jeder startet mit 1500 EUR.")
-        Text("• Du bewegst dich durch Würfeln.")
-        Text("• Freie Grundstücke kannst du kaufen.")
-        Text("• Bei fremden Grundstücken musst du Miete zahlen.")
-        Text("• Du kannst Häuser und Hotels bauen, um Miete zu erhöhen.")
-        Text("• Chance- und Gemeinschaftskarten haben spezielle Effekte.")
-        Text("• Wer kein Geld mehr hat, verliert.")
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            "🎲 Monopoly Spielregeln",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.height(12.dp))
+        listOf(
+            "• Ziel: Bringe alle anderen Spieler in den Bankrott.",
+            "• Jeder startet mit 1500 EUR.",
+            "• Du bewegst dich durch Würfeln.",
+            "• Freie Grundstücke kannst du kaufen.",
+            "• Bei fremden Grundstücken musst du Miete zahlen.",
+            "• Du kannst Häuser und Hotels bauen, um Miete zu erhöhen.",
+            "• Chance- und Gemeinschaftskarten haben spezielle Effekte.",
+            "• Wer kein Geld mehr hat, verliert."
+        ).forEach {
+            Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
+        }
     }
 }
 
 @Composable
 fun LobbyHelp() {
-    Column {
-        Text("🏠 Lobby-Hilfe", fontSize = 20.sp)
-        Spacer(Modifier.height(8.dp))
-        Text("1. Klicke auf **Connect**, um dich mit dem Server zu verbinden.")
-        Text("2. Danach auf **Join Game**, um einem Spiel beizutreten.")
-        Text("3. Du kannst optional über den Chat Nachrichten schreiben.")
-        Text("4. Wenn genug Spieler verbunden sind, startet das Spiel automatisch.")
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            "🏠 Lobby-Hilfe",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.height(12.dp))
+        listOf(
+            "1. Klicke auf Connect, um dich mit dem Server zu verbinden.",
+            "2. Danach auf Join Game, um einem Spiel beizutreten.",
+            "3. Du kannst über den Chat Nachrichten schreiben.",
+            "4. Sobald genug Spieler verbunden sind, startet das Spiel automatisch."
+        ).forEach {
+            Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
+        }
     }
 }
 
 @Composable
 fun BoardHelp() {
-    Column {
-        Text("🗺️ Spielfeld-Erklärung", fontSize = 20.sp)
-        Spacer(Modifier.height(8.dp))
-        Text("• Unten rechts ist das **START-Feld** – 200 EUR beim Überqueren.")
-        Text("• Links oben: **Gemeinschaftsfeld** mit zufälligen Effekten.")
-        Text("• Oben rechts: **Gefängnis** – du bleibst dort für 3 Züge oder zahlst.")
-        Text("• Der Button **Roll Dice** (oben links) bewegt deine Spielfigur.")
-        Text("• Rechts siehst du deine Position, dein Geld und deine Farbe.")
-        Text("• Unten kannst du den **Terminal** oder **Chat** öffnen.")
-        Text("• Mit **Give Up** kannst du das Spiel aufgeben.")
-        Text("• **Back to Lobby** bringt dich zurück zur Lobby.")
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("🗺️ Spielfeld-Erklärung", fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(12.dp))
+        listOf(
+            "• Unten rechts ist das START-Feld – 200 EUR beim Überqueren.",
+            "• Links oben: Gemeinschaftsfeld mit Effekten.",
+            "• Oben rechts: Gefängnis – bleibst 3 Runden oder zahlst.",
+            "• 🎲 Roll Dice bewegt dich.",
+            "• Rechte Seite: deine Position, Geld, Farbe.",
+            "• Unten: Chat & Terminal öffnen.",
+            "• Give Up = Spiel aufgeben.",
+            "• Back to Lobby bringt dich zurück."
+        ).forEach {
+            Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
+        }
     }
 }
