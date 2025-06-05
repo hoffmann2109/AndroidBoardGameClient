@@ -139,17 +139,18 @@ fun LobbyHelp() {
 @Composable
 fun BoardHelp() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("🗺️ Spielfeld-Erklärung", fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
-        Spacer(Modifier.height(12.dp))
+        Text("🗺️ Spielfeld-Erklärung", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(16.dp))
+
         listOf(
-            "• Unten rechts ist das START-Feld – 200 EUR beim Überqueren.",
-            "• Links oben: Gemeinschaftsfeld mit Effekten.",
-            "• Oben rechts: Gefängnis – bleibst 3 Runden oder zahlst.",
-            "• 🎲 Roll Dice bewegt dich.",
-            "• Rechte Seite: deine Position, Geld, Farbe.",
-            "• Unten: Chat & Terminal öffnen.",
-            "• Give Up = Spiel aufgeben.",
-            "• Back to Lobby bringt dich zurück."
+            "🏁 Unten rechts ist das START-Feld – 200 EUR beim Überqueren.",
+            "🃏 Links oben: Gemeinschaftsfeld mit Effekten.",
+            "🚓 Oben rechts: Gefängnis – bleibst 3 Runden oder zahlst.",
+            "🎲 Roll Dice bewegt dich.",
+            "🧍‍♂️ Rechte Seite: deine Position, Geld, Farbe.",
+            "🖥️ Unten: Chat & Terminal öffnen.",
+            "🙈 Give Up = Spiel aufgeben.",
+            "🏠 Back to Lobby bringt dich zurück."
         ).forEach {
             Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
         }
