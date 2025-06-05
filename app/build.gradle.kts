@@ -235,6 +235,7 @@ dependencies {
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
+    implementation(libs.cronet.embedded)
 
     // --- Test Libraries ---
     testImplementation(libs.junit)

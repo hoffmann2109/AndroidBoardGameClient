@@ -28,6 +28,7 @@ navigation-compose = "2.5.3"
 playServicesAuth = "21.1.1"
 playServicesAuthVersion = "21.0.0"
 uiTestJunit4Android = "1.7.8"
+cronetEmbedded = "119.6045.31"
 
 
 [libraries]
@@ -69,6 +70,7 @@ mockk-v1135 = { module = "io.mockk:mockk", version.ref = "mockk" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-auth-v2100 = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuthVersion" }
 mockito-inline = { module = "org.mockito:mockito-inline", version = "5.2.0" }
+cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronetEmbedded" }
 
 
 [plugins]

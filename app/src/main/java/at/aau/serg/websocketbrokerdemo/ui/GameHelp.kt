@@ -101,21 +101,18 @@ fun GameHelp(onClose: () -> Unit) {
 @Composable
 fun RulesContent() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            "🎲 Monopoly Spielregeln",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(Modifier.height(12.dp))
+        Text("🎲 Monopoly Spielregeln", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(16.dp))
+
         listOf(
-            "• Ziel: Bringe alle anderen Spieler in den Bankrott.",
-            "• Jeder startet mit 1500 EUR.",
-            "• Du bewegst dich durch Würfeln.",
-            "• Freie Grundstücke kannst du kaufen.",
-            "• Bei fremden Grundstücken musst du Miete zahlen.",
-            "• Du kannst Häuser und Hotels bauen, um Miete zu erhöhen.",
-            "• Chance- und Gemeinschaftskarten haben spezielle Effekte.",
-            "• Wer kein Geld mehr hat, verliert."
+            "🎯 Ziel: Bringe alle anderen Spieler in den Bankrott.",
+            "💰 Jeder startet mit 1500 EUR.",
+            "🎲 Du bewegst dich durch Würfeln.",
+            "🏠 Freie Grundstücke kannst du kaufen.",
+            "💸 Bei fremden Grundstücken musst du Miete zahlen.",
+            "🏗️ Du kannst Häuser und Hotels bauen.",
+            "🎁 Karten haben spezielle Effekte.",
+            "❌ Wer kein Geld mehr hat, verliert."
         ).forEach {
             Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
         }
