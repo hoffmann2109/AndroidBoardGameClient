@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,30 +45,47 @@ fun GameHelp(onClose: () -> Unit) {
                     .fillMaxSize()
                     .padding(24.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    tabs.forEachIndexed { index, title ->
-                        Text(
-                            text = title,
-                            modifier = Modifier
-                                .padding(horizontal = 12.dp, vertical = 8.dp)
-                                .clickable { selectedTab = index },
-                            color = if (selectedTab == index) Color.Red else Color.DarkGray,
-                            fontSize = 18.sp
-                        )
+                val selectedTabIndex = selectedTab
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    TabRow(
+                        selectedTabIndex = selectedTabIndex,
+                        containerColor = Color.Transparent,
+                        contentColor = Color.Black,
+                        indicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                Modifier
+                                    .tabIndicatorOffset(tabPositions[selectedTabIndex])
+                                    .height(3.dp),
+                                color = Color(0xFF007AFF)
+                            )
+                        }
+                    ) {
+                        tabs.forEachIndexed { index, title ->
+                            Tab(
+                                selected = selectedTabIndex == index,
+                                onClick = { selectedTab = index },
+                                text = {
+                                    Text(
+                                        text = title,
+                                        fontSize = 16.sp,
+                                        fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                }
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Close button oben rechts
                     Text(
                         text = "✕",
                         fontSize = 20.sp,
+                        color = Color.Gray,
                         modifier = Modifier
+                            .align(Alignment.TopEnd)
                             .clickable { onClose() }
-                            .padding(end = 8.dp)
+                            .padding(12.dp)
                     )
                 }
-
                 Spacer(Modifier.height(16.dp))
 
                 when (selectedTab) {
