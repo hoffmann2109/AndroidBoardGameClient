@@ -122,17 +122,14 @@ fun RulesContent() {
 @Composable
 fun LobbyHelp() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            "🏠 Lobby-Hilfe",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Spacer(Modifier.height(12.dp))
+        Text("🏠 Lobby-Hilfe", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(16.dp))
+
         listOf(
-            "1. Klicke auf Connect, um dich mit dem Server zu verbinden.",
-            "2. Danach auf Join Game, um einem Spiel beizutreten.",
-            "3. Du kannst über den Chat Nachrichten schreiben.",
-            "4. Sobald genug Spieler verbunden sind, startet das Spiel automatisch."
+            "📡 Klicke auf Connect, um dich mit dem Server zu verbinden.",
+            "🎮 Danach auf Join Game, um einem Spiel beizutreten.",
+            "💬 Du kannst über den Chat Nachrichten schreiben.",
+            "🚀 Wenn genug Spieler verbunden sind, startet das Spiel automatisch."
         ).forEach {
             Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
         }
