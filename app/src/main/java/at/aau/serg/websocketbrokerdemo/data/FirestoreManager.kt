@@ -49,18 +49,6 @@ object FirestoreManager : UserProfileProvider{
         }
     }
 
-    //for testing will be deleted when serverside is implemented
-    private suspend fun saveGameData(userId: String, gameData: GameData) {
-        try {
-            usersCollection.document(userId)
-                .collection("gameHistory")
-                .add(gameData)
-                .await()
-        } catch (e: Exception) {
-            Log.e("FirestoreManager", "Error saving game data", e)
-        }
-    }
-
     suspend fun getGameHistory(userId: String): List<GameData> {
         return try {
             usersCollection.document(userId)
@@ -72,31 +60,6 @@ object FirestoreManager : UserProfileProvider{
         } catch (e: Exception) {
             Log.e("FirestoreManager", "Error getting game history", e)
             emptyList()
-        }
-    }
-
-    suspend fun initializeUserStats(userId: String) {
-        val fakeGames = listOf(
-            GameData(
-                timestamp = com.google.firebase.Timestamp(Date().apply { time -= 86400000 * 7 }),
-                won = true,
-                endMoney = 2500,
-                durationMinutes = 45,
-                playersCount = 3,
-                levelGained = 1
-            ),
-            GameData(
-                timestamp = com.google.firebase.Timestamp(Date().apply { time -= 86400000 * 3 }),
-                won = false,
-                endMoney = 800,
-                durationMinutes = 32,
-                playersCount = 4,
-                levelGained = 0
-            )
-        )
-
-        fakeGames.forEach { game ->
-            saveGameData(userId, game)
         }
     }
 

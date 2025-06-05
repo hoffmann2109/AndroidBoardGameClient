@@ -83,6 +83,9 @@ import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
 import com.google.gson.Gson
+import at.aau.serg.websocketbrokerdemo.logic.ShakeDetector
+import at.aau.serg.websocketbrokerdemo.data.messages.ShakeMessage
+
 
 fun extractPlayerId(message: String): String {
     val regex = """Player ([\w-]+) bought""".toRegex()
@@ -168,6 +171,14 @@ fun PlayboardScreen(
     var isCountering by remember { mutableStateOf(false) }
 
     var ownedProperties by remember { mutableStateOf<List<Property>>(emptyList()) }
+
+
+    // ShakeDetector:
+    ShakeDetector(shakingThreshold = 15f) {
+        val shakeMsg = ShakeMessage(playerId = currentPlayerId)
+        val json = Gson().toJson(shakeMsg)
+        webSocketClient.sendMessage(json)
+    }
 
     // Update owned properties when properties or players change
     LaunchedEffect(properties, players) {

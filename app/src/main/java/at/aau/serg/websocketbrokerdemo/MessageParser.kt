@@ -12,6 +12,7 @@ import at.aau.serg.websocketbrokerdemo.data.messages.HasWonMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.TaxPaymentMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.GiveUpMessage
 
 
 class MessageParser(
@@ -21,6 +22,7 @@ class MessageParser(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val onPropertyBought: (raw: String) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
+    private val onGiveUpReceived: () -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String, cardId: Int) -> Unit,
@@ -179,7 +181,18 @@ class MessageParser(
             println("Error parsing CLEAR_CHAT: ${e.message}")
         }
 
-        // 15) FALLBACK
+        // 15) GIVE_UP
+        try {
+            val giveUp = gson.fromJson(text, GiveUpMessage::class.java)
+            if (giveUp.type == "GIVE_UP") {
+                onGiveUpReceived()
+                return
+            }
+        } catch (e: Exception) {
+            println("Error parsing GIVE_UP: ${e.message}")
+        }
+
+        // 16) FALLBACK
         onMessageReceived(text)
     }
 }
