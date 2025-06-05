@@ -146,30 +146,59 @@ fun RuleCard(
 
 @Composable
 fun RulesContent() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("🎲 Monopoly Spielregeln", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(16.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            "🎲 Monopoly Spielregeln",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        listOf(
-            "🎯 Ziel: Bringe alle anderen Spieler in den Bankrott.",
-            "💰 Jeder startet mit 1500 EUR.",
-            "🎲 Du bewegst dich durch Würfeln.",
-            "🏠 Freie Grundstücke kannst du kaufen.",
-            "💸 Bei fremden Grundstücken musst du Miete zahlen.",
-            "🏗️ Du kannst Häuser und Hotels bauen.",
-            "🎁 Karten haben spezielle Effekte.",
-            "❌ Wer kein Geld mehr hat, verliert."
-        ).forEach {
-            Text(
-                it,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                color = Color.Black,
-                textAlign = TextAlign.Center
-            )
-        }
+        RuleCard(
+            title = "Startkapital",
+            description = "Jeder Spieler startet mit 1500 EUR. Die Bank verwaltet das restliche Geld, Grundstücke und Gebäude.",
+            emoji = "💰",
+            backgroundColor = Color(0xFFD0F0C0) // mintgrün
+        )
+        RuleCard(
+            title = "Ziel des Spiels",
+            description = "Bringe alle anderen Spieler in den Bankrott. Wer als letzter übrig bleibt, gewinnt.",
+            emoji = "🎯",
+            backgroundColor = Color(0xFFFFF3B0) // sanftes gelb
+        )
+        RuleCard(
+            title = "Würfeln & Bewegen",
+            description = "Würfle und ziehe deine Spielfigur entsprechend der Augenzahl.",
+            emoji = "🎲",
+            backgroundColor = Color(0xFFE0F7FA) // hellblau
+        )
+        RuleCard(
+            title = "Grundstücke kaufen",
+            description = "Freie Grundstücke kannst du kaufen, bei fremden musst du Miete zahlen.",
+            emoji = "🏠",
+            backgroundColor = Color(0xFFFFE0E0) // hellrot/pink
+        )
+        RuleCard(
+            title = "Bauen & Vermieten",
+            description = "Baue Häuser oder Hotels und verlange höhere Mieten.",
+            emoji = "🏗️",
+            backgroundColor = Color(0xFFEDE7F6) // lila-ton
+        )
+        RuleCard(
+            title = "Sonderkarten",
+            description = "Chance- und Gemeinschaftskarten lösen Spezialeffekte aus.",
+            emoji = "🎁",
+            backgroundColor = Color(0xFFFFF9C4) // zartes gelb
+        )
+        RuleCard(
+            title = "Bankrott",
+            description = "Wer kein Geld mehr hat, verliert das Spiel.",
+            emoji = "❌",
+            backgroundColor = Color(0xFFFFCDD2) // rosa
+        )
     }
 }
 
