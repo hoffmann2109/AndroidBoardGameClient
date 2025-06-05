@@ -24,6 +24,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun GameHelp(onClose: () -> Unit) {
@@ -126,7 +127,15 @@ fun RulesContent() {
             "🎁 Karten haben spezielle Effekte.",
             "❌ Wer kein Geld mehr hat, verliert."
         ).forEach {
-            Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
+            Text(
+                it,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -143,7 +152,15 @@ fun LobbyHelp() {
             "💬 Du kannst über den Chat Nachrichten schreiben.",
             "🚀 Wenn genug Spieler verbunden sind, startet das Spiel automatisch."
         ).forEach {
-            Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
+            Text(
+                it,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
@@ -164,7 +181,15 @@ fun BoardHelp() {
             "🙈 Give Up = Spiel aufgeben.",
             "🏠 Back to Lobby bringt dich zurück."
         ).forEach {
-            Text(it, fontSize = 18.sp, modifier = Modifier.padding(4.dp), color = Color.Black)
+            Text(
+                it,
+                fontSize = 18.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                color = Color.Black,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
