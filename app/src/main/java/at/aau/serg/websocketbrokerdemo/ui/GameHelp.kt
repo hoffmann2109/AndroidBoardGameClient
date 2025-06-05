@@ -19,6 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 
 @Composable
 fun GameHelp(onClose: () -> Unit) {
@@ -32,66 +37,73 @@ fun GameHelp(onClose: () -> Unit) {
             .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .fillMaxHeight(0.85f)
-                .shadow(16.dp, RoundedCornerShape(24.dp)),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9FB))
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + slideInVertically(initialOffsetY = { it / 2 }),
+            exit = fadeOut() + slideOutVertically(targetOffsetY = { it / 2 })
         ) {
-            Column(
+            Card(
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp)
+                    .fillMaxWidth(0.9f)
+                    .fillMaxHeight(0.85f)
+                    .shadow(16.dp, RoundedCornerShape(24.dp)),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9FB))
             ) {
-                val selectedTabIndex = selectedTab
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    TabRow(
-                        selectedTabIndex = selectedTabIndex,
-                        containerColor = Color.Transparent,
-                        contentColor = Color.Black,
-                        indicator = { tabPositions ->
-                            TabRowDefaults.Indicator(
-                                Modifier
-                                    .tabIndicatorOffset(tabPositions[selectedTabIndex])
-                                    .height(3.dp),
-                                color = Color(0xFF007AFF)
-                            )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp)
+                ) {
+                    val selectedTabIndex = selectedTab
+
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        TabRow(
+                            selectedTabIndex = selectedTabIndex,
+                            containerColor = Color.Transparent,
+                            contentColor = Color.Black,
+                            indicator = { tabPositions ->
+                                TabRowDefaults.Indicator(
+                                    Modifier
+                                        .tabIndicatorOffset(tabPositions[selectedTabIndex])
+                                        .height(3.dp),
+                                    color = Color(0xFF007AFF)
+                                )
+                            }
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                Tab(
+                                    selected = selectedTabIndex == index,
+                                    onClick = { selectedTab = index },
+                                    text = {
+                                        Text(
+                                            text = title,
+                                            fontSize = 16.sp,
+                                            fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    }
+                                )
+                            }
                         }
-                    ) {
-                        tabs.forEachIndexed { index, title ->
-                            Tab(
-                                selected = selectedTabIndex == index,
-                                onClick = { selectedTab = index },
-                                text = {
-                                    Text(
-                                        text = title,
-                                        fontSize = 16.sp,
-                                        fontWeight = if (selectedTab == index) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                }
-                            )
-                        }
+
+                        Text(
+                            text = "✕",
+                            fontSize = 20.sp,
+                            color = Color.Gray,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .clickable { onClose() }
+                                .padding(12.dp)
+                        )
                     }
 
-                    // Close button oben rechts
-                    Text(
-                        text = "✕",
-                        fontSize = 20.sp,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .clickable { onClose() }
-                            .padding(12.dp)
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                when (selectedTab) {
-                    0 -> RulesContent()
-                    1 -> LobbyHelp()
-                    2 -> BoardHelp()
+                    when (selectedTab) {
+                        0 -> RulesContent()
+                        1 -> LobbyHelp()
+                        2 -> BoardHelp()
+                    }
                 }
             }
         }
