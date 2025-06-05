@@ -168,4 +168,39 @@ class GameLogicHandlerTest {
             assertTrue(json.contains("TestUser"))
         }
     }
+
+
+    @Test
+    fun testSellProperty_withValidUser() {
+        // Mock FirebaseAuth and current user
+        val mockUser = mock(FirebaseUser::class.java)
+        `when`(mockUser.uid).thenReturn("mockUid")
+
+        mockStatic(FirebaseAuth::class.java).use { firebaseAuth ->
+            val mockAuth = mock(FirebaseAuth::class.java)
+            `when`(mockAuth.currentUser).thenReturn(mockUser)
+            `when`(FirebaseAuth.getInstance()).thenReturn(mockAuth)
+
+            handler.sellProperty(20)
+
+            assertTrue(sendLog.isNotEmpty())
+            val sentMessage = sendLog[0]
+            assertTrue(sentMessage.contains("SELL_PROPERTY"))
+            assertTrue(sentMessage.contains("20"))
+        }
+    }
+
+    @Test
+    fun testSellProperty_withNoUser() {
+        // Mock FirebaseAuth with no current user
+        mockStatic(FirebaseAuth::class.java).use { firebaseAuth ->
+            val mockAuth = mock(FirebaseAuth::class.java)
+            `when`(mockAuth.currentUser).thenReturn(null)
+            `when`(FirebaseAuth.getInstance()).thenReturn(mockAuth)
+
+            handler.sellProperty(20)
+
+            assertTrue(sendLog.isEmpty())
+        }
+    }
 }
