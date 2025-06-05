@@ -112,6 +112,39 @@ fun GameHelp(onClose: () -> Unit) {
 }
 
 @Composable
+fun RuleCard(
+    title: String,
+    description: String,
+    emoji: String,
+    backgroundColor: Color
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 12.dp),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "$emoji  $title",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = description,
+                fontSize = 16.sp,
+                color = Color.DarkGray
+            )
+        }
+    }
+}
+
+
+@Composable
 fun RulesContent() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text("🎲 Monopoly Spielregeln", fontSize = 22.sp, fontWeight = FontWeight.Bold)
