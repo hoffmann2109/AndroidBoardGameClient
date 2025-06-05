@@ -1,12 +1,9 @@
 package at.aau.serg.websocketbrokerdemo
 
 import android.app.Activity
-import android.content.Context.SENSOR_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -24,7 +21,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import at.aau.serg.websocketbrokerdemo.ui.LobbyScreen
-import androidx.navigation.compose.*
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.PlayerProfile
@@ -32,21 +28,16 @@ import at.aau.serg.websocketbrokerdemo.data.FirestoreManager
 import at.aau.serg.websocketbrokerdemo.ui.SettingsScreen
 import at.aau.serg.websocketbrokerdemo.ui.SoundSelectionScreen
 import at.aau.serg.websocketbrokerdemo.ui.UserProfileScreen
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
 import kotlinx.coroutines.delay
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import androidx.compose.runtime.DisposableEffect
-import kotlin.math.sqrt
 
 import kotlinx.coroutines.launch
 
@@ -54,11 +45,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent { MonopolyWebSocketApp() }
-
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     @Composable
@@ -85,6 +71,13 @@ class MainActivity : ComponentActivity() {
         var taxPaymentAmount by remember { mutableStateOf(0) }
         var taxPaymentType by remember { mutableStateOf("") }
         var youWon by remember { mutableStateOf(false) }
+        var currentDealProposal by remember { mutableStateOf<DealProposalMessage?>(null) }
+        var currentDealResponse by remember { mutableStateOf<DealResponseMessage?>(null) }
+        var showIncomingDialog by remember { mutableStateOf(false) }
+        var drawnCardType by remember { mutableStateOf<String?>(null) }
+        var drawnCardId   by remember { mutableStateOf<Int?>(null) }
+        var drawnCardDesc by remember { mutableStateOf<String?>(null) }
+        var shouldNavigateToLobby by remember { mutableStateOf(false) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -177,20 +170,24 @@ class MainActivity : ComponentActivity() {
                     taxPaymentType = taxType
                     showTaxPaymentAlert = true
                 },
-                onCardDrawn = { _, cardType, description ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast
-                            .makeText(
-                                context,
-                                "You drew a $cardType card: $description",
-                                Toast.LENGTH_LONG
-                            )
-                            .show()
-                    }
+                onCardDrawn = { _, cardType, description, cardId ->
+                    // Open the dialog in Compose
+                    drawnCardType = cardType
+                    drawnCardDesc = description
+                    drawnCardId = cardId
                 },
                 onClearChat = {
                     chatMessages.clear()
                     cheatMessages.clear()
+                },
+                onDealProposal = { proposal ->
+                    currentDealProposal = proposal
+                    showIncomingDialog = true
+                },
+                onDealResponse = { response -> currentDealResponse = response },
+                onGiveUpReceived = {
+                    // GIVE_UP message from the server -> go to lobby
+                    shouldNavigateToLobby = true
                 },
                 coroutineDispatcher = Dispatchers.IO
             )
@@ -213,6 +210,16 @@ class MainActivity : ComponentActivity() {
 
 
         val navController = rememberNavController()
+
+        // Go to LobbyScreen
+        LaunchedEffect(shouldNavigateToLobby) {
+            if (shouldNavigateToLobby) {
+                navController.navigate("lobby") {
+                    popUpTo("lobby") { inclusive = false }
+                }
+                shouldNavigateToLobby = false
+            }
+        }
 
         // 3) When that state flips, actually navigate:
         LaunchedEffect(youWon) {
@@ -315,11 +322,27 @@ class MainActivity : ComponentActivity() {
                     taxPaymentPlayerName = taxPaymentPlayerName,
                     taxPaymentAmount = taxPaymentAmount,
                     taxPaymentType = taxPaymentType,
+                    currentDealProposal = currentDealProposal,
+                    setCurrentDealProposal = { currentDealProposal = it },
+                    currentDealResponse = currentDealResponse,
+                    setCurrentDealResponse = { currentDealResponse = it },
+                    incomingDeal = currentDealProposal,
+                    setIncomingDeal = { currentDealProposal = it },
+                    showIncomingDialog = showIncomingDialog,
+                    setShowIncomingDialog = { showIncomingDialog = it },
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)
                             navController.navigate("lobby")
                         }
+                    },
+                    drawnCardType     = drawnCardType,
+                    drawnCardId       = drawnCardId,
+                    drawnCardDesc     = drawnCardDesc,
+                    onCardDialogDismiss = {
+                        drawnCardType = null
+                        drawnCardId = null
+                        drawnCardDesc = null
                     }
                 )
             }
@@ -335,66 +358,7 @@ class MainActivity : ComponentActivity() {
                 SoundSelectionScreen()
             }
         }
-        if (
-            localPlayerId != null &&
-            currentGamePlayerId != null &&
-            playerMoneyList.size >= 2
-        ) {
-            ShakeDetector(
-                localPlayerId = localPlayerId,
-                currentGamePlayerId = currentGamePlayerId,
-                onShake = { webSocketClient.sendMessage("Roll") }
-            )
-        }
     }
 
-
-    @Composable
-    fun ShakeDetector(
-
-        localPlayerId: String?,
-        currentGamePlayerId: String?,
-        onShake: () -> Unit
-    ) {
-        val context = LocalContext.current
-        val sensorManager = remember {
-            context.getSystemService(SENSOR_SERVICE) as SensorManager
-        }
-        val accelerometer = remember { sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
-        val lastShakeTime = remember { mutableStateOf(0L) }
-        val isMyTurn by rememberUpdatedState(localPlayerId != null && localPlayerId == currentGamePlayerId)
-        if (accelerometer == null) {
-            Log.w("ShakeDetector", "No accelerometer available on device")
-            return
-        }
-        DisposableEffect(Unit) {
-            val listener = object : SensorEventListener {
-                override fun onSensorChanged(event: SensorEvent) {
-                    val x = event.values[0]
-                    val y = event.values[1]
-                    val z = event.values[2]
-                    val acceleration = sqrt((x * x + y * y + z * z).toDouble()).toFloat()
-                    val now = System.currentTimeMillis()
-
-                    if (acceleration > 12f && now - lastShakeTime.value > 1000) {
-                        lastShakeTime.value = now
-                        if (isMyTurn) {
-                            Log.d("Sensor", "Shake detected → sending Roll")
-                            onShake()
-                        } else {
-                            Log.d("Sensor", "Shake ignored – not your turn")
-                        }
-                    }
-                }
-
-                override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
-            }
-
-            sensorManager.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_UI)
-            onDispose {
-                sensorManager.unregisterListener(listener)
-            }
-        }
-    }
 }
 

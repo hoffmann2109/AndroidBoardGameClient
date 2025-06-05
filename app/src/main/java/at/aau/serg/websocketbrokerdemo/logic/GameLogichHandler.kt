@@ -131,4 +131,15 @@ class GameLogicHandler(
             Log.e("GameLogic", "Failed to send rent payment: No user ID available")
         }
     }
+
+    fun sellProperty(propertyId: Int) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        currentUser?.uid?.let { userId ->
+            val message = "SELL_PROPERTY:$propertyId"
+            sendMessage(message)
+            Log.d("GameLogic", "Sent sell property message: $message")
+        } ?: run {
+            Log.e("GameLogic", "Failed to send sell property message: No user ID available")
+        }
+    }
 }

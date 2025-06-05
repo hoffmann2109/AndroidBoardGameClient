@@ -27,20 +27,23 @@ class GameWebSocketClientTest {
         val input = ByteArrayInputStream(props.toByteArray())
         `when`(assetManager.open("config.properties")).thenReturn(input)
         return GameWebSocketClient(
-            context,
+            context = context,
             onConnected = { /* No-op */ },
             onMessageReceived = { /* No-op */ },
-            onDiceRolled = { _, _, _, _-> /* No-op */ },
+            onDiceRolled = { _, _, _, _ -> /* No-op */ },
             onGameStateReceived = { /* No-op */ },
             onPlayerTurn = { /* No-op */ },
             onPlayerPassedGo = { /* No-op */ },
+            onHasWon = { /* No-op */ },
             coroutineDispatcher = Dispatchers.IO,
             onChatMessageReceived = { _, _ -> },
-            onCheatMessageReceived = {_, _ -> },
-            onCardDrawn = { _, _, _ -> },
-            onClearChat = {},
-            onHasWon = { _ -> },
-            onTaxPayment = { _, _, _ -> }
+            onCheatMessageReceived = { _, _ -> },
+            onCardDrawn = { _, _, _, _ -> },
+            onTaxPayment = { _, _, _ -> },
+            onClearChat = { },
+            onDealProposal = { /* No-op */ },
+            onGiveUpReceived = {/* No-op */},
+            onDealResponse = { /* No-op */ }
         )
     }
 
@@ -172,5 +175,30 @@ class GameWebSocketClientTest {
 
         spyClient.logic().sendPullCard("p3", 1)
         verify(spyClient, never()).sendMessage(anyString())
+    }
+
+    @Test
+    fun testPullCardInvalidField() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
+
+        spyClient.logic().sendPullCard("p3", 1)
+        verify(spyClient, never()).sendMessage(anyString())
+    }
+
+    @Test
+    fun testSellProperty() {
+        val client = createClient()
+        val spyClient = spy(client)
+        doNothing().`when`(spyClient).sendMessage(anyString())
+
+        // Test successful property sale
+        spyClient.logic().sellProperty(5)
+        verify(spyClient).sendMessage("SELL_PROPERTY:5")
+
+        // Test with different property ID
+        spyClient.logic().sellProperty(10)
+        verify(spyClient).sendMessage("SELL_PROPERTY:10")
     }
 }
