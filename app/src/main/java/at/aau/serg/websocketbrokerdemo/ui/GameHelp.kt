@@ -244,29 +244,65 @@ fun LobbyHelp() {
 
 @Composable
 fun BoardHelp() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("🗺️ Spielfeld-Erklärung", fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(16.dp))
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            "🗺️ Spielfeld-Erklärung",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        listOf(
-            "🏁 Unten rechts ist das START-Feld – 200 EUR beim Überqueren.",
-            "🃏 Links oben: Gemeinschaftsfeld mit Effekten.",
-            "🚓 Oben rechts: Gefängnis – bleibst 3 Runden oder zahlst.",
-            "🎲 Roll Dice bewegt dich.",
-            "🧍‍♂️ Rechte Seite: deine Position, Geld, Farbe.",
-            "🖥️ Unten: Chat & Terminal öffnen.",
-            "🙈 Give Up = Spiel aufgeben.",
-            "🏠 Back to Lobby bringt dich zurück."
-        ).forEach {
-            Text(
-                it,
-                fontSize = 18.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                color = Color.Black,
-                textAlign = TextAlign.Center
-            )
-        }
+        RuleCard(
+            title = "Startfeld",
+            description = "Unten rechts ist das START-Feld – 200 EUR beim Überqueren.",
+            emoji = "🏁",
+            backgroundColor = Color(0xFFE3F2FD) // hellblau
+        )
+        RuleCard(
+            title = "Gemeinschaftsfeld",
+            description = "Links oben: Gemeinschaftsfeld mit Effekten.",
+            emoji = "🃏",
+            backgroundColor = Color(0xFFE1BEE7) // lila
+        )
+        RuleCard(
+            title = "Gefängnis",
+            description = "Oben rechts: Gefängnis – bleibst 3 Runden oder zahlst.",
+            emoji = "🚓",
+            backgroundColor = Color(0xFFFFCDD2) // rosa
+        )
+        RuleCard(
+            title = "Würfeln",
+            description = "Mit Roll Dice bewegst du deine Spielfigur.",
+            emoji = "🎲",
+            backgroundColor = Color(0xFFFFF9C4) // gelb
+        )
+        RuleCard(
+            title = "Spielerinfos",
+            description = "Rechts siehst du deine Position, Farbe und Kontostand.",
+            emoji = "🧍‍♂️",
+            backgroundColor = Color(0xFFDCEDC8) // hellgrün
+        )
+        RuleCard(
+            title = "Chat & Terminal",
+            description = "Unten findest du Chat und Terminal.",
+            emoji = "🖥️",
+            backgroundColor = Color(0xFFD7CCC8) // grau
+        )
+        RuleCard(
+            title = "Aufgeben",
+            description = "Mit Give Up kannst du das Spiel verlassen.",
+            emoji = "🙈",
+            backgroundColor = Color(0xFFFFE0B2) // orange
+        )
+        RuleCard(
+            title = "Zurück zur Lobby",
+            description = "Mit Back to Lobby kehrst du zur Lobby zurück.",
+            emoji = "🏠",
+            backgroundColor = Color(0xFFB3E5FC) // hellblau
+        )
     }
 }
+
