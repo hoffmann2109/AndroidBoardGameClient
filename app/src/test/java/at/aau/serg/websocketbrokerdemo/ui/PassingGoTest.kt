@@ -8,14 +8,12 @@ import org.junit.Rule
 import org.junit.Test
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.delay
-import org.junit.Assert.*
 import android.content.Context
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
-import org.junit.jupiter.api.Assertions
-import kotlin.String
+
 
 class PassingGoTest {
     @get:Rule
@@ -72,10 +70,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -122,10 +116,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -167,10 +157,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -215,10 +201,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -270,10 +252,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},

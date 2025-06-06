@@ -2,7 +2,6 @@ package at.aau.serg.websocketbrokerdemo.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
@@ -30,7 +29,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -221,7 +219,6 @@ fun DealPropertyRow(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.LightGray)
                         .clickable { onToggle(property.id, !isSelected) }
                 ) {
                     if (imageResId != 0) {
@@ -229,7 +226,7 @@ fun DealPropertyRow(
                             painter = painterResource(id = imageResId),
                             contentDescription = property.name,
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop,
+                            contentScale = ContentScale.Fit,
                             alpha = if (isSelected) 1f else 0.4f
                         )
                     } else {
