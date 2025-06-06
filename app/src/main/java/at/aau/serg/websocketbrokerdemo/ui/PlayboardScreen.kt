@@ -455,10 +455,10 @@ fun PlayboardScreen(
 
         // Popup für Grundstück
         if (selectedProperty != null) {
-            // Automatisch nach 3 Sekunden schließen – nur für Spieler, die NICHT dran sind
+            // Automatisch nach 1,5 Sekunden schließen – nur für Spieler, die NICHT dran sind
             LaunchedEffect(selectedProperty, localPlayerId == currentPlayerId) {
                 if (selectedProperty != null && localPlayerId != currentPlayerId && !openedByClick) {
-                    delay(3000)
+                    delay(1500)
                     selectedProperty = null
                     canBuy = false
                 }
