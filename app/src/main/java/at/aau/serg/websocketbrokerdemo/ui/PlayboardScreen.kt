@@ -879,15 +879,15 @@ fun PlayboardScreen(
             initialOffered = incomingDeal.requestedPropertyIds,
             initialMoney = incomingDeal.offeredMoney,
             onSendDeal = { counter ->
-                val response = DealResponseMessage(
-                    type = "DEAL_RESPONSE",
+                val counterProposal = DealProposalMessage(
+                    type = "DEAL_PROPOSAL",
                     fromPlayerId = localPlayerId,
                     toPlayerId = incomingDeal.fromPlayerId,
-                    responseType = DealResponseType.COUNTER,
-                    counterPropertyIds = counter.requestedPropertyIds,
-                    counterMoney = counter.offeredMoney
+                    offeredPropertyIds = counter.requestedPropertyIds,
+                    requestedPropertyIds = counter.offeredPropertyIds,
+                    offeredMoney = counter.offeredMoney
                 )
-                webSocketClient.sendMessage(Gson().toJson(response))
+                webSocketClient.sendMessage(Gson().toJson(counterProposal))
                 isCountering = false
                 setIncomingDeal(null)
             },
