@@ -804,15 +804,15 @@ fun PlayboardScreen(
         val receiverProps = properties.filter { it.ownerId == localPlayerId }.map { it.id }
 
         IncomingDealDialog(
-            proposal = incomingDeal!!,
-            senderName = players.find { it.id == incomingDeal!!.fromPlayerId }?.name ?: "???",
+            proposal = incomingDeal,
+            senderName = players.find { it.id == incomingDeal.fromPlayerId }?.name ?: "???",
             allProperties = properties,
             receiverProperties = receiverProps,
             onAccept = {
                 val response = DealResponseMessage(
                     type = "DEAL_RESPONSE",
                     fromPlayerId = localPlayerId,
-                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    toPlayerId = incomingDeal.fromPlayerId,
                     responseType = DealResponseType.ACCEPT,
                     counterPropertyIds = listOf(),
                     counterMoney = 0
@@ -825,7 +825,7 @@ fun PlayboardScreen(
                 val response = DealResponseMessage(
                     type = "DEAL_RESPONSE",
                     fromPlayerId = localPlayerId,
-                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    toPlayerId = incomingDeal.fromPlayerId,
                     responseType = DealResponseType.DECLINE,
                     counterPropertyIds = listOf(),
                     counterMoney = 0
@@ -846,15 +846,15 @@ fun PlayboardScreen(
             players = players.filter { it.id != localPlayerId },
             senderId = localPlayerId,
             allProperties = properties,
-            receiver = players.find { it.id == incomingDeal!!.fromPlayerId },
-            initialRequested = incomingDeal!!.offeredPropertyIds,
-            initialOffered = incomingDeal!!.requestedPropertyIds,
-            initialMoney = incomingDeal!!.offeredMoney,
+            receiver = players.find { it.id == incomingDeal.fromPlayerId },
+            initialRequested = incomingDeal.offeredPropertyIds,
+            initialOffered = incomingDeal.requestedPropertyIds,
+            initialMoney = incomingDeal.offeredMoney,
             onSendDeal = { counter ->
                 val response = DealResponseMessage(
                     type = "DEAL_RESPONSE",
                     fromPlayerId = localPlayerId,
-                    toPlayerId = incomingDeal!!.fromPlayerId,
+                    toPlayerId = incomingDeal.fromPlayerId,
                     responseType = DealResponseType.COUNTER,
                     counterPropertyIds = counter.requestedPropertyIds,
                     counterMoney = counter.offeredMoney
