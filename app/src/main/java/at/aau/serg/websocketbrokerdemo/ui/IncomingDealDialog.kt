@@ -29,6 +29,7 @@ fun IncomingDealDialog(
     senderName: String,
     receiverProperties: List<Int>,
     allProperties: List<Property>,
+    isMyTurn: Boolean,
     onAccept: () -> Unit,
     onDecline: () -> Unit,
     onCounter: () -> Unit
@@ -91,7 +92,10 @@ fun IncomingDealDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onAccept) {
+            Button(
+                onClick = onAccept,
+                enabled = isMyTurn
+            ) {
                 Text("Accept")
             }
         },

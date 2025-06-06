@@ -835,6 +835,7 @@ fun PlayboardScreen(
             senderName = players.find { it.id == incomingDeal.fromPlayerId }?.name ?: "???",
             allProperties = properties,
             receiverProperties = receiverProps,
+            isMyTurn = isMyTurn,
             onAccept = {
                 val response = DealResponseMessage(
                     type = "DEAL_RESPONSE",
