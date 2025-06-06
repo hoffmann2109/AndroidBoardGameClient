@@ -388,9 +388,11 @@ fun PlayboardScreen(
                         .fillMaxWidth()
                         .height(48.dp)
                 ) {
-                    Text("Start Deal", color = Color.White)
+                    Text("Start Deal", color = Color.White, fontSize = 18.sp)
                 }
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = onBackToLobby,
