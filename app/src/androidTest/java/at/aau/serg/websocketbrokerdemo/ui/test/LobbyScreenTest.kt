@@ -35,7 +35,8 @@ class LobbyScreenTest {
                 onOpenSettings = {},
                 onOpenSoundSelection = {},
                 playerCount = 1,
-                onJoinGame = {}
+                onJoinGame = {},
+                onHelpClick = {}
             )
         }
 
@@ -66,7 +67,8 @@ class LobbyScreenTest {
                 onOpenSettings = {},
                 onOpenSoundSelection = {},
                 playerCount = 1,
-                onJoinGame = {}
+                onJoinGame = {},
+                onHelpClick = {}
             )
         }
 
@@ -99,7 +101,8 @@ class LobbyScreenTest {
                 onOpenSettings = {},
                 onOpenSoundSelection = {},
                 playerCount = 1,
-                onJoinGame = {}
+                onJoinGame = {},
+                onHelpClick = {}
             )
         }
 

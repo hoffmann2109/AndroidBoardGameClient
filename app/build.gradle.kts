@@ -195,7 +195,7 @@ sonar {
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml," +
-            "${project.projectDir}/build/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"
+                    "${project.projectDir}/build/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"
         )
     }
 }
@@ -211,55 +211,49 @@ tasks.withType<Test>().configureEach {
 
 dependencies {
 
-    // --- Application Libraries ---
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
-    implementation(libs.core.ktx)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.espresso.intents)
+    implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.test.junit4.android)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.core.ktx)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore)
-    implementation(libs.gson)
-    implementation(libs.coil.compose)
-    implementation(libs.play.services.auth)
-
-    // --- Compose BOM ---
-    implementation(platform(libs.androidx.compose.bom))
-
-    // --- Krossbow (WebSocket/STOMP) ---
     implementation(libs.krossbow.websocket.okhttp)
     implementation(libs.krossbow.stomp.core)
     implementation(libs.krossbow.websocket.builtin)
-    implementation(libs.cronet.embedded)
-
-    // --- Test Libraries ---
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.gson)
+    implementation(libs.coil.compose)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter.api)
+    testImplementation (libs.junit.jupiter.api)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.junit.jupiter)
+    testImplementation("org.mockito:mockito-inline:5.2.0")
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.mockk.v1135)
     testImplementation(libs.mockk.mockk)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.junit.jupiter)
-    testImplementation(libs.mockito.inline)
-    testImplementation(kotlin("test"))
 
-    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly (libs.junit.jupiter.engine)
 
-    // --- Android Instrumentation Test Libraries ---
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.junit.ktx)
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.mockito.core)
+    androidTestImplementation(libs.mockito.junit.jupiter)
     androidTestImplementation(libs.kotlinx.coroutines.play.services)
     androidTestImplementation(platform(libs.androidx.compose.bom))
 
-    // --- Debug only ---
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
+
 }
