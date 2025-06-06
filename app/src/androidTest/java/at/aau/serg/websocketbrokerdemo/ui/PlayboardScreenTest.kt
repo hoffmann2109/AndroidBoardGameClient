@@ -69,10 +69,6 @@ class PlayboardScreenTest {
                 cheatFlags = emptyMap(),
 
                 // ── NEW "deal" parameters (all defaults) ──
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -119,10 +115,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -168,10 +160,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -218,10 +206,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -267,10 +251,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -320,10 +300,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -378,10 +354,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -435,10 +407,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -491,10 +459,6 @@ class PlayboardScreenTest {
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
 
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
