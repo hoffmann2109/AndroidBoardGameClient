@@ -70,7 +70,6 @@ import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
@@ -147,7 +146,7 @@ fun PlayboardScreen(
     var lastPlayerPosition by remember { mutableStateOf<Int?>(null) }
     var manualDiceValue by remember { mutableStateOf("") }
     var chatOpen by remember { mutableStateOf(false) }
-    var cheatTerminalOpen by remember {mutableStateOf(false)}
+    var cheatTerminalOpen by remember { mutableStateOf(false) }
     var chatInput by remember { mutableStateOf("") }
     var cheatInput by remember { mutableStateOf("") }
     var rentPaid by remember { mutableStateOf(false) }
@@ -167,6 +166,8 @@ fun PlayboardScreen(
     var isCountering by remember { mutableStateOf(false) }
 
     var ownedProperties by remember { mutableStateOf<List<Property>>(emptyList()) }
+
+    var showActionMenu by remember { mutableStateOf(false) }
 
 
     // ShakeDetector:
@@ -375,55 +376,6 @@ fun PlayboardScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (isMyTurn && !turnEnded) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Button(
-                    onClick = { showDealDialog = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                ) {
-                    Text("Start Deal", color = Color.White, fontSize = 18.sp)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = onBackToLobby,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            ) {
-                Text("Back to Lobby", fontSize = 18.sp)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            val giveUpEnabled = isMyTurn
-            val giveUpColor   = if (giveUpEnabled) Color.Red else Color.Gray
-            val giveUpTextColor = if (giveUpEnabled) Color.White else Color.DarkGray
-
-            Button(
-                onClick = onGiveUp,
-                enabled = giveUpEnabled,
-                colors = ButtonDefaults.buttonColors(containerColor = giveUpColor),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .testTag("giveUpButton")
-            ) {
-                Text(
-                    text = "Give Up",
-                    fontSize = 18.sp,
-                    color = giveUpTextColor
-                )
-            }
-
-            if (isMyTurn && !turnEnded) {
-                Spacer(modifier = Modifier.height(8.dp))
-
                 Button(
                     onClick = {
                         webSocketClient.sendMessage("NEXT_TURN")
@@ -436,6 +388,18 @@ fun PlayboardScreen(
                 ) {
                     Text("End Turn", fontSize = 16.sp, color = Color.White)
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Button(
+                onClick = { showActionMenu = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            ) {
+                Text("Action Menu", fontSize = 18.sp, color = Color.White)
             }
         }
 
@@ -447,6 +411,70 @@ fun PlayboardScreen(
                 setHasPasch(false)
                 rentPaid = false
             }
+        }
+
+        // ACTION MENU
+        if (showActionMenu) {
+            AlertDialog(
+                onDismissRequest = { showActionMenu = false },
+                confirmButton = {},
+                dismissButton = {},
+                text = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (isMyTurn && !turnEnded) {
+                            Button(
+                                onClick = {
+                                    showDealDialog = true
+                                    showActionMenu = false
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)) // Violett
+                            ) {
+                                Text("Start Deal", color = Color.White)
+                            }
+                        }
+
+                        Button(
+                            onClick = {
+                                onBackToLobby()
+                                showActionMenu = false
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)) // Blau
+                        ) {
+                            Text("Back to Lobby", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = {
+                                onGiveUp()
+                                showActionMenu = false
+                            },
+                            enabled = isMyTurn,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (isMyTurn) Color.Red else Color.Gray
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Give Up", color = Color.White)
+                        }
+
+                        Button(
+                            onClick = { showActionMenu = false },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                        ) {
+                            Text("Close", color = Color.Black)
+                        }
+                    }
+                }
+            )
         }
 
         // Popup für Grundstück
@@ -528,7 +556,7 @@ fun PlayboardScreen(
                         ) {
                             Text("Exit")
                         }
-                        if (canBuy&& localPlayerId == currentPlayerId) {
+                        if (canBuy && localPlayerId == currentPlayerId) {
                             Button(
                                 onClick = {
                                     webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
@@ -548,7 +576,8 @@ fun PlayboardScreen(
                         // Add Pay Rent button if property is owned by another player
                         if (selectedProperty?.ownerId != null &&
                             selectedProperty?.ownerId != localPlayerId &&
-                            localPlayerId == currentPlayerId) {
+                            localPlayerId == currentPlayerId
+                        ) {
                             Button(
                                 onClick = {
                                     webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
@@ -902,8 +931,8 @@ fun PlayboardScreen(
                         Text(
                             text = "${entry.senderName.lowercase()}@monopoly > ${entry.message}",
                             fontFamily = FontFamily.Monospace,
-                            fontSize   = 14.sp,
-                            color      = Color(0xFF00FF00)
+                            fontSize = 14.sp,
+                            color = Color(0xFF00FF00)
                         )
                     }
                 }
@@ -925,7 +954,8 @@ fun PlayboardScreen(
                     Button(
                         onClick = {
                             if (cheatInput.isNotBlank()) {
-                                webSocketClient.logic().sendCheatMessage(currentPlayerId, cheatInput)
+                                webSocketClient.logic()
+                                    .sendCheatMessage(currentPlayerId, cheatInput)
                                 cheatInput = "" // Nach Senden Eingabefeld leeren
                             }
                         }
