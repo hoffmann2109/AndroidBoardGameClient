@@ -167,13 +167,9 @@ fun PlayboardScreen(
         .toMap()
     var showDealDialog by remember { mutableStateOf(false) }
     var selectedReceiver by remember { mutableStateOf<PlayerMoney?>(null) }
-    var offeredProperties by remember { mutableStateOf(listOf<Int>()) }
-    var requestedProperties by remember { mutableStateOf(listOf<Int>()) }
-    var offeredMoney by remember { mutableStateOf(0) }
 
     var isCountering by remember { mutableStateOf(false) }
 
-    var selectedColorSet by remember { mutableStateOf<PropertyColor?>(null) }
     var ownedProperties by remember { mutableStateOf<List<Property>>(emptyList()) }
 
 
@@ -186,7 +182,6 @@ fun PlayboardScreen(
 
     // Update owned properties when properties or players change
     LaunchedEffect(properties, players) {
-        val localPlayer = players.find { it.id == localPlayerId }
         ownedProperties = properties.filter { it.ownerId == localPlayerId }
     }
 

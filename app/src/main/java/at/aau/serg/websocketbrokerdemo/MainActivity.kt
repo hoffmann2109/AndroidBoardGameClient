@@ -1,3 +1,4 @@
+//main activity
 package at.aau.serg.websocketbrokerdemo
 
 import android.app.Activity
@@ -34,6 +35,7 @@ import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.ui.GameHelp
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MonopolyWebSocketApp() {
         val context = LocalContext.current
+        var showHelp by remember { mutableStateOf(false) }
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
         var playerProfile by remember { mutableStateOf<PlayerProfile?>(null) }
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
         val cheatFlags = remember { mutableStateMapOf<String, Boolean>() }
         var currentGamePlayerId by remember { mutableStateOf<String?>(null) }
         val chatMessages = remember { mutableStateListOf<ChatEntry>() }
-        val cheatMessages = remember { mutableStateListOf<CheatEntry>()}
+        val cheatMessages = remember { mutableStateListOf<CheatEntry>() }
         var localPlayerId by remember { mutableStateOf<String?>(null) }
         var showPassedGoAlert by remember { mutableStateOf(false) }
         var passedGoPlayerName by remember { mutableStateOf("") }
@@ -75,7 +78,7 @@ class MainActivity : ComponentActivity() {
         var currentDealResponse by remember { mutableStateOf<DealResponseMessage?>(null) }
         var showIncomingDialog by remember { mutableStateOf(false) }
         var drawnCardType by remember { mutableStateOf<String?>(null) }
-        var drawnCardId   by remember { mutableStateOf<Int?>(null) }
+        var drawnCardId by remember { mutableStateOf<Int?>(null) }
         var drawnCardDesc by remember { mutableStateOf<String?>(null) }
         var shouldNavigateToLobby by remember { mutableStateOf(false) }
 
@@ -259,8 +262,9 @@ class MainActivity : ComponentActivity() {
                     onStatisticsClick = { navController.navigate("statistics") },
                     onLeaderboardClick = { navController.navigate("leaderboard") },
 
-                    onOpenSettings ={navController.navigate("settings")},
-                    onOpenSoundSelection ={navController.navigate("soundSelection")}
+                    onOpenSettings = { navController.navigate("settings") },
+                    onOpenSoundSelection = { navController.navigate("soundSelection") },
+                    onHelpClick = { showHelp = true }
 
                 )
             }
@@ -336,9 +340,9 @@ class MainActivity : ComponentActivity() {
                             navController.navigate("lobby")
                         }
                     },
-                    drawnCardType     = drawnCardType,
-                    drawnCardId       = drawnCardId,
-                    drawnCardDesc     = drawnCardDesc,
+                    drawnCardType = drawnCardType,
+                    drawnCardId = drawnCardId,
+                    drawnCardDesc = drawnCardDesc,
                     onCardDialogDismiss = {
                         drawnCardType = null
                         drawnCardId = null
@@ -349,14 +353,19 @@ class MainActivity : ComponentActivity() {
             composable("leaderboard") {
                 LeaderboardScreen(
                     onBack = { navController.popBackStack() },
-                    currentUsername = playerProfile?.name)
+                    currentUsername = playerProfile?.name
+                )
             }
-            composable("settings"){
+            composable("settings") {
                 SettingsScreen()
             }
-            composable("soundSelection"){
+            composable("soundSelection") {
                 SoundSelectionScreen()
             }
+        }
+
+        if (showHelp) {
+            GameHelp(onClose = { showHelp = false })
         }
     }
 

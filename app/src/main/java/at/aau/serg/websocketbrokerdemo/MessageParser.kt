@@ -140,7 +140,7 @@ class MessageParser(
         try {
             val proposal = gson.fromJson(text, DealProposalMessage::class.java)
             if (proposal.type == "DEAL_PROPOSAL") {
-                onDealProposal?.invoke(proposal)
+                onDealProposal.invoke(proposal)
                 return
             }
         } catch (e: Exception) {
@@ -151,7 +151,7 @@ class MessageParser(
         try {
             val response = gson.fromJson(text, DealResponseMessage::class.java)
             if (response.type == "DEAL_RESPONSE") {
-                onDealResponse?.invoke(response)
+                onDealResponse.invoke(response)
                 return
             }
         } catch (e: Exception) {
