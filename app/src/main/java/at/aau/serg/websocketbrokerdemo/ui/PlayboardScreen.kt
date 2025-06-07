@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -362,7 +363,7 @@ fun PlayboardScreen(
                             player = player,
                             ownedProperties = properties.filter { it.ownerId == player.id },
                             allProperties = properties,
-                            isCurrentPlayer = player.id == currentPlayerId,
+                            isCurrentPlayer = player.id == localPlayerId,
                             playerIndex = players.indexOf(player),
                             onPropertySetClicked = { colorSet ->
                                 println("Clicked on color set: $colorSet")
@@ -1044,7 +1045,16 @@ fun PlayerCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .then(
+                if (isCurrentPlayer) {
+                    Modifier.border(
+                        width = 4.dp,
+                        color = Color.Black,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                } else Modifier
+            ),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         shape = RoundedCornerShape(8.dp)
     ) {

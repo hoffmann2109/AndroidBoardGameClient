@@ -6,7 +6,6 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
-import java.util.Date
 
 object FirestoreManager : UserProfileProvider{
     private val db = FirebaseFirestore.getInstance()
