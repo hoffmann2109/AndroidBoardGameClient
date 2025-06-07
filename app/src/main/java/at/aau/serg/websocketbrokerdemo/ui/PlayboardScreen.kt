@@ -363,7 +363,7 @@ fun PlayboardScreen(
                             player = player,
                             ownedProperties = properties.filter { it.ownerId == player.id },
                             allProperties = properties,
-                            isCurrentPlayer = player.id == currentPlayerId,
+                            isCurrentPlayer = player.id == localPlayerId,
                             playerIndex = players.indexOf(player),
                             onPropertySetClicked = { colorSet ->
                                 println("Clicked on color set: $colorSet")
