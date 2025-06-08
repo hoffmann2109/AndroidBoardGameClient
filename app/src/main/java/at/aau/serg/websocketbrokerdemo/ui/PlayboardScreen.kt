@@ -132,7 +132,7 @@ fun PlayboardScreen(
     drawnCardType: String?,         // "CHANCE" or "COMMUNITY_CHEST"
     drawnCardId:   Int?,            // e.g. 1..8
     drawnCardDesc: String?,         // the description (fallback) if drawable not found
-    onCardDialogDismiss: () -> Unit // called to clear the popup
+    onCardDialogDismiss: () -> Unit, // called to clear the popup
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -155,6 +155,7 @@ fun PlayboardScreen(
     var chatInput by remember { mutableStateOf("") }
     var cheatInput by remember { mutableStateOf("") }
     var rentPaid by remember { mutableStateOf(false) }
+    val amInJail = players.find { it.id == localPlayerId }?.inJail ?: false
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
         Color(0xFF64B5F6), // Blau
@@ -301,7 +302,7 @@ fun PlayboardScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val diceEnabled = isMyTurn && (!hasRolled || hasPasch)
+            val diceEnabled = isMyTurn && !amInJail &&  (!hasRolled || hasPasch)
             DiceRollingButton(
                 text = "Roll Dice",
                 color = if (diceEnabled) Color(0xFF3FAF3F) else Color.Gray,

@@ -343,7 +343,9 @@ class MainActivity : ComponentActivity() {
                         drawnCardType = null
                         drawnCardId = null
                         drawnCardDesc = null
-                    }
+                    },
+
+
                 )
             }
             composable("leaderboard") {

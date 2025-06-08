@@ -8,6 +8,8 @@ import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.logic.GameLogicHandler
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -17,6 +19,7 @@ import okio.ByteString
 import java.util.Properties
 
 class GameWebSocketClient(
+
     private val context: Context,
     private val onConnected: () -> Unit,
     private var onMessageReceived: (String) -> Unit,
@@ -65,7 +68,11 @@ class GameWebSocketClient(
             onPlayerTurn(sessionId)
             onPlayerTurnListener?.invoke(sessionId)
         },
-        onDiceRolled = { pid, v, manual, isPasch -> onDiceRolled(pid, v, manual, isPasch) },
+        onDiceRolled = { pid, value, manual, isPasch ->
+            _lastRoll.value = value      // <-- auch Bot-Würfe!
+            _rollerId.value = pid
+            onDiceRolled(pid, value, manual, isPasch)     // dein bisheriger Callback
+        },
         onCardDrawn = { pid, type, desc, cardId -> onCardDrawn(pid, type, desc, cardId) },
         onChatMessageReceived = { pid, msg -> onChatMessageReceived(pid, msg) },
         onCheatMessageReceived = { pid, msg -> onCheatMessageReceived(pid, msg) },
@@ -76,7 +83,11 @@ class GameWebSocketClient(
         onGiveUpReceived = onGiveUpReceived,
         onDealResponse = { dealResponse -> onDealResponse(dealResponse) }
     )
+    private val _lastRoll  = MutableStateFlow<Int?>(null)
+    private val _rollerId  = MutableStateFlow<String?>(null)
 
+    val lastRoll : StateFlow<Int?>    = _lastRoll
+    val rollerId : StateFlow<String?> = _rollerId
     private val serverUrl: String = loadServerUrl(context)
     private val request: Request = Request.Builder().url(serverUrl).build()
 

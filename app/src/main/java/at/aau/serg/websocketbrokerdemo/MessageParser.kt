@@ -91,16 +91,26 @@ class MessageParser(
             }
         }
 
-        // 7) DICE_ROLL
+        // 7) DICE_ROLL  ───────────────  neu
         try {
-            val roll = gson.fromJson(text, DiceRollMessage::class.java)
-            if (roll.type == "DICE_ROLL") {
-                onDiceRolled(roll.playerId, roll.value, roll.manual, roll.isPasch)
-                return
+            val obj = gson.fromJson(text, com.google.gson.JsonObject::class.java)
+            if (obj["type"]?.asString == "DICE_ROLL") {
+
+                /*      alte + neue Keys sauber abfangen                       */
+                val pid     = obj["playerId"]?.asString ?: obj["userId"]?.asString
+                val value   = obj["value"]?.asInt       ?: obj["roll"]?.asInt
+                val isPasch = obj["isPasch"]?.asBoolean ?: obj["pasch"]?.asBoolean ?: false
+                val manual  = obj["manual"] ?.asBoolean ?: obj["isManual"]?.asBoolean ?: false
+
+                if (pid != null && value != null) {      // nur wenn alles da ist
+                    onDiceRolled(pid, value, manual, isPasch)
+                    return
+                }
             }
         } catch (e: Exception) {
-            println("Error parsing DICE_ROLL: ${e.message}")
+            println("Error parsing DICE_ROLL (fallback): ${e.message}")
         }
+
 
         // 8) CARD_DRAWN
         try {
