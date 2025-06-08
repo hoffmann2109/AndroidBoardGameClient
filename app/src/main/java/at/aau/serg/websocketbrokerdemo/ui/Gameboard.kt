@@ -20,6 +20,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun Gameboard(
@@ -28,6 +33,8 @@ fun Gameboard(
     players: List<PlayerMoney> = emptyList(),
     cheatFlags: Map<String, Boolean>
 ) {
+    val context = LocalContext.current
+    val showTestToast = remember { mutableStateOf(true) }
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f
     val regularFactor = 1f
@@ -128,7 +135,10 @@ fun Gameboard(
                                             modifier = Modifier
                                                 .size(tokenSize)
                                                 .align(gridAlignments[idxOnTile])
-                                                .offset(x = applyOffset.first, y = applyOffset.second)
+                                                .offset(
+                                                    x = applyOffset.first,
+                                                    y = applyOffset.second
+                                                )
                                                 .clip(CircleShape)
                                                 .testTag("playerImage_${player.id}"),
                                             contentScale = ContentScale.Fit
@@ -141,8 +151,16 @@ fun Gameboard(
                 }
             }
         }
+        // Show toast on first render (test Pasch)
+        LaunchedEffect(showTestToast.value) {
+            if (showTestToast.value) {
+                Toast.makeText(context, "🎉 Pasch gewürfelt!", Toast.LENGTH_SHORT).show()
+                showTestToast.value = false
+            }
+        }
     }
 }
+
 
 /**
  * 0 = Start-Tile
@@ -151,15 +169,15 @@ fun Gameboard(
 fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
         row == 10 && col == 10 -> 0   // Bottom-right corner (Start)
-        row == 10 && col == 0  -> 10  // Bottom-left corner
-        row == 0  && col == 0  -> 20  // Top-left corner
-        row == 0  && col == 10 -> 30  // Top-right corner
+        row == 10 && col == 0 -> 10  // Bottom-left corner
+        row == 0 && col == 0 -> 20  // Top-left corner
+        row == 0 && col == 10 -> 30  // Top-right corner
 
         row == 10 -> if (col in 1..9) 10 - col else -1
-        col == 0  -> if (row in 1..9) 10 + (10 - row) else -1
-        row == 0  -> if (col in 1..9) 20 + col else -1
+        col == 0 -> if (row in 1..9) 10 + (10 - row) else -1
+        row == 0 -> if (col in 1..9) 20 + col else -1
         col == 10 -> if (row in 1..9) 30 + row else -1
 
-        else      -> -1
+        else -> -1
     }
 }
