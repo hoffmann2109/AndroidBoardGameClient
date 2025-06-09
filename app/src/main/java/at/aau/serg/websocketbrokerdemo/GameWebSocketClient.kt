@@ -73,8 +73,9 @@ class GameWebSocketClient(
         onHasWon = { winnerId -> onHasWon(winnerId) },
         onMessageReceived = { text -> onMessageReceived(text) },
         onDealProposal = { dealProposal -> onDealProposal(dealProposal) },
-        onGiveUpReceived = onGiveUpReceived,
-        onDealResponse = { dealResponse -> onDealResponse(dealResponse) }
+        onGiveUpReceived = { givingUpUserId -> onGiveUpReceived(givingUpUserId) },
+        onDealResponse = { dealResponse -> onDealResponse(dealResponse) },
+        onReset = { logicHandler.sendInitMessage() }
     )
 
     private val serverUrl: String = loadServerUrl(context)
