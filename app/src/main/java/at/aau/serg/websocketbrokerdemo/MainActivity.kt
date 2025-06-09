@@ -257,6 +257,7 @@ class MainActivity : ComponentActivity() {
                         webSocketClient.close()
                         log = "Logs:\n" // Clear the log
                         log += "Disconnected from server\n"
+                        gameEvents.add("⚠️ Disconnected from server.")
                     },
                     onSendMessage = {
                         if (message.isNotEmpty()) {
