@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -53,6 +54,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MonopolyWebSocketApp() {
         val context = LocalContext.current
+        fun showToast(message: String) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
         var showHelp by remember { mutableStateOf(false) }
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
@@ -252,12 +256,13 @@ class MainActivity : ComponentActivity() {
                     log = log,
                     playerCount = playerCount,
                     onMessageChange = { message = it },
-                    onConnect = { webSocketClient.connect() },
+                    onConnect = { webSocketClient.connect()
+                        showToast("✅ Connection with the server")},
                     onDisconnect = {
                         webSocketClient.close()
                         log = "Logs:\n" // Clear the log
                         log += "Disconnected from server\n"
-                        gameEvents.add("⚠️ Disconnected from server.")
+                        showToast("⚠️ Disconnected from server.")
                     },
                     onSendMessage = {
                         if (message.isNotEmpty()) {
