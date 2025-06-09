@@ -26,7 +26,8 @@ fun Gameboard(
     modifier: Modifier = Modifier,
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
-    cheatFlags: Map<String, Boolean>
+    cheatFlags: Map<String, Boolean>,
+    avatarMap: Map<String, Int> = emptyMap()
 ) {
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f
@@ -108,13 +109,21 @@ fun Gameboard(
                                 Box(modifier = Modifier.fillMaxSize(0.8f)) {
                                     playersOnTile.forEachIndexed { idxOnTile, player ->
                                         // find which slot this player is in (0–3)
-                                        val slotIndex = players.indexOfFirst { it.id == player.id }
                                         val cheated = cheatFlags[player.id] == true
+                                        val baseAvatar = avatarMap[player.id] ?: R.drawable.player_red // fallback normal
 
-                                        val imageRes = if (cheated)
-                                            cheatImages.getOrElse(slotIndex) { playerImages[slotIndex] }
-                                        else
-                                            playerImages.getOrElse(slotIndex) { playerImages[0] }
+                                        val imageRes = if (cheated) {
+                                            when (baseAvatar) {
+                                                R.drawable.player_red -> R.drawable.player_red_cheat
+                                                R.drawable.player_blue -> R.drawable.player_blue_cheat
+                                                R.drawable.player_green -> R.drawable.player_green_cheat
+                                                R.drawable.player_yellow -> R.drawable.player_yellow_cheat
+                                                else -> R.drawable.player_red_cheat
+                                            }
+                                        } else {
+                                            baseAvatar
+                                        }
+
 
                                         // Apply offsets only if multiple game pieces are on a tile
                                         val applyOffset = if (playersOnTile.size > 1)

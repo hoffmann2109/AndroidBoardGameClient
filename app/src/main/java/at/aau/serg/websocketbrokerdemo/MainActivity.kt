@@ -39,6 +39,7 @@ import at.aau.serg.websocketbrokerdemo.ui.GameHelp
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
+import com.example.myapplication.R
 import kotlinx.coroutines.delay
 
 import kotlinx.coroutines.launch
@@ -82,10 +83,20 @@ class MainActivity : ComponentActivity() {
         var drawnCardDesc by remember { mutableStateOf<String?>(null) }
         var shouldNavigateToLobby by remember { mutableStateOf(false) }
         var hasGivenUp by remember { mutableStateOf(false) }
+        val avatarMap = remember { mutableStateMapOf<String, Int>() }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
         val userId = auth.currentUser?.uid
+
+        val availableAvatars = remember {
+            mutableStateListOf(
+                R.drawable.player_red,
+                R.drawable.player_blue,
+                R.drawable.player_green,
+                R.drawable.player_yellow
+            )
+        }
 
         // Show passed GO alert for 3 seconds
         LaunchedEffect(showPassedGoAlert) {
@@ -114,6 +125,12 @@ class MainActivity : ComponentActivity() {
                 currentGamePlayerId = playerMoneyList.find { it.id == userId }?.id
                     ?: playerMoneyList.firstOrNull()?.id
                             ?: userId // Fallback to Firebase ID if no players exist yet
+            }
+            //Figurzuweisung gleich hier machen
+            playerMoneyList.forEach { player ->
+                if (avatarMap[player.id] == null && availableAvatars.isNotEmpty()) {
+                    avatarMap[player.id] = availableAvatars.removeAt(0)
+                }
             }
         }
 
@@ -311,6 +328,7 @@ class MainActivity : ComponentActivity() {
 
                 PlayboardScreen(
                     players = playerMoneyList,
+                    avatarMap = avatarMap,
                     currentPlayerId = currentGamePlayerId ?: "",
                     onRollDice = { webSocketClient.sendMessage("Roll") },
                     onBackToLobby = { navController.navigate("lobby") },
