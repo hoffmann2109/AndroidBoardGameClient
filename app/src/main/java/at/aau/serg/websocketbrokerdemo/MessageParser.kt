@@ -22,7 +22,7 @@ class MessageParser(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val onPropertyBought: (raw: String) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
-    private val onGiveUpReceived: () -> Unit,
+    private val onGiveUpReceived: (userId: String) -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String, cardId: Int) -> Unit,

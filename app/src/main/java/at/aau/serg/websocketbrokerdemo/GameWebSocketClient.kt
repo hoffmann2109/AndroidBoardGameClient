@@ -33,7 +33,7 @@ class GameWebSocketClient(
     private val onClearChat: () -> Unit,
     private val onDealProposal: (DealProposalMessage) -> Unit,
     private val onDealResponse: (DealResponseMessage) -> Unit,
-    private val onGiveUpReceived: () -> Unit
+    private val onGiveUpReceived: (userId: String) -> Unit
     ) {
 
     private val client = OkHttpClient()
