@@ -100,6 +100,7 @@ fun extractPropertyId(message: String): Int {
 @Composable
 fun PlayboardScreen(
     players: List<PlayerMoney>,
+    avatarMap: Map<String, Int>,
     currentPlayerId: String,
     localPlayerId: String,
     onRollDice: () -> Unit,
@@ -280,7 +281,8 @@ fun PlayboardScreen(
                     canBuy = currentPlayer?.position == tilePos
                 },
                 cheatFlags = cheatFlags,
-                players = players
+                players = players,
+                avatarMap = avatarMap
             )
         }
 
@@ -814,6 +816,7 @@ fun PlayboardScreen(
             senderId = localPlayerId,
             allProperties = properties,
             receiver = selectedReceiver,
+            avatarMap = avatarMap,
             onReceiverChange = { selectedReceiver = it },
             onSendDeal = { deal ->
                 val json = Gson().toJson(deal)
@@ -876,6 +879,7 @@ fun PlayboardScreen(
             senderId = localPlayerId,
             allProperties = properties,
             receiver = players.find { it.id == incomingDeal.fromPlayerId },
+            avatarMap = avatarMap,
             initialRequested = incomingDeal.offeredPropertyIds,
             initialOffered = incomingDeal.requestedPropertyIds,
             initialMoney = incomingDeal.offeredMoney,
