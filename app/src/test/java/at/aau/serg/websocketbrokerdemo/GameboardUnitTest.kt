@@ -4,11 +4,10 @@ import androidx.compose.ui.unit.dp
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import at.aau.serg.websocketbrokerdemo.ui.*
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 
 class GameboardUnitTest {
-    var allPositions  = mutableListOf<Int>()
+    private var allPositions  = mutableListOf<Int>()
 
     @BeforeEach
     fun setup(){
