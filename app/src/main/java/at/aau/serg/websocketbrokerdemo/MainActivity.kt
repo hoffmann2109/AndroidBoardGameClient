@@ -35,6 +35,7 @@ import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
 import at.aau.serg.websocketbrokerdemo.ui.GameHelp
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
@@ -193,7 +194,12 @@ class MainActivity : ComponentActivity() {
                 },
                 onDealResponse = { response ->
                     currentDealResponse = response
-                    gameEvents.add("💬 Exchange: ${response.responseType}")
+                    val msg = when (response.responseType) {
+                        DealResponseType.ACCEPT -> "✅ Deal accepted"
+                        DealResponseType.DECLINE -> "❌ Deal declined"
+                        DealResponseType.COUNTER -> "🤝 Counter-proposal sent"
+                    }
+                    gameEvents.add(msg)
                 },
                 onGiveUpReceived = {
                     // GIVE_UP message from the server -> go to lobby
