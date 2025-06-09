@@ -22,7 +22,7 @@ class MessageParser(
     private val onPlayerPassedGo: (playerName: String) -> Unit,
     private val onPropertyBought: (raw: String) -> Unit,
     private val onGameStateReceived: (List<PlayerMoney>) -> Unit,
-    private val onGiveUpReceived: () -> Unit,
+    private val onGiveUpReceived: (userId: String) -> Unit,
     private val onPlayerTurn: (sessionId: String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
     private val onCardDrawn: (playerId: String, cardType: String, description: String, cardId: Int) -> Unit,
@@ -33,6 +33,7 @@ class MessageParser(
     private val onMessageReceived: (text: String) -> Unit,
     private val onDealProposal: (DealProposalMessage) -> Unit,
     private val onDealResponse: (DealResponseMessage) -> Unit,
+    private val onReset: () -> Unit
     ) {
     fun parse(text: String) {
         // 1) TAX_PAYMENT
@@ -185,12 +186,19 @@ class MessageParser(
         try {
             val giveUp = gson.fromJson(text, GiveUpMessage::class.java)
             if (giveUp.type == "GIVE_UP") {
-                onGiveUpReceived()
+                onGiveUpReceived(giveUp.userId)
                 return
             }
         } catch (e: Exception) {
             println("Error parsing GIVE_UP: ${e.message}")
         }
+
+        // 17) RESET
+        if (text.contains("\"type\":\"RESET\"")) {
+            onReset()
+            return
+        }
+
 
         // 16) FALLBACK
         onMessageReceived(text)

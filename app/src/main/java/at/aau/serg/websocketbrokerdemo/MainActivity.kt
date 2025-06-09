@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
         var drawnCardId by remember { mutableStateOf<Int?>(null) }
         var drawnCardDesc by remember { mutableStateOf<String?>(null) }
         var shouldNavigateToLobby by remember { mutableStateOf(false) }
+        var hasGivenUp by remember { mutableStateOf(false) }
 
         // Firebase Auth instance
         val auth = FirebaseAuth.getInstance()
@@ -188,10 +189,14 @@ class MainActivity : ComponentActivity() {
                     showIncomingDialog = true
                 },
                 onDealResponse = { response -> currentDealResponse = response },
-                onGiveUpReceived = {
-                    // GIVE_UP message from the server -> go to lobby
-                    shouldNavigateToLobby = true
+                onGiveUpReceived = { givingUpUserId ->
+                    // Only navigate user who has given up, not everyone
+                    if (givingUpUserId == userId) {
+                        hasGivenUp = true
+                        shouldNavigateToLobby = true
+                    }
                 },
+
                 coroutineDispatcher = Dispatchers.IO
             )
         }

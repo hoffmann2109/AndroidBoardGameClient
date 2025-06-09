@@ -1280,7 +1280,6 @@ fun PropertySetPopup(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Exit", color = Color.White)
                 ownedProperties.forEach { property ->
                     Button(
                         onClick = { 
