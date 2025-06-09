@@ -125,6 +125,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // Create websocket client
+        val gameEvents = remember { mutableStateListOf<String>() }
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
@@ -138,6 +139,9 @@ class MainActivity : ComponentActivity() {
                     if (pid == localPlayerId) {
                         hasRolled = !isPasch
                         hasPasch = isPasch
+                    }
+                    if (isPasch && pid == localPlayerId) {
+                        gameEvents.add("🎉 Double rolled!!")
                     }
                 },
                 onHasWon = { winnerId ->
@@ -187,10 +191,14 @@ class MainActivity : ComponentActivity() {
                     currentDealProposal = proposal
                     showIncomingDialog = true
                 },
-                onDealResponse = { response -> currentDealResponse = response },
+                onDealResponse = { response ->
+                    currentDealResponse = response
+                    gameEvents.add("💬 Exchange: ${response.responseType}")
+                },
                 onGiveUpReceived = {
                     // GIVE_UP message from the server -> go to lobby
                     shouldNavigateToLobby = true
+
                 },
                 coroutineDispatcher = Dispatchers.IO
             )
@@ -330,6 +338,7 @@ class MainActivity : ComponentActivity() {
                     setIncomingDeal = { currentDealProposal = it },
                     showIncomingDialog = showIncomingDialog,
                     setShowIncomingDialog = { showIncomingDialog = it },
+                    gameEvents = gameEvents,
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)

@@ -101,6 +101,7 @@ fun extractPropertyId(message: String): Int {
 fun PlayboardScreen(
     players: List<PlayerMoney>,
     currentPlayerId: String,
+    gameEvents: List<String>,
     localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
@@ -169,6 +170,8 @@ fun PlayboardScreen(
     var ownedProperties by remember { mutableStateOf<List<Property>>(emptyList()) }
 
     var showActionMenu by remember { mutableStateOf(false) }
+
+    val gameEvents = gameEvents
 
 
     // ShakeDetector:

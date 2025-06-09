@@ -31,10 +31,16 @@ fun Gameboard(
     modifier: Modifier = Modifier,
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
-    cheatFlags: Map<String, Boolean>
+    cheatFlags: Map<String, Boolean>,
+    gameEvents: List<String> = emptyList()
 ) {
     val context = LocalContext.current
-    val showTestToast = remember { mutableStateOf(true) }
+    LaunchedEffect(gameEvents) {
+        if (gameEvents.isNotEmpty()) {
+            val latestEvent = gameEvents.last()
+            Toast.makeText(context, latestEvent, Toast.LENGTH_SHORT).show()
+        }
+    }
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f
     val regularFactor = 1f
@@ -149,13 +155,6 @@ fun Gameboard(
                         }
                     }
                 }
-            }
-        }
-        // Show toast on first render (test Pasch)
-        LaunchedEffect(showTestToast.value) {
-            if (showTestToast.value) {
-                Toast.makeText(context, "🎉 Pasch gewürfelt!", Toast.LENGTH_SHORT).show()
-                showTestToast.value = false
             }
         }
     }
