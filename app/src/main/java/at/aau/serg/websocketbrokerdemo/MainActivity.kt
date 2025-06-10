@@ -145,8 +145,13 @@ class MainActivity : ComponentActivity() {
                         hasRolled = !isPasch
                         hasPasch = isPasch
                     }
+
                     if (isPasch && pid == localPlayerId) {
                         gameEvents.add("🎉 Double rolled!!")
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(context, "🎲 Double rolled! You can dice again.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 },
                 onHasWon = { winnerId ->
