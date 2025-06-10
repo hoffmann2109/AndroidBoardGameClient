@@ -38,7 +38,7 @@ fun Gameboard(
     LaunchedEffect(gameEvents) {
         if (gameEvents.isNotEmpty()) {
             val latestEvent = gameEvents.last()
-            Toast.makeText(context, latestEvent, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, latestEvent, Toast.LENGTH_LONG).show()
         }
     }
     // Make the corners bigger like in a real monopoly board

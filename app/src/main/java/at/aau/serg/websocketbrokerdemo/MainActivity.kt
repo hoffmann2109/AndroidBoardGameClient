@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
     fun MonopolyWebSocketApp() {
         val context = LocalContext.current
         fun showToast(message: String) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         }
         var showHelp by remember { mutableStateOf(false) }
         var message by remember { mutableStateOf("") }

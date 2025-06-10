@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -78,6 +79,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.font.FontFamily
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
@@ -101,7 +103,7 @@ fun extractPropertyId(message: String): Int {
 fun PlayboardScreen(
     players: List<PlayerMoney>,
     currentPlayerId: String,
-    gameEvents: List<String>,
+    gameEvents: SnapshotStateList<String>,
     localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
@@ -171,7 +173,6 @@ fun PlayboardScreen(
 
     var showActionMenu by remember { mutableStateOf(false) }
 
-    val gameEvents = gameEvents
 
 
     // ShakeDetector:
@@ -563,7 +564,14 @@ fun PlayboardScreen(
                         if (canBuy && localPlayerId == currentPlayerId) {
                             Button(
                                 onClick = {
+                                    val propertyName = selectedProperty?.name ?: "a property"
+                                    val message = "Purchase confirmed ✅ : $propertyName"
+
                                     webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
+
+                                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                                    gameEvents.add(message)
+
                                     selectedProperty = null
                                     openedByClick = false
                                     canBuy = false
