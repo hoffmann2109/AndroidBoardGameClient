@@ -553,6 +553,8 @@ fun PlayboardScreen(
                     ) {
                         Button(
                             onClick = {
+                                Toast.makeText(context, "❌ Purchase declined", Toast.LENGTH_SHORT).show()
+                                gameEvents.add("❌ Purchase declined")
                                 selectedProperty = null
                                 openedByClick = false
                                 canBuy = false
