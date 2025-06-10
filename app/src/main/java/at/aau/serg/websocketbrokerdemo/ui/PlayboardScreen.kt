@@ -594,6 +594,10 @@ fun PlayboardScreen(
                         ) {
                             Button(
                                 onClick = {
+                                    val msg = "💸 Rent paid for ${selectedProperty?.name ?: "a property"}"
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                    gameEvents.add(msg)
+
                                     webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
                                     rentPaid = true
                                     selectedProperty = null
