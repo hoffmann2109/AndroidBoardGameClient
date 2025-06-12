@@ -17,6 +17,7 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 import java.util.Properties
+import java.util.concurrent.TimeUnit
 
 class GameWebSocketClient(
 
@@ -39,13 +40,23 @@ class GameWebSocketClient(
     private val onGiveUpReceived: () -> Unit
     ) {
 
-    private val client = OkHttpClient()
+   /* private val client = OkHttpClient.Builder()
+        .pingInterval(15, TimeUnit.SECONDS)   // alle 15s ein WebSocket‐Ping
+        .build()*/
+    private val client= OkHttpClient();
     private var webSocket: WebSocket? = null
     private val gson = Gson()
 
     private var players: List<PlayerMoney> = emptyList()
     private var onPlayerTurnListener: ((String) -> Unit)? = null
     private var propertyBoughtListener: ((String) -> Unit)? = null
+    //  wer ist gerade dran?
+    private val _currentTurnId = MutableStateFlow<String?>(null)
+    val    currentTurnId: StateFlow<String?> = _currentTurnId
+
+    private val myPlayerId: String =
+        com.google.firebase.auth.FirebaseAuth.getInstance().currentUser!!.uid
+
 
     private val logicHandler = GameLogicHandler(
         context = context,
@@ -65,8 +76,15 @@ class GameWebSocketClient(
             onGameStateReceived(state)
         },
         onPlayerTurn = { sessionId ->
+            _currentTurnId.value = sessionId      // wer ist dran?
             onPlayerTurn(sessionId)
             onPlayerTurnListener?.invoke(sessionId)
+
+            if (sessionId == myPlayerId) {
+                Log.d("WebSocket", "It's now YOUR turn; session ID = $sessionId")
+            } else {
+                Log.d("WebSocket", "Opponent’s turn: $sessionId")
+            }
         },
         onDiceRolled = { pid, value, manual, isPasch ->
             _lastRoll.value = value      // <-- auch Bot-Würfe!

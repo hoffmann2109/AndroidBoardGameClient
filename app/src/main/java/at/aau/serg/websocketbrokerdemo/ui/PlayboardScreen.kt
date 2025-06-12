@@ -1,5 +1,5 @@
 package at.aau.serg.websocketbrokerdemo.ui
-
+import androidx.compose.runtime.collectAsState
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -100,7 +100,6 @@ fun extractPropertyId(message: String): Int {
 @Composable
 fun PlayboardScreen(
     players: List<PlayerMoney>,
-    currentPlayerId: String,
     localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
@@ -143,7 +142,14 @@ fun PlayboardScreen(
             )
         }
     }
-    val isMyTurn = currentPlayerId == localPlayerId
+
+    val turnId   = webSocketClient.currentTurnId.collectAsState().value
+    val turnPlayer = players.firstOrNull { it.id == turnId }
+    // eigener Zug NUR wenn …
+//   • die ID stimmt UND
+//   • der Spieler **kein** Bot ist
+    val isMyTurn = turnId == localPlayerId && turnPlayer?.bot != true
+
     var turnEnded by remember { mutableStateOf(false) }
     var selectedProperty by remember { mutableStateOf<Property?>(null) }
     var canBuy by remember { mutableStateOf(false) }
@@ -180,7 +186,7 @@ fun PlayboardScreen(
 
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
-        val shakeMsg = ShakeMessage(playerId = currentPlayerId)
+        val shakeMsg = ShakeMessage(playerId = localPlayerId)
         val json = Gson().toJson(shakeMsg)
         webSocketClient.sendMessage(json)
     }
@@ -244,7 +250,7 @@ fun PlayboardScreen(
                 }
                 selectedProperty = landedProperty
                 openedByClick = false
-                canBuy = true
+                canBuy = isMyTurn && landedProperty.ownerId == null
             }
         }
     }
@@ -285,7 +291,9 @@ fun PlayboardScreen(
                     val currentPlayer = players.find { it.id == dicePlayerId }
                     selectedProperty = properties.find { it.position == tilePos }
                     openedByClick = true
-                    canBuy = currentPlayer?.position == tilePos
+                    canBuy = isMyTurn &&
+                            (currentPlayer?.position == tilePos) &&
+                            (selectedProperty?.ownerId == null)
                 },
                 cheatFlags = cheatFlags,
                 players = players
@@ -371,7 +379,7 @@ fun PlayboardScreen(
                             player = player,
                             ownedProperties = properties.filter { it.ownerId == player.id },
                             allProperties = properties,
-                            isCurrentPlayer = player.id == currentPlayerId,
+                            isCurrentPlayer = (player.id == turnId),
                             playerIndex = players.indexOf(player),
                             onPropertySetClicked = { colorSet ->
                                 println("Clicked on color set: $colorSet")
@@ -448,8 +456,8 @@ fun PlayboardScreen(
         }
 
         // Reset wenn neuer Zug
-        LaunchedEffect(currentPlayerId == localPlayerId) {
-            if (currentPlayerId == localPlayerId) {
+        LaunchedEffect(turnId) {
+            if (isMyTurn) {
                 turnEnded = false
                 setHasRolled(false)
                 setHasPasch(false)
@@ -459,14 +467,15 @@ fun PlayboardScreen(
 
         // Popup für Grundstück
         if (selectedProperty != null) {
-            // Automatisch nach 3 Sekunden schließen – nur für Spieler, die NICHT dran sind
-            LaunchedEffect(selectedProperty, localPlayerId == currentPlayerId) {
-                if (selectedProperty != null && localPlayerId != currentPlayerId && !openedByClick) {
-                    delay(3000)
+            // Nur automatisch schließen, wenn es NICHT dein Zug ist
+            LaunchedEffect(selectedProperty, isMyTurn) {
+                if (selectedProperty != null && !isMyTurn && !openedByClick) {
+                    delay(3_000)
                     selectedProperty = null
                     canBuy = false
                 }
             }
+
             val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
 
             AlertDialog(
@@ -536,7 +545,7 @@ fun PlayboardScreen(
                         ) {
                             Text("Exit")
                         }
-                        if (canBuy&& localPlayerId == currentPlayerId) {
+                        if (canBuy&& isMyTurn) {
                             Button(
                                 onClick = {
                                     webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
@@ -556,7 +565,7 @@ fun PlayboardScreen(
                         // Add Pay Rent button if property is owned by another player
                         if (selectedProperty?.ownerId != null &&
                             selectedProperty?.ownerId != localPlayerId &&
-                            localPlayerId == currentPlayerId) {
+                            isMyTurn) {
                             Button(
                                 onClick = {
                                     webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
@@ -717,7 +726,7 @@ fun PlayboardScreen(
                     reverseLayout = true
                 ) {
                     items(chatMessages.reversed()) { entry ->
-                        val isOwnMessage = entry.senderId == currentPlayerId
+                        val isOwnMessage = entry.senderId == localPlayerId
 
                         Row(
                             modifier = Modifier
@@ -772,7 +781,7 @@ fun PlayboardScreen(
                     Button(
                         onClick = {
                             if (chatInput.isNotBlank()) {
-                                webSocketClient.logic().sendChatMessage(currentPlayerId, chatInput)
+                                webSocketClient.logic().sendChatMessage(localPlayerId, chatInput)
                                 chatInput = "" // Nach Senden Eingabefeld leeren
                             }
                         }
@@ -933,7 +942,7 @@ fun PlayboardScreen(
                     Button(
                         onClick = {
                             if (cheatInput.isNotBlank()) {
-                                webSocketClient.logic().sendCheatMessage(currentPlayerId, cheatInput)
+                                webSocketClient.logic().sendCheatMessage(localPlayerId, cheatInput)
                                 cheatInput = "" // Nach Senden Eingabefeld leeren
                             }
                         }
@@ -1007,6 +1016,7 @@ fun PlayerCard(
     onPropertySetClicked: (PropertyColor) -> Unit,
     webSocketClient: GameWebSocketClient
 ) {
+    val displayName = if (player.bot) "${player.name} 🤖" else player.name
     val playerColors = listOf(
         Color(0x80FF0000), // Less saturated Red
         Color(0x800000FF), // Less saturated Blue
@@ -1043,7 +1053,7 @@ fun PlayerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (player.bot) "${player.name} [BOT]" else player.name,
+                    text = displayName,
                     color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -1256,7 +1266,7 @@ fun PropertySetPopup(
                 Text("Exit", color = Color.White)
                 ownedProperties.forEach { property ->
                     Button(
-                        onClick = { 
+                        onClick = {
                             onSellProperty(property.id)
                             onDismiss()
                         },
