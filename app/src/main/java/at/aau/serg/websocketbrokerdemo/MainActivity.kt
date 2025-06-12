@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -40,6 +41,7 @@ import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
 import at.aau.serg.websocketbrokerdemo.ui.WinScreen
 import com.example.myapplication.R
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 
 import kotlinx.coroutines.launch
@@ -136,8 +138,8 @@ class MainActivity : ComponentActivity() {
 
         LaunchedEffect(userId) {
             if (userId != null) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    playerProfile = FirestoreManager.getUserProfile(userId)
+                FirestoreManager.listenToUserProfile(userId) { updatedProfile ->
+                    playerProfile = updatedProfile
                 }
             }
         }
@@ -297,12 +299,40 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("profile") {
+                val context = LocalContext.current
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                var profile by remember { mutableStateOf<PlayerProfile?>(null) }
+                DisposableEffect(userId) {
+                    if (userId != null) {
+                        val listenerRegistration = FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .document(userId)
+                            .addSnapshotListener { snapshot, error ->
+                                if (error != null) {
+                                    Log.e("ProfileScreen", "Listener failed", error)
+                                    return@addSnapshotListener
+                                }
+
+                                if (snapshot != null && snapshot.exists()) {
+                                    profile = snapshot.toObject(PlayerProfile::class.java)
+                                }
+                            }
+                        onDispose {
+                            listenerRegistration.remove()
+                        }
+                    } else {
+                        onDispose { /* nothing */ }
+                    }
+                }
+
                 UserProfileScreen(
-                    playerProfile = playerProfile,
+                    playerProfile = profile,
                     onNameChange = { newName ->
                         CoroutineScope(Dispatchers.IO).launch {
-                            userId?.let { FirestoreManager.updateUserProfileName(it, newName) }
-                            playerProfile = playerProfile?.copy(name = newName)
+                            userId?.let {
+                                FirestoreManager.updateUserProfileName(it, newName)
+                                // Kein manuelles Neuladen nötig – Listener bekommt Update automatisch
+                            }
                         }
                     },
                     onBack = { navController.popBackStack() }
