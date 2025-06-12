@@ -92,6 +92,4 @@ object FirestoreManager : UserProfileProvider{
             }
         }
     }
-
-
 }
