@@ -79,6 +79,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.zIndex
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
@@ -162,6 +163,7 @@ fun PlayboardScreen(
     var cheatInput by remember { mutableStateOf("") }
     var rentPaid by remember { mutableStateOf(false) }
     val amInJail = players.find { it.id == localPlayerId }?.inJail ?: false
+    var timeLeft by remember { mutableStateOf<Int?>(null) }
     val nameColors = listOf(
         Color(0xFFE57373), // Rot
         Color(0xFF64B5F6), // Blau
@@ -465,6 +467,20 @@ fun PlayboardScreen(
             }
         }
 
+        // Timer
+        LaunchedEffect(turnId) {
+            // nur starten, wenn jemand dran ist, der kein Bot ist
+            if (turnId != null && !players.first { it.id == turnId }.bot) {
+                timeLeft = 30
+                while (timeLeft!! > 0) {
+                    delay(1_000)
+                    timeLeft = timeLeft!! - 1
+                }
+            } else {
+                timeLeft = null                     // Bots brauchen keinen Timer
+            }
+        }
+
         // Popup für Grundstück
         if (selectedProperty != null) {
             // Nur automatisch schließen, wenn es NICHT dein Zug ist
@@ -475,6 +491,7 @@ fun PlayboardScreen(
                     canBuy = false
                 }
             }
+
 
             val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
 
@@ -656,6 +673,22 @@ fun PlayboardScreen(
                 }
             }
         }
+
+        //  ⬇️  NEU: Overlay-Timer
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)   // mittig oben
+                .padding(top = 6.dp)
+                .zIndex(1f)                   // ganz oben stapeln
+        ) {
+            timeLeft?.let { secs ->
+                TurnTimer(
+                    seconds  = secs,
+                    modifier = Modifier.size(52.dp)   // ggf. anpassen
+                )
+            }
+        }
+
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -1369,3 +1402,32 @@ fun DiceFace(diceValue: Int?) {
         )
     }
 }
+
+@Composable
+fun TurnTimer(seconds: Int, modifier: Modifier = Modifier) {
+
+
+    val color by animateColorAsState(
+        when {
+            seconds > 20 -> Color(0xFF4CAF50)  // green
+            seconds > 10 -> Color(0xFFFFA000)  // amber
+            else          -> Color(0xFFD32F2F) // red
+        },
+        animationSpec = tween(300)
+    )
+
+    Box(
+        modifier = modifier
+            .size(60.dp)
+            .background(color, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = seconds.toString(),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
+    }
+}
+
