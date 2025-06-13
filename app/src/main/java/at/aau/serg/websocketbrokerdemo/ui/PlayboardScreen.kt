@@ -1310,7 +1310,7 @@ fun PropertySetPopup(
                 Text("Exit", color = Color.White)
                 ownedProperties.forEach { property ->
                     Button(
-                        onClick = { 
+                        onClick = {
                             onSellProperty(property.id)
                             onDismiss()
                         },
