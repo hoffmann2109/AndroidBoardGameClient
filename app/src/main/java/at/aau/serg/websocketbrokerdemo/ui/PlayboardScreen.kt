@@ -194,6 +194,16 @@ fun PlayboardScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        webSocketClient.setPlayerInJailListener { playerId ->
+            if (playerId == localPlayerId) {
+                val msg = "🚓 You ended up in prison!"
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                gameEvents.add(msg)
+            }
+        }
+    }
+
     LaunchedEffect(players, dicePlayerId) {
         val currentPlayer = players.find { it.id == dicePlayerId }
         val newPosition = currentPlayer?.position
