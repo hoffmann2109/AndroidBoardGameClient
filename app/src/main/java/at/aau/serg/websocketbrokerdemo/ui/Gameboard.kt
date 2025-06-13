@@ -32,6 +32,7 @@ fun Gameboard(
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
     cheatFlags: Map<String, Boolean>,
+    avatarMap: Map<String, Int> = emptyMap(),
     gameEvents: List<String> = emptyList()
 ) {
     val context = LocalContext.current
@@ -121,13 +122,21 @@ fun Gameboard(
                                 Box(modifier = Modifier.fillMaxSize(0.8f)) {
                                     playersOnTile.forEachIndexed { idxOnTile, player ->
                                         // find which slot this player is in (0–3)
-                                        val slotIndex = players.indexOfFirst { it.id == player.id }
                                         val cheated = cheatFlags[player.id] == true
+                                        val baseAvatar = avatarMap[player.id] ?: R.drawable.player_red // fallback normal
 
-                                        val imageRes = if (cheated)
-                                            cheatImages.getOrElse(slotIndex) { playerImages[slotIndex] }
-                                        else
-                                            playerImages.getOrElse(slotIndex) { playerImages[0] }
+                                        val imageRes = if (cheated) {
+                                            when (baseAvatar) {
+                                                R.drawable.player_red -> R.drawable.player_red_cheat
+                                                R.drawable.player_blue -> R.drawable.player_blue_cheat
+                                                R.drawable.player_green -> R.drawable.player_green_cheat
+                                                R.drawable.player_yellow -> R.drawable.player_yellow_cheat
+                                                else -> R.drawable.player_red_cheat
+                                            }
+                                        } else {
+                                            baseAvatar
+                                        }
+
 
                                         // Apply offsets only if multiple game pieces are on a tile
                                         val applyOffset = if (playersOnTile.size > 1)
@@ -141,10 +150,7 @@ fun Gameboard(
                                             modifier = Modifier
                                                 .size(tokenSize)
                                                 .align(gridAlignments[idxOnTile])
-                                                .offset(
-                                                    x = applyOffset.first,
-                                                    y = applyOffset.second
-                                                )
+                                                .offset(x = applyOffset.first, y = applyOffset.second)
                                                 .clip(CircleShape)
                                                 .testTag("playerImage_${player.id}"),
                                             contentScale = ContentScale.Fit
@@ -160,7 +166,6 @@ fun Gameboard(
     }
 }
 
-
 /**
  * 0 = Start-Tile
  * Indices are increased clockwise (0-39)
@@ -168,15 +173,15 @@ fun Gameboard(
 fun calculateTilePosition(row: Int, col: Int): Int {
     return when {
         row == 10 && col == 10 -> 0   // Bottom-right corner (Start)
-        row == 10 && col == 0 -> 10  // Bottom-left corner
-        row == 0 && col == 0 -> 20  // Top-left corner
-        row == 0 && col == 10 -> 30  // Top-right corner
+        row == 10 && col == 0  -> 10  // Bottom-left corner
+        row == 0  && col == 0  -> 20  // Top-left corner
+        row == 0  && col == 10 -> 30  // Top-right corner
 
         row == 10 -> if (col in 1..9) 10 - col else -1
-        col == 0 -> if (row in 1..9) 10 + (10 - row) else -1
-        row == 0 -> if (col in 1..9) 20 + col else -1
+        col == 0  -> if (row in 1..9) 10 + (10 - row) else -1
+        row == 0  -> if (col in 1..9) 20 + col else -1
         col == 10 -> if (row in 1..9) 30 + row else -1
 
-        else -> -1
+        else      -> -1
     }
 }

@@ -46,10 +46,12 @@ class PassingGoTest {
     fun testPassingGoAlertShowsCorrectly() {
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -92,10 +94,12 @@ class PassingGoTest {
         var showAlert = true
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -137,6 +141,7 @@ class PassingGoTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -177,10 +182,12 @@ class PassingGoTest {
     fun testPropertyCardShowsAfterGoAlert() = runTest {
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -228,10 +235,12 @@ class PassingGoTest {
         val initialMoney = 1500
         val testPlayer = PlayerMoney("test-id", "Test Player", initialMoney, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
