@@ -56,19 +56,6 @@ fun Gameboard(
     )
 
     //Changed the circles to pictures
-    val playerImages = listOf(
-        R.drawable.player_red,
-        R.drawable.player_blue,
-        R.drawable.player_green,
-        R.drawable.player_yellow
-    )
-    val cheatImages = listOf(
-        R.drawable.player_red_cheat,
-        R.drawable.player_blue_cheat,
-        R.drawable.player_green_cheat,
-        R.drawable.player_yellow_cheat
-    )
-
     val boardPainter = painterResource(R.drawable.monopoly_board)
 
     Box(
