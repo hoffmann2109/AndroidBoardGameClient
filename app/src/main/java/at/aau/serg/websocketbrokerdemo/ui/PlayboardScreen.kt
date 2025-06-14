@@ -749,7 +749,7 @@ fun PlayboardScreen(
                 onClick = { chatOpen = false },
                 modifier = Modifier.align(Alignment.TopStart)
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
             }
             Column(
                 modifier = Modifier
@@ -942,7 +942,7 @@ fun PlayboardScreen(
                 onClick = { cheatTerminalOpen = false },
                 modifier = Modifier.align(Alignment.TopStart)
             ) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color(0xFFCCFF90))
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color(0xFFCCFF90))
             }
             Column(
                 modifier = Modifier

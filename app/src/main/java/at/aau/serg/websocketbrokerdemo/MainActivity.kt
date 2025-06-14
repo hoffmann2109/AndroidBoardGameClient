@@ -327,7 +327,6 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("profile") {
-                val context = LocalContext.current
                 val userId = FirebaseAuth.getInstance().currentUser?.uid
                 var profile by remember { mutableStateOf<PlayerProfile?>(null) }
                 DisposableEffect(userId) {
