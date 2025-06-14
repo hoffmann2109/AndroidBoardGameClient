@@ -20,6 +20,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
+import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun Gameboard(
@@ -27,8 +32,16 @@ fun Gameboard(
     onTileClick: (tilePosition: Int) -> Unit = {},
     players: List<PlayerMoney> = emptyList(),
     cheatFlags: Map<String, Boolean>,
-    avatarMap: Map<String, Int> = emptyMap()
+    avatarMap: Map<String, Int> = emptyMap(),
+    gameEvents: List<String> = emptyList()
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(gameEvents) {
+        if (gameEvents.isNotEmpty()) {
+            val latestEvent = gameEvents.last()
+            Toast.makeText(context, latestEvent, Toast.LENGTH_LONG).show()
+        }
+    }
     // Make the corners bigger like in a real monopoly board
     val cornerFactor = 1.5f
     val regularFactor = 1f

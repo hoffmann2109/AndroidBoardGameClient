@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -78,6 +79,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.text.font.FontFamily
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
@@ -102,6 +104,7 @@ fun PlayboardScreen(
     players: List<PlayerMoney>,
     avatarMap: Map<String, Int>,
     currentPlayerId: String,
+    gameEvents: SnapshotStateList<String>,
     localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
@@ -172,6 +175,7 @@ fun PlayboardScreen(
     var showActionMenu by remember { mutableStateOf(false) }
 
 
+
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
         val shakeMsg = ShakeMessage(playerId = currentPlayerId)
@@ -188,6 +192,16 @@ fun PlayboardScreen(
         webSocketClient.setDealProposalListener {
             setIncomingDeal(it)
             setShowIncomingDialog(true)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        webSocketClient.setPlayerInJailListener { playerId ->
+            if (playerId == localPlayerId) {
+                val msg = "🚓 You ended up in prison!"
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                gameEvents.add(msg)
+            }
         }
     }
 
@@ -551,6 +565,8 @@ fun PlayboardScreen(
                     ) {
                         Button(
                             onClick = {
+                                Toast.makeText(context, "❌ Purchase declined", Toast.LENGTH_SHORT).show()
+                                gameEvents.add("❌ Purchase declined")
                                 selectedProperty = null
                                 openedByClick = false
                                 canBuy = false
@@ -562,7 +578,14 @@ fun PlayboardScreen(
                         if (canBuy && localPlayerId == currentPlayerId) {
                             Button(
                                 onClick = {
+                                    val propertyName = selectedProperty?.name ?: "a property"
+                                    val message = "Purchase confirmed ✅ : $propertyName"
+
                                     webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
+
+                                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                                    gameEvents.add(message)
+
                                     selectedProperty = null
                                     openedByClick = false
                                     canBuy = false
@@ -583,6 +606,10 @@ fun PlayboardScreen(
                         ) {
                             Button(
                                 onClick = {
+                                    val msg = "💸 Rent paid for ${selectedProperty?.name ?: "a property"}"
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                    gameEvents.add(msg)
+
                                     webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
                                     rentPaid = true
                                     selectedProperty = null
@@ -1286,7 +1313,7 @@ fun PropertySetPopup(
             ) {
                 ownedProperties.forEach { property ->
                     Button(
-                        onClick = { 
+                        onClick = {
                             onSellProperty(property.id)
                             onDismiss()
                         },
