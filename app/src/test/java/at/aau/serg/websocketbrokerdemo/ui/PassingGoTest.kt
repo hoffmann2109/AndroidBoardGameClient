@@ -9,6 +9,7 @@ import org.junit.Test
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.delay
 import android.content.Context
+import androidx.compose.runtime.mutableStateListOf
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import io.mockk.mockk
@@ -22,6 +23,8 @@ class PassingGoTest {
     private val mockContext = mockk<Context>(relaxed = true)
     private val emptyChat = emptyList<ChatEntry>()
     private val emptyCheat = emptyList<CheatEntry>()
+    private val gameEvents = mutableStateListOf<String>()
+
     private val mockWebSocketClient = GameWebSocketClient(
         context = mockContext,
         onConnected = { /* No-op for testing */ },
@@ -46,12 +49,10 @@ class PassingGoTest {
     fun testPassingGoAlertShowsCorrectly() {
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
-        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
-                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -80,7 +81,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -94,12 +97,10 @@ class PassingGoTest {
         var showAlert = true
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
-        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
-                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -128,7 +129,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -141,7 +144,6 @@ class PassingGoTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
-                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -170,7 +172,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -182,12 +186,10 @@ class PassingGoTest {
     fun testPropertyCardShowsAfterGoAlert() = runTest {
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
-        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
-                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -216,7 +218,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -235,12 +239,10 @@ class PassingGoTest {
         val initialMoney = 1500
         val testPlayer = PlayerMoney("test-id", "Test Player", initialMoney, 0)
         val players = listOf(testPlayer)
-        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
-                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -269,7 +271,9 @@ class PassingGoTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
