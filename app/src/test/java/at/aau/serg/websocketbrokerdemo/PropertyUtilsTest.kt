@@ -2,7 +2,6 @@ package at.aau.serg.websocketbrokerdemo
 
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
-import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
 import at.aau.serg.websocketbrokerdemo.ui.checkCompleteSet
 import at.aau.serg.websocketbrokerdemo.ui.getColorForPosition
 import org.junit.Assert.*
