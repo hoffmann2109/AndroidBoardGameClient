@@ -134,7 +134,7 @@ class GameLogicHandler(
 
     fun sellProperty(propertyId: Int) {
         val currentUser = FirebaseAuth.getInstance().currentUser
-        currentUser?.uid?.let { userId ->
+        currentUser?.uid?.let {
             val message = "SELL_PROPERTY:$propertyId"
             sendMessage(message)
             Log.d("GameLogic", "Sent sell property message: $message")

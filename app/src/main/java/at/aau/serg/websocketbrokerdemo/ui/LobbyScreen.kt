@@ -1,3 +1,4 @@
+//Lobby Screen
 package at.aau.serg.websocketbrokerdemo.ui
 
 import androidx.compose.animation.AnimatedVisibility
@@ -57,8 +58,9 @@ fun LobbyScreen(
     onStatisticsClick: () -> Unit,
     onLeaderboardClick: () -> Unit,
     onJoinGame: () -> Unit,
-    onOpenSettings:() -> Unit,
-    onOpenSoundSelection:() -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenSoundSelection: () -> Unit,
+    onHelpClick: () -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
     var showDisconnectIcon by remember { mutableStateOf(false) }
@@ -108,11 +110,19 @@ fun LobbyScreen(
                     wifiIconSize = 220.dp // Vergrößern des WiFi-Symbols
                     onDisconnect()
                 }
-                AnimatedButton(text = "Send Message", color = Color(0xFF0074cc), onClick = onSendMessage)
+                AnimatedButton(
+                    text = "Send Message",
+                    color = Color(0xFF0074cc),
+                    onClick = onSendMessage
+                )
                 AnimatedButton(text = "Logout", color = Color.Red, onClick = onLogout)
                 AnimatedButton(text = "Profile", color = Color.Blue, onClick = onProfileClick)
                 AnimatedButton(text = "Statistics", color = Color.Blue, onClick = onStatisticsClick)
-                AnimatedButton(text = "Leaderboard", color = Color.Blue, onClick = onLeaderboardClick)
+                AnimatedButton(
+                    text = "Leaderboard",
+                    color = Color.Blue,
+                    onClick = onLeaderboardClick
+                )
 
 
                 // Join Game button
@@ -126,14 +136,24 @@ fun LobbyScreen(
                     enabled = joinEnabled,
                     onClick = { if (joinEnabled) onJoinGame() }
                 )
-                AnimatedButton(text = "️Settings", color = Color(0xFF4CAF50), onClick = onOpenSettings)
+                AnimatedButton(
+                    text = "️Settings",
+                    color = Color(0xFF4CAF50),
+                    onClick = onOpenSettings
+                )
             }
 
             // WiFi Icon Animation (Connect)
             AnimatedVisibility(
                 visible = showWifiIcon,
-                enter = fadeIn(animationSpec = tween(500)) + scaleIn(initialScale = 0.5f, animationSpec = tween(500)),
-                exit = fadeOut(animationSpec = tween(500)) + scaleOut(targetScale = 0.5f, animationSpec = tween(500))
+                enter = fadeIn(animationSpec = tween(500)) + scaleIn(
+                    initialScale = 0.5f,
+                    animationSpec = tween(500)
+                ),
+                exit = fadeOut(animationSpec = tween(500)) + scaleOut(
+                    targetScale = 0.5f,
+                    animationSpec = tween(500)
+                )
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.wifi_icon),
@@ -147,8 +167,14 @@ fun LobbyScreen(
             // Disconnect Icon Animation
             AnimatedVisibility(
                 visible = showDisconnectIcon,
-                enter = fadeIn(animationSpec = tween(500)) + scaleIn(initialScale = 0.5f, animationSpec = tween(500)),
-                exit = fadeOut(animationSpec = tween(500)) + scaleOut(targetScale = 0.5f, animationSpec = tween(500))
+                enter = fadeIn(animationSpec = tween(500)) + scaleIn(
+                    initialScale = 0.5f,
+                    animationSpec = tween(500)
+                ),
+                exit = fadeOut(animationSpec = tween(500)) + scaleOut(
+                    targetScale = 0.5f,
+                    animationSpec = tween(500)
+                )
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.wifi_notconnected), // Hier das neue Disconnect-Symbol
@@ -171,6 +197,14 @@ fun LobbyScreen(
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Button(
+                onClick = onHelpClick,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text("❓ Hilfe / Regeln", fontSize = 14.sp)
+            }
         }
     }
 

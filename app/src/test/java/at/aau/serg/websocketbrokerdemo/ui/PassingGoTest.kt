@@ -8,14 +8,12 @@ import org.junit.Rule
 import org.junit.Test
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.delay
-import org.junit.Assert.*
 import android.content.Context
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
-import org.junit.jupiter.api.Assertions
-import kotlin.String
+
 
 class PassingGoTest {
     @get:Rule
@@ -48,10 +46,12 @@ class PassingGoTest {
     fun testPassingGoAlertShowsCorrectly() {
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -72,10 +72,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -98,10 +94,12 @@ class PassingGoTest {
         var showAlert = true
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -122,10 +120,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -147,6 +141,7 @@ class PassingGoTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -167,10 +162,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -191,10 +182,12 @@ class PassingGoTest {
     fun testPropertyCardShowsAfterGoAlert() = runTest {
         val testPlayer = PlayerMoney("test-id", "Test Player", 1500, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -215,10 +208,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},
@@ -246,10 +235,12 @@ class PassingGoTest {
         val initialMoney = 1500
         val testPlayer = PlayerMoney("test-id", "Test Player", initialMoney, 0)
         val players = listOf(testPlayer)
+        val avatarMap = mapOf("test-id" to 0)
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
+                avatarMap = avatarMap,
                 currentPlayerId = "test-id",
                 localPlayerId = "test-id",
                 onRollDice = {},
@@ -270,10 +261,6 @@ class PassingGoTest {
                 taxPaymentAmount = 0,
                 taxPaymentType = "",
                 cheatFlags = emptyMap(),
-                currentDealProposal = null,
-                setCurrentDealProposal = {},
-                currentDealResponse = null,
-                setCurrentDealResponse = {},
                 incomingDeal = null,
                 showIncomingDialog = false,
                 setIncomingDeal = {},

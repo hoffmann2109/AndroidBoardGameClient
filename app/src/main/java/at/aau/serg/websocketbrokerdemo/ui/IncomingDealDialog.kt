@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -29,6 +31,7 @@ fun IncomingDealDialog(
     senderName: String,
     receiverProperties: List<Int>,
     allProperties: List<Property>,
+    isMyTurn: Boolean,
     onAccept: () -> Unit,
     onDecline: () -> Unit,
     onCounter: () -> Unit
@@ -40,7 +43,9 @@ fun IncomingDealDialog(
 
     AlertDialog(
         onDismissRequest = onDecline,
-        title = { Text("Incoming Deal") },
+        title = {
+            Text("Incoming Deal")
+        },
         text = {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 Text("$senderName offers you a deal:")
@@ -91,20 +96,37 @@ fun IncomingDealDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onAccept) {
-                Text("Accept")
+            Button(
+                onClick = onAccept,
+                enabled = isMyTurn,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isMyTurn) Color(0xFF4CAF50) else Color.LightGray
+                )
+            ) {
+                Text("Accept", color = if (isMyTurn) Color.White else Color.DarkGray)
             }
         },
         dismissButton = {
             Row {
-                Button(onClick = onDecline) {
-                    Text("Decline")
+                Button(
+                    onClick = onDecline,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text("Decline", color = Color.White)
                 }
-                Spacer(Modifier.width(8.dp))
-                Button(onClick = onCounter) {
-                    Text("Counter")
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(
+                    onClick = onCounter,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isMyTurn) Color(0xFFFF9800) else Color.LightGray)
+                ) {
+                    Text("Counter", color = if (isMyTurn) Color.White else Color.DarkGray)
                 }
             }
         }
     )
 }
+
+

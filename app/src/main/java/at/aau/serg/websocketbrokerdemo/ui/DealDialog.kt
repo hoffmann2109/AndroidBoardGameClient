@@ -2,7 +2,6 @@ package at.aau.serg.websocketbrokerdemo.ui
 
 import android.content.Context
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
@@ -30,7 +29,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,6 +44,7 @@ fun DealDialog(
     senderId: String,
     allProperties: List<Property>,
     receiver: PlayerMoney?,
+    avatarMap: Map<String, Int>,
     initialRequested: List<Int> = emptyList(),
     initialOffered: List<Int> = emptyList(),
     initialMoney: Int = 0,
@@ -95,21 +94,16 @@ fun DealDialog(
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        val playerImages = listOf(
-                            R.drawable.player_red,
-                            R.drawable.player_blue,
-                            R.drawable.player_green,
-                            R.drawable.player_yellow
-                        )
+                        players.forEach { player ->
+                            val imageRes = avatarMap[player.id] ?: R.drawable.player_red
 
-                        players.forEachIndexed { index, player ->
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(player.name)
 
                                 Spacer(Modifier.height(4.dp))
 
                                 Image(
-                                    painter = painterResource(id = playerImages.getOrElse(index) { playerImages[0] }),
+                                    painter = painterResource(id = imageRes),
                                     contentDescription = "${player.name}'s figure",
                                     modifier = Modifier
                                         .size(64.dp)
@@ -221,7 +215,6 @@ fun DealPropertyRow(
                     modifier = Modifier
                         .size(100.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(Color.LightGray)
                         .clickable { onToggle(property.id, !isSelected) }
                 ) {
                     if (imageResId != 0) {
@@ -229,7 +222,7 @@ fun DealPropertyRow(
                             painter = painterResource(id = imageResId),
                             contentDescription = property.name,
                             modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop,
+                            contentScale = ContentScale.Fit,
                             alpha = if (isSelected) 1f else 0.4f
                         )
                     } else {

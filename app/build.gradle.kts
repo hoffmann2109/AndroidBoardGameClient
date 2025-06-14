@@ -195,7 +195,7 @@ sonar {
         property(
             "sonar.coverage.jacoco.xmlReportPaths",
             "${project.projectDir}/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml," +
-            "${project.projectDir}/build/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"
+                    "${project.projectDir}/build/reports/jacoco/jacocoAndroidTestReport/jacocoAndroidTestReport.xml"
         )
     }
 }
@@ -210,7 +210,7 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
-    
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.constraintlayout)

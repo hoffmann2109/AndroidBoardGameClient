@@ -6,7 +6,6 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
-import java.util.Date
 
 object FirestoreManager : UserProfileProvider{
     private val db = FirebaseFirestore.getInstance()
@@ -77,4 +76,20 @@ object FirestoreManager : UserProfileProvider{
         }
     }
 
+    fun listenToUserProfile(userId: String, onProfileChanged: (PlayerProfile?) -> Unit) {
+        val docRef = FirebaseFirestore.getInstance().collection("users").document(userId)
+        docRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.e("FirestoreManager", "Listen failed.", error)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                val profile = snapshot.toObject(PlayerProfile::class.java)
+                onProfileChanged(profile)
+            } else {
+                onProfileChanged(null)
+            }
+        }
+    }
 }
