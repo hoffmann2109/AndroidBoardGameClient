@@ -1,6 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
-import com.example.myapplication.R
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -20,11 +22,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import android.widget.Toast
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import at.aau.serg.websocketbrokerdemo.logic.TilePositionCalculator
+import com.example.myapplication.R
+
 
 @Composable
 fun Gameboard(
@@ -83,7 +83,7 @@ fun Gameboard(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     repeat(11) { col ->
-                        val tilePos = calculateTilePosition(row, col)
+                        val tilePos = TilePositionCalculator.calculateTilePosition(row, col)
                         val playersOnTile = players.filter { it.position == tilePos }
                         val isCorner = (row == 0 || row == 10) && (col == 0 || col == 10)
                         val tileWeight = if (isCorner) cornerFactor else regularFactor
@@ -150,25 +150,5 @@ fun Gameboard(
                 }
             }
         }
-    }
-}
-
-/**
- * 0 = Start-Tile
- * Indices are increased clockwise (0-39)
- */
-fun calculateTilePosition(row: Int, col: Int): Int {
-    return when {
-        row == 10 && col == 10 -> 0   // Bottom-right corner (Start)
-        row == 10 && col == 0  -> 10  // Bottom-left corner
-        row == 0  && col == 0  -> 20  // Top-left corner
-        row == 0  && col == 10 -> 30  // Top-right corner
-
-        row == 10 -> if (col in 1..9) 10 - col else -1
-        col == 0  -> if (row in 1..9) 10 + (10 - row) else -1
-        row == 0  -> if (col in 1..9) 20 + col else -1
-        col == 10 -> if (row in 1..9) 30 + row else -1
-
-        else      -> -1
     }
 }
