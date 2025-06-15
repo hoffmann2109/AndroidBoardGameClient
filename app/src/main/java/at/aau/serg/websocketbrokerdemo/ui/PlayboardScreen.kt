@@ -1,30 +1,13 @@
 package at.aau.serg.websocketbrokerdemo.ui
-import androidx.compose.runtime.collectAsState
+
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
-import kotlinx.coroutines.delay
-import at.aau.serg.websocketbrokerdemo.data.properties.Property
-import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -43,49 +26,68 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import at.aau.serg.websocketbrokerdemo.GameWebSocketClient
 import at.aau.serg.websocketbrokerdemo.data.ChatEntry
-import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
-import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
-import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.zIndex
+import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
-import com.google.gson.Gson
-import at.aau.serg.websocketbrokerdemo.logic.ShakeDetector
 import at.aau.serg.websocketbrokerdemo.data.messages.ShakeMessage
+import at.aau.serg.websocketbrokerdemo.data.properties.Property
+import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
+import at.aau.serg.websocketbrokerdemo.data.properties.PropertyViewModel
+import at.aau.serg.websocketbrokerdemo.data.properties.getDrawableIdFromName
+import at.aau.serg.websocketbrokerdemo.logic.ShakeDetector
+import com.google.gson.Gson
+import kotlinx.coroutines.delay
 
 
 fun extractPlayerId(message: String): String {
@@ -103,6 +105,7 @@ fun PlayboardScreen(
     players: List<PlayerMoney>,
     avatarMap: Map<String, Int>,
     currentPlayerId: String,
+    gameEvents: SnapshotStateList<String>,
     localPlayerId: String,
     onRollDice: () -> Unit,
     onBackToLobby: () -> Unit,
@@ -130,7 +133,7 @@ fun PlayboardScreen(
     drawnCardType: String?,         // "CHANCE" or "COMMUNITY_CHEST"
     drawnCardId:   Int?,            // e.g. 1..8
     drawnCardDesc: String?,         // the description (fallback) if drawable not found
-    onCardDialogDismiss: () -> Unit, // called to clear the popup
+    onCardDialogDismiss: () -> Unit // called to clear the popup
 ) {
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
@@ -182,6 +185,7 @@ fun PlayboardScreen(
     var showActionMenu by remember { mutableStateOf(false) }
 
 
+
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
         val shakeMsg = ShakeMessage(playerId = localPlayerId)
@@ -198,6 +202,16 @@ fun PlayboardScreen(
         webSocketClient.setDealProposalListener {
             setIncomingDeal(it)
             setShowIncomingDialog(true)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        webSocketClient.setPlayerInJailListener { playerId ->
+            if (playerId == localPlayerId) {
+                val msg = "🚓 You ended up in prison!"
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                gameEvents.add(msg)
+            }
         }
     }
 
@@ -516,7 +530,7 @@ fun PlayboardScreen(
             // Nur automatisch schließen, wenn es NICHT dein Zug ist
             LaunchedEffect(selectedProperty, isMyTurnEvenIfBot, openedByClick) {
                 if (selectedProperty != null && !isMyTurnEvenIfBot && !openedByClick) {
-                    delay(4500) // insgesamt 3s + 1.5s = 4.5s Warten
+                    delay(1500) // insgesamt 3s + 1.5s = 4.5s Warten
                     selectedProperty = null
                     canBuy = false
                 }
@@ -525,156 +539,167 @@ fun PlayboardScreen(
 
                     val imageResId = getDrawableIdFromName(selectedProperty!!.image, context)
 
-                    AlertDialog(
-                        modifier = Modifier
-                            .width(300.dp)
-                            .height(400.dp),
-                        onDismissRequest = {
-                            selectedProperty = null
-                            openedByClick = false
-                            canBuy = false
-                        },
-                        title = {
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = selectedProperty!!.name,
-                                    style = TextStyle(
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-                        },
-                        text = {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(300.dp),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                if (imageResId != 0) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(250.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Image(
-                                            painter = painterResource(imageResId),
-                                            contentDescription = selectedProperty!!.name,
-                                            contentScale = ContentScale.Fit,
-                                            modifier = Modifier
-                                                .width(180.dp)
-                                                .height(240.dp)
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                        confirmButton = {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly
-                            ) {
-                                Button(
-                                    onClick = {
-                                        selectedProperty = null
-                                        openedByClick = false
-                                        canBuy = false
-                                    },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(
-                                            0xFF0074cc
-                                        )
-                                    )
-                                ) {
-                                    Text("Exit")
-                                }
-                                if (canBuy && isMyTurn) {
-                                    Button(
-                                        onClick = {
-                                            webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
-                                            selectedProperty = null
-                                            openedByClick = false
-                                            canBuy = false
-                                        },
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(
-                                                0xFF0074cc
-                                            )
-                                        )
-                                    ) {
-                                        Text("Buy")
-                                    }
-                                }
-                                // Add Pay Rent button if property is owned by another player
-                                if (selectedProperty?.ownerId != null &&
-                                    selectedProperty?.ownerId != localPlayerId &&
-                                    isMyTurn
-                                ) {
-                                    Button(
-                                        onClick = {
-                                            webSocketClient.logic()
-                                                .payRent(selectedProperty?.id ?: -1)
-                                            rentPaid = true
-                                            selectedProperty = null
-                                            openedByClick = false
-                                            canBuy = false
-                                        },
-                                        enabled = !rentPaid,
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = Color(0xFFE57373),
-                                            disabledContainerColor = Color(0xFFBDBDBD)
-                                        )
-                                    ) {
-                                        Text("Pay Rent")
-                                    }
-                                }
-                            }
-                        },
-                        dismissButton = {}
-                    )
-                }
-
-                // Passed GO Alert
-                if (showPassedGoAlert) {
+            AlertDialog(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(400.dp),
+                onDismissRequest = {
+                    selectedProperty = null
+                    openedByClick = false
+                    canBuy = false
+                },
+                title = {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.3f)
-                            .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                        Text(
+                            text = selectedProperty!!.name,
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                },
+                text = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (imageResId != 0) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(250.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(imageResId),
+                                    contentDescription = selectedProperty!!.name,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .width(180.dp)
+                                        .height(240.dp)
+                                )
+                            }
+                        }
+                    }
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+
+                        /* ───────── Exit / Decline ───────── */
+                        if (canBuy && isMyTurn) {
+                            // Spieler könnte kaufen → echter "Decline"-Button
+                            Button(
+                                onClick = {
+                                    Toast.makeText(context, "❌ Purchase declined", Toast.LENGTH_SHORT).show()
+                                    gameEvents.add("❌ Purchase declined")
+                                    selectedProperty = null
+                                    openedByClick    = false
+                                    canBuy           = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                            ) { Text("Decline") }
+                        } else {
+                            // Nur Informations-Dialog (Bot oder fremdes Feld)
+                            Button(
+                                onClick = {
+                                    selectedProperty = null      // einfach schließen
+                                    openedByClick    = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                            ) { Text("Exit") }
+                        }
+
+                        /* ───────── Buy-Button ───────── */
+                        if (canBuy && isMyTurn) {
+                            Button(
+                                onClick = {
+                                    val name = selectedProperty?.name ?: "a property"
+                                    webSocketClient.sendMessage("BUY_PROPERTY:${selectedProperty?.id}")
+                                    Toast.makeText(context, "Purchase confirmed ✅ : $name", Toast.LENGTH_LONG).show()
+                                    gameEvents.add("Purchase confirmed ✅ : $name")
+                                    selectedProperty = null
+                                    openedByClick    = false
+                                    canBuy           = false
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc))
+                            ) { Text("Buy") }
+                        }
+
+                        /* ───────── Pay-Rent-Button ───────── */
+                        if (selectedProperty?.ownerId != null &&
+                            selectedProperty?.ownerId != localPlayerId &&
+                            isMyTurn
                         ) {
-                            Text(
-                                text = "Glückwunsch!",
-                                style = TextStyle(
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
+                            Button(
+                                onClick = {
+                                    val msg = "💸 Rent paid for ${selectedProperty?.name}"
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                    gameEvents.add(msg)
+                                    webSocketClient.logic().payRent(selectedProperty?.id ?: -1)
+                                    rentPaid          = true
+                                    selectedProperty  = null
+                                    openedByClick     = false
+                                },
+                                enabled = !rentPaid,
+                                colors  = ButtonDefaults.buttonColors(
+                                    containerColor        = Color(0xFFE57373),
+                                    disabledContainerColor = Color(0xFFBDBDBD)
                                 )
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "$passedGoPlayerName fuhr über los und erhält 200€!",
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    color = Color.White
-                                )
-                            )
+                            ) { Text("Pay Rent") 
                         }
                     }
                 }
+
+                },
+                dismissButton = {}
+            )
+        }
+
+        // Passed GO Alert
+        if (showPassedGoAlert) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.3f)
+                    .background(Color(0xFF4CAF50).copy(alpha = 0.9f))
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Glückwunsch!",
+                        style = TextStyle(
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "$passedGoPlayerName fuhr über los und erhält 200€!",
+                        style = TextStyle(
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    )
+                }
+            }
+        }
 
                 // Tax Payment Alert
                 if (showTaxPaymentAlert) {
@@ -764,42 +789,38 @@ fun PlayboardScreen(
                 }
             }
 
-            // Chat Overlay
+    // Chat Overlay
 
-            if (chatOpen) {
-                Box(
+    if (chatOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
+                .padding(32.dp)
+        ) {
+            IconButton(
+                onClick = { chatOpen = false },
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.Black)
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                // Nachrichtenliste
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.3f)) // halbtransparenter schwarzer Hintergrund
-                        .padding(32.dp)
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(8.dp),
+                    reverseLayout = true
                 ) {
-                    IconButton(
-                        onClick = { chatOpen = false },
-                        modifier = Modifier.align(Alignment.TopStart)
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.Black
-                        )
-                    }
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxWidth()
-                            .background(Color.White.copy(alpha = 0.85f), RoundedCornerShape(12.dp))
-                            .padding(16.dp)
-                    ) {
-                        // Nachrichtenliste
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .padding(8.dp),
-                            reverseLayout = true
-                        ) {
-                            items(chatMessages.reversed()) { entry ->
-                                val isOwnMessage = entry.senderId == localPlayerId
+                    items(chatMessages.reversed()) { entry ->
+                        val isOwnMessage = entry.senderId == currentPlayerId
 
                                 Row(
                                     modifier = Modifier
@@ -836,9 +857,9 @@ fun PlayboardScreen(
                                 }
                             }
 
-                        }
+                }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                         // Eingabe und Senden
                         Row(
@@ -963,132 +984,127 @@ fun PlayboardScreen(
                 )
             }
 
-            // Cheat Terminal Overview
-            if (cheatTerminalOpen) {
-                Box(
+    // Cheat Terminal Overview
+    if (cheatTerminalOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.65f))
+                .padding(32.dp)
+        ) {
+            // ← Back button in top-left
+            IconButton(
+                onClick = { cheatTerminalOpen = false },
+                modifier = Modifier.align(Alignment.TopStart)
+            ) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color(0xFFCCFF90))
+            }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .background(Color.Black.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
+                    .padding(16.dp)
+            ) {
+                // Nachrichtenliste
+                LazyColumn(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.65f))
-                        .padding(32.dp)
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(8.dp),
+                    reverseLayout = true
                 ) {
-                    // ← Back button in top-left
-                    IconButton(
-                        onClick = { cheatTerminalOpen = false },
-                        modifier = Modifier.align(Alignment.TopStart)
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color(0xFFCCFF90)
+                    items(cheatMessages.reversed()) { entry ->
+                        Text(
+                            text = "${entry.senderName.lowercase()}@monopoly > ${entry.message}",
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 14.sp,
+                            color = Color(0xFF00FF00)
                         )
                     }
-                    Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .fillMaxWidth()
-                            .background(Color.Black.copy(alpha = 0.65f), RoundedCornerShape(12.dp))
-                            .padding(16.dp)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Eingabe und Senden
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TextField(
+                        value = cheatInput,
+                        onValueChange = { cheatInput = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = { Text("Type your cheat code...") }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            if (cheatInput.isNotBlank()) {
+                                webSocketClient.logic()
+                                    .sendCheatMessage(currentPlayerId, cheatInput)
+                                cheatInput = "" // Nach Senden Eingabefeld leeren
+                            }
+                        }
                     ) {
-                        // Nachrichtenliste
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .padding(8.dp),
-                            reverseLayout = true
-                        ) {
-                            items(cheatMessages.reversed()) { entry ->
-                                Text(
-                                    text = "${entry.senderName.lowercase()}@monopoly > ${entry.message}",
-                                    fontFamily = FontFamily.Monospace,
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF00FF00)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Eingabe und Senden
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            TextField(
-                                value = cheatInput,
-                                onValueChange = { cheatInput = it },
-                                modifier = Modifier.weight(1f),
-                                placeholder = { Text("Type your cheat code...") }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(
-                                onClick = {
-                                    if (cheatInput.isNotBlank()) {
-                                        webSocketClient.logic()
-                                            .sendCheatMessage(localPlayerId, cheatInput)
-                                        cheatInput = "" // Nach Senden Eingabefeld leeren
-                                    }
-                                }
-                            ) {
-                                Text("Send")
-                            }
-                        }
+                        Text("Send")
                     }
                 }
             }
-            // Popup for CHANCE and COMMUNITY_CHEST
-            if (drawnCardType != null && drawnCardId != null) {
-                // Build the resource name, e.g. "chance_2" or "community_chest_7"
-                val resName = "${drawnCardType.lowercase()}_${drawnCardId}"
-                val imageResId =
-                    context.resources.getIdentifier(resName, "drawable", context.packageName)
-
-                AlertDialog(
-                    onDismissRequest = { onCardDialogDismiss() },
-                    title = {
-                        Text(
-                            text = if (drawnCardType == "CHANCE") "Ereigniskarte" else "Gemeinschaftskarte",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    text = {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            // Show the card image if it exists
-                            if (imageResId != 0) {
-                                Image(
-                                    painter = painterResource(id = imageResId),
-                                    contentDescription = "Card $resName",
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(200.dp)
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    contentScale = ContentScale.Fit
-                                )
-                            } else {
-                                // Fallback
-                                Text(
-                                    text = drawnCardDesc ?: "",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = { onCardDialogDismiss() }
-                        ) {
-                            Text("OK")
-                        }
-                    },
-                    dismissButton = {}
-                )
-            }
         }
+    }
+    // Popup for CHANCE and COMMUNITY_CHEST
+    if (drawnCardType != null && drawnCardId != null) {
+        // Build the resource name, e.g. "chance_2" or "community_chest_7"
+        val resName = "${drawnCardType.lowercase()}_${drawnCardId}"
+        val imageResId = context.resources.getIdentifier(resName, "drawable", context.packageName)
+
+        AlertDialog(
+            onDismissRequest = { onCardDialogDismiss() },
+            title = {
+                Text(
+                    text = if (drawnCardType == "CHANCE") "Ereigniskarte" else "Gemeinschaftskarte",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Show the card image if it exists
+                    if (imageResId != 0) {
+                        Image(
+                            painter = painterResource(id = imageResId),
+                            contentDescription = "Card $resName",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Fit
+                        )
+                    } else {
+                        // Fallback
+                        Text(
+                            text = drawnCardDesc ?: "",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onCardDialogDismiss() }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {}
+        )
+    }
+}
 
 
 
@@ -1170,11 +1186,11 @@ fun PlayboardScreen(
                         )
                     }
 
-                    Text(
-                        text = "ID: ${player.id}",
-                        color = Color.White,
-                        fontSize = 6.sp
-                    )
+            Text(
+                text = "ID: ${player.id}",
+                color = Color.White,
+                fontSize = 6.sp
+            )
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 4.dp),
@@ -1242,226 +1258,214 @@ fun PlayboardScreen(
             val cardAlpha =
                 if (propertiesInSet.isEmpty()) 0.3f else if (ownsCompleteSet) 1f else 0.6f
 
-            Card(
+    Card(
+        modifier = Modifier
+            .padding(2.dp)
+            .aspectRatio(1f)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = getColorForSet(colorSet).copy(alpha = cardAlpha)
+        )
+    ) {}
+}
+
+fun checkCompleteSet(colorSet: PropertyColor, owned: List<Property>, allProperties: List<Property>): Boolean {
+    val totalInSet = allProperties.count { getColorForPosition(it.position) == colorSet }
+    return owned.size == totalInSet
+}
+
+fun getColorForSet(colorSet: PropertyColor): Color {
+    return when (colorSet) {
+        PropertyColor.BROWN -> Color(0xFF964B00)
+        PropertyColor.LIGHT_BLUE -> Color(0xFFADD8E6)
+        PropertyColor.PINK -> Color(0xFFFFC0CB)
+        PropertyColor.ORANGE -> Color(0xFFFFA500)
+        PropertyColor.RED -> Color.Red
+        PropertyColor.YELLOW -> Color.Yellow
+        PropertyColor.GREEN -> Color.Green
+        PropertyColor.DARK_BLUE -> Color(0xFF00008B)
+        PropertyColor.RAILROAD -> Color(0xFF8B4513)
+        PropertyColor.UTILITY -> Color (0xFF20B2AA)
+    }
+}
+
+fun getColorForPosition(position: Int): PropertyColor {
+    return when (position) {
+        1, 3 -> PropertyColor.BROWN
+        6, 8, 9 -> PropertyColor.LIGHT_BLUE
+        11, 13, 14 -> PropertyColor.PINK
+        16, 18, 19 -> PropertyColor.ORANGE
+        21, 23, 24 -> PropertyColor.RED
+        26, 27, 29 -> PropertyColor.YELLOW
+        31, 32, 34 -> PropertyColor.GREEN
+        37, 39 -> PropertyColor.DARK_BLUE
+        5, 15, 25, 35 -> PropertyColor.RAILROAD
+        12, 28 -> PropertyColor.UTILITY
+        else -> error("Unhandled position: $position")
+    }
+}
+
+@Composable
+fun PropertySetPopup(
+    colorSet: PropertyColor,
+    ownedProperties: List<Property>,
+    allProperties: List<Property>,
+    onDismiss: () -> Unit,
+    onSellProperty: (Int) -> Unit
+) {
+    val context = LocalContext.current
+    val propertiesInSet = allProperties.filter { getColorForPosition(it.position) == colorSet }
+
+    AlertDialog(
+        modifier = Modifier
+            .width(420.dp)
+            .height(550.dp),
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = "${colorSet.name} Set",
+                style = TextStyle(
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        text = {
+            Row(
                 modifier = Modifier
-                    .padding(2.dp)
-                    .aspectRatio(1f)
-                    .clickable { onClick() },
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = getColorForSet(colorSet).copy(alpha = cardAlpha)
-                )
-            ) {}
-        }
-
-        fun checkCompleteSet(
-            colorSet: PropertyColor,
-            owned: List<Property>,
-            allProperties: List<Property>
-        ): Boolean {
-            val totalInSet = allProperties.count { getColorForPosition(it.position) == colorSet }
-            return owned.size == totalInSet
-        }
-
-        fun getColorForSet(colorSet: PropertyColor): Color {
-            return when (colorSet) {
-                PropertyColor.BROWN -> Color(0xFF964B00)
-                PropertyColor.LIGHT_BLUE -> Color(0xFFADD8E6)
-                PropertyColor.PINK -> Color(0xFFFFC0CB)
-                PropertyColor.ORANGE -> Color(0xFFFFA500)
-                PropertyColor.RED -> Color.Red
-                PropertyColor.YELLOW -> Color.Yellow
-                PropertyColor.GREEN -> Color.Green
-                PropertyColor.DARK_BLUE -> Color(0xFF00008B)
-                PropertyColor.RAILROAD -> Color(0xFF8B4513)
-                PropertyColor.UTILITY -> Color(0xFF20B2AA)
-            }
-        }
-
-        fun getColorForPosition(position: Int): PropertyColor {
-            return when (position) {
-                1, 3 -> PropertyColor.BROWN
-                6, 8, 9 -> PropertyColor.LIGHT_BLUE
-                11, 13, 14 -> PropertyColor.PINK
-                16, 18, 19 -> PropertyColor.ORANGE
-                21, 23, 24 -> PropertyColor.RED
-                26, 27, 29 -> PropertyColor.YELLOW
-                31, 32, 34 -> PropertyColor.GREEN
-                37, 39 -> PropertyColor.DARK_BLUE
-                5, 15, 25, 35 -> PropertyColor.RAILROAD
-                12, 28 -> PropertyColor.UTILITY
-                else -> error("Unhandled position: $position")
-            }
-        }
-
-        @Composable
-        fun PropertySetPopup(
-            colorSet: PropertyColor,
-            ownedProperties: List<Property>,
-            allProperties: List<Property>,
-            onDismiss: () -> Unit,
-            onSellProperty: (Int) -> Unit
-        ) {
-            val context = LocalContext.current
-            val propertiesInSet =
-                allProperties.filter { getColorForPosition(it.position) == colorSet }
-
-            AlertDialog(
-                modifier = Modifier
-                    .width(420.dp)
-                    .height(550.dp),
-                onDismissRequest = onDismiss,
-                title = {
-                    Text(
-                        text = "${colorSet.name} Set",
-                        style = TextStyle(
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        ),
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                },
-                text = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(350.dp)
-                            .horizontalScroll(rememberScrollState())
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        propertiesInSet.forEach { property ->
-                            val imageResId = getDrawableIdFromName(property.image, context)
-                            val isOwned = ownedProperties.any { it.id == property.id }
-                            Box(
-                                modifier = Modifier
-                                    .width(180.dp)
-                                    .aspectRatio(0.7f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(
-                                        Color.LightGray.copy(alpha = 1f)
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (imageResId != 0) {
-                                    Image(
-                                        painter = painterResource(id = imageResId),
-                                        contentDescription = property.name,
-                                        contentScale = ContentScale.Fit,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .alpha(if (isOwned) 1f else 0.4f)
-                                    )
-                                } else {
-                                    Text(
-                                        text = property.name,
-                                        color = Color.Black,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
-                },
-                confirmButton = {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        ownedProperties.forEach { property ->
-                            Button(
-                                onClick = {
-                                    onSellProperty(property.id)
-                                    onDismiss()
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(
-                                        0xFFE53935
-                                    )
-                                ),
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp)
-                            ) {
-                                Text("Sell ${property.name}", color = Color.White)
-                            }
-                        }
-                        Button(
-                            onClick = onDismiss,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
-                            shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
-                        ) {
-                            Text("Exit", color = Color.White)
-                        }
-                    }
-                },
-                dismissButton = {}
-            )
-        }
-
-
-        @Composable
-        fun DiceRollingButton(
-            text: String,
-            color: Color,
-            onClick: () -> Unit,
-            diceValue: Int?,
-            enabled: Boolean = true,
-            onRollComplete: () -> Unit = {}
-        ) {
-
-            var isPressed by remember { mutableStateOf(false) }
-            var rotateAngle by remember { mutableFloatStateOf(0f) }
-
-            val rotation by animateFloatAsState(
-                targetValue = rotateAngle,
-                animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
-            )
-            val scale by animateFloatAsState(
-                if (isPressed && enabled) 1.1f else 1f,
-                animationSpec = tween(150)
-            )
-            val buttonColor by animateColorAsState(
-                targetValue = when {
-                    !enabled -> Color.Gray
-                    isPressed -> color.copy(alpha = 0.7f)
-                    else -> color
-                },
-                animationSpec = tween(durationMillis = 150)
-            )
-
-            Button(
-                onClick = {
-                    if (!enabled) return@Button
-                    isPressed = true
-                    rotateAngle += 720f
-                    onClick()
-                    onRollComplete()
-                },
-                enabled = enabled,
-                modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
-                shape = RoundedCornerShape(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+                    .fillMaxWidth()
+                    .height(350.dp)
+                    .horizontalScroll(rememberScrollState())
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(text, fontSize = 18.sp)
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // show the face
-            DiceFace(diceValue)
-
-            LaunchedEffect(isPressed) {
-                if (isPressed) {
-                    delay(1000)
-                    isPressed = false
+                propertiesInSet.forEach { property ->
+                    val imageResId = getDrawableIdFromName(property.image, context)
+                    val isOwned = ownedProperties.any { it.id == property.id }
+                    Box(
+                        modifier = Modifier
+                            .width(180.dp)
+                            .aspectRatio(0.7f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(
+                                Color.LightGray.copy(alpha = 1f)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (imageResId != 0) {
+                            Image(
+                                painter = painterResource(id = imageResId),
+                                contentDescription = property.name,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .alpha(if (isOwned) 1f else 0.4f)
+                            )
+                        } else {
+                            Text(
+                                text = property.name,
+                                color = Color.Black,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
                 }
             }
+        },
+        confirmButton = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ownedProperties.forEach { property ->
+                    Button(
+                        onClick = {
+                            onSellProperty(property.id)
+                            onDismiss()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935)),
+                        shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Text("Sell ${property.name}", color = Color.White)
+                    }
+                }
+                Button(
+                    onClick = onDismiss,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Text("Exit", color = Color.White)
+                }
+            }
+        },
+        dismissButton = {}
+    )
+}
+
+
+@Composable
+fun DiceRollingButton(
+    text: String,
+    color: Color,
+    onClick: () -> Unit,
+    diceValue: Int?,
+    enabled: Boolean = true,
+    onRollComplete: () -> Unit = {}
+) {
+
+    var isPressed by remember { mutableStateOf(false) }
+    var rotateAngle by remember { mutableFloatStateOf(0f) }
+
+    val rotation by animateFloatAsState(
+        targetValue = rotateAngle,
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+    )
+    val scale by animateFloatAsState(if (isPressed && enabled) 1.1f else 1f, animationSpec = tween(150))
+    val buttonColor by animateColorAsState(
+        targetValue = when {
+            !enabled      -> Color.Gray
+            isPressed     -> color.copy(alpha = 0.7f)
+            else          -> color
+        },
+        animationSpec = tween(durationMillis = 150)
+    )
+
+    Button(
+        onClick = {
+            if (!enabled) return@Button
+            isPressed = true
+            rotateAngle += 720f
+            onClick()
+            onRollComplete()
+        },
+        enabled = enabled,
+        modifier = Modifier.height(56.dp).scale(scale).rotate(rotation),
+        shape = RoundedCornerShape(8.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+    ) {
+        Text(text, fontSize = 18.sp)
+    }
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    // show the face
+    DiceFace(diceValue)
+
+    LaunchedEffect(isPressed) {
+        if (isPressed) {
+            delay(1000)
+            isPressed = false
         }
+    }
+}
 
         @Composable
         fun DiceFace(diceValue: Int?) {

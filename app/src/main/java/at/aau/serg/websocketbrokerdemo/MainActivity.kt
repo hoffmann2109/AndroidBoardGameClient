@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ import at.aau.serg.websocketbrokerdemo.ui.PlayboardScreen
 import at.aau.serg.websocketbrokerdemo.data.PlayerMoney
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
+import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
 import at.aau.serg.websocketbrokerdemo.ui.GameHelp
 import at.aau.serg.websocketbrokerdemo.ui.StatisticsScreen
 import at.aau.serg.websocketbrokerdemo.ui.LeaderboardScreen
@@ -55,6 +57,10 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MonopolyWebSocketApp() {
         val context = LocalContext.current
+        fun showToast(message: String) {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        }
+
         var showHelp by remember { mutableStateOf(false) }
         var message by remember { mutableStateOf("") }
         var log by remember { mutableStateOf("Logs:\n") }
@@ -145,6 +151,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // Create websocket client
+        val gameEvents = remember { mutableStateListOf<String>() }
         val webSocketClient = remember {
             GameWebSocketClient(
                 context = context,
@@ -158,6 +165,17 @@ class MainActivity : ComponentActivity() {
                     if (pid == localPlayerId) {
                         hasRolled = !isPasch
                         hasPasch = isPasch
+                    }
+                    if (isPasch && pid == localPlayerId) {
+                        gameEvents.add("🎉 Double rolled!!")
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(
+                                context,
+                                "🎲 Double rolled! You can dice again.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 },
                 onHasWon = { winnerId ->
@@ -207,7 +225,15 @@ class MainActivity : ComponentActivity() {
                     currentDealProposal = proposal
                     showIncomingDialog = true
                 },
-                onDealResponse = { response -> currentDealResponse = response },
+                onDealResponse = { response ->
+                    currentDealResponse = response
+                    val msg = when (response.responseType) {
+                        DealResponseType.ACCEPT -> "✅ Deal accepted"
+                        DealResponseType.DECLINE -> "❌ Deal declined"
+                        DealResponseType.COUNTER -> "🤝 Counter-proposal sent"
+                    }
+                    gameEvents.add(msg)
+                },
                 onGiveUpReceived = { givingUpUserId ->
                     // Only navigate user who has given up, not everyone
                     if (givingUpUserId == userId) {
@@ -262,11 +288,13 @@ class MainActivity : ComponentActivity() {
                     log = log,
                     playerCount = playerCount,
                     onMessageChange = { message = it },
-                    onConnect = { webSocketClient.connect() },
+                    onConnect = { webSocketClient.connect()
+                        showToast("✅ Connection with the server")},
                     onDisconnect = {
                         webSocketClient.close()
                         log = "Logs:\n" // Clear the log
                         log += "Disconnected from server\n"
+                        showToast("⚠️ Disconnected from server.")
                     },
                     onSendMessage = {
                         if (message.isNotEmpty()) {
@@ -299,7 +327,6 @@ class MainActivity : ComponentActivity() {
                 })
             }
             composable("profile") {
-                val context = LocalContext.current
                 val userId = FirebaseAuth.getInstance().currentUser?.uid
                 var profile by remember { mutableStateOf<PlayerProfile?>(null) }
                 DisposableEffect(userId) {
@@ -383,6 +410,7 @@ class MainActivity : ComponentActivity() {
                     setIncomingDeal = { currentDealProposal = it },
                     showIncomingDialog = showIncomingDialog,
                     setShowIncomingDialog = { showIncomingDialog = it },
+                    gameEvents = gameEvents,
                     onGiveUp = {
                         localPlayerId?.let {
                             webSocketClient.logic().sendGiveUpMessage(it)
@@ -421,4 +449,3 @@ class MainActivity : ComponentActivity() {
     }
 
 }
-

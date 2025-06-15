@@ -16,12 +16,14 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import org.json.JSONObject
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 
 class GameWebSocketClient(
 
     private val context: Context,
+    private var onPlayerInJail: ((String) -> Unit)? = null,
     private val onConnected: () -> Unit,
     private var onMessageReceived: (String) -> Unit,
     private val onDiceRolled: (playerId: String, value: Int, manual: Boolean, isPasch: Boolean) -> Unit,
@@ -132,6 +134,16 @@ class GameWebSocketClient(
 
         override fun onMessage(ws: WebSocket, text: String) {
             Log.d("WebSocket", "Received: $text")
+            try {
+                val json = JSONObject(text)
+                if (json.optString("type") == "PLAYER_IN_JAIL") {
+                    val playerId = json.optString("playerId")
+                    onPlayerInJail?.invoke(playerId)
+                    return
+                }
+            } catch (e: Exception) {
+                // ignorieren, wenn kein JSON
+            }
             messageParser.parse(text)
         }
 
@@ -183,6 +195,10 @@ class GameWebSocketClient(
 
     fun setDealResponseListener(callback: (DealResponseMessage) -> Unit) {
         dealResponseListener = callback
+    }
+
+    fun setPlayerInJailListener(listener: (String) -> Unit) {
+        onPlayerInJail = listener
     }
 
     // Zugriffe auf GameLogicHandler – optional von außen nutzbar

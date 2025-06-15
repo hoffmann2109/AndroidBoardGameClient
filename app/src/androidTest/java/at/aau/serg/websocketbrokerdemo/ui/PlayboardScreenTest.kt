@@ -1,5 +1,6 @@
 package at.aau.serg.websocketbrokerdemo.ui
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.assertIsDisplayed
@@ -15,8 +16,6 @@ import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.HouseableProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
-import at.aau.serg.websocketbrokerdemo.data.properties.copyWithOwner
-import com.example.myapplication.R
 import kotlinx.coroutines.test.runTest
 import org.junit.Ignore
 import org.junit.Rule
@@ -35,6 +34,7 @@ class PlayboardScreenTest {
 
     private val emptyChat = emptyList<ChatEntry>()
     private val emptyCheat = emptyList<CheatEntry>()
+    private val gameEvents = mutableStateListOf<String>()
 
     @Test
     fun testPlayboardScreenDisplaysPlayers() {
@@ -42,15 +42,10 @@ class PlayboardScreenTest {
             PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0),
             PlayerMoney(id = "2", name = "Player 2", money = 1500, position = 0)
         )
-        val avatarMap = mapOf(
-            "1" to R.drawable.player_red,
-            "2" to R.drawable.player_blue
-        )
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = players,
-                avatarMap = avatarMap,
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -85,7 +80,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -98,7 +95,6 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                avatarMap = emptyMap(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -130,7 +126,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -144,7 +142,6 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                avatarMap = emptyMap(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -176,7 +173,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -191,7 +190,6 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                avatarMap = emptyMap(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -223,7 +221,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -237,7 +237,6 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                avatarMap = emptyMap(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -269,7 +268,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -283,14 +284,10 @@ class PlayboardScreenTest {
         val players = listOf(
             PlayerMoney(id = "1", name = "Player 1", money = 1500, position = 0)
         )
-        val avatarMap = mapOf(
-            "p1" to R.drawable.player_red
-        )
 
         composeTestRule.setContent {
             PlayboardScreen(
-                players = players,
-                avatarMap = avatarMap,
+                players = emptyList(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -322,7 +319,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -345,7 +344,6 @@ class PlayboardScreenTest {
         composeTestRule.setContent {
             PlayboardScreen(
                 players = emptyList(),
-                avatarMap = emptyMap(),
                 currentPlayerId = "1",
                 localPlayerId = "1",
                 onRollDice = {},
@@ -357,7 +355,7 @@ class PlayboardScreenTest {
                 setHasRolled = {},
                 setHasPasch = {},
                 webSocketClient = mockWebSocketClient,
-                chatMessages = messages,
+                chatMessages = emptyChat,
                 cheatMessages = emptyCheat,
                 showPassedGoAlert = false,
                 passedGoPlayerName = "",
@@ -377,7 +375,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -395,15 +395,10 @@ class PlayboardScreenTest {
             PlayerMoney("p1", "Alice", 1500, 3),
             PlayerMoney("p2", "Bob", 1500, 5)
         )
-        val avatarMap = mapOf(
-            "1" to R.drawable.player_red,
-            "2" to R.drawable.player_blue
-        )
 
         composeTestRule.setContent {
             PlayboardScreen(
                 players = testPlayers,
-                avatarMap = avatarMap,
                 currentPlayerId = "p1",
                 localPlayerId = "p1",
                 onRollDice = {},
@@ -435,7 +430,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
@@ -453,14 +450,9 @@ class PlayboardScreenTest {
 
         val testPlayers = listOf(PlayerMoney("p1", "Alice", 1500, 3))
 
-        val avatarMap = mapOf(
-            "1" to R.drawable.player_red
-        )
-
         composeTestRule.setContent {
             PlayboardScreen(
                 players = testPlayers,
-                avatarMap = avatarMap,
                 currentPlayerId = "p1",
                 localPlayerId = "p1",
                 onRollDice = {},
@@ -492,7 +484,9 @@ class PlayboardScreenTest {
                 drawnCardType = null,
                 drawnCardId = null,
                 drawnCardDesc = null,
-                onCardDialogDismiss = {}
+                onCardDialogDismiss = {},
+                gameEvents = gameEvents,
+                avatarMap = emptyMap()
             )
         }
 
