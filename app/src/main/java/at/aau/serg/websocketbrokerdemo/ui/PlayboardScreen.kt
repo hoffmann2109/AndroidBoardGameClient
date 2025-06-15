@@ -405,13 +405,20 @@ fun PlayboardScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isMyTurn && !turnEnded) {
+
+            val endTurnEnabled = isMyTurn && !turnEnded && (hasRolled || amInJail)
+
+            if (isMyTurn) {
                 Button(
                     onClick = {
                         webSocketClient.sendMessage("NEXT_TURN")
                         turnEnded = true
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0074cc)),
+                    enabled = endTurnEnabled,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (endTurnEnabled) Color(0xFF0074cc)
+                        else Color.Gray      // deaktiviert
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
@@ -421,6 +428,7 @@ fun PlayboardScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
+
 
             Button(
                 onClick = { showActionMenu = true },
