@@ -170,7 +170,6 @@ fun PlayboardScreen(
     var showActionMenu by remember { mutableStateOf(false) }
 
 
-
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
         val shakeMsg = ShakeMessage(playerId = localPlayerId)
@@ -487,69 +486,54 @@ fun PlayboardScreen(
                 }
             )
 
-        // Passed GO Alert
-        if (showPassedGoAlert) {
-            PassedGoAlertBox(playerName = passedGoPlayerName)
-        }
+            // Passed GO Alert
+            if (showPassedGoAlert) {
+                PassedGoAlertBox(playerName = passedGoPlayerName)
+            }
 
-        // Tax Payment Alert
-        if (showTaxPaymentAlert) {
-            TaxPaymentAlertBox(
-                playerName = taxPaymentPlayerName,
-                amount = taxPaymentAmount,
-                taxType = taxPaymentType
-            )
-        }
-                // Tax Payment Alert
-                if (showTaxPaymentAlert) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.3f)
-                            .background(Color(0xFFFFA500).copy(alpha = 0.9f))
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = "Autsch!",
-                                style = TextStyle(
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = "$taxPaymentPlayerName muss ${taxPaymentAmount}€ $taxPaymentType an die Bank zahlen!",
-                                style = TextStyle(
-                                    fontSize = 20.sp,
-                                    color = Color.White
-                                )
-                            )
-                        }
-                    }
-                }
-
-                //  ⬇️  NEU: Overlay-Timer
+            // Tax Payment Alert
+            if (showTaxPaymentAlert) {
+                TaxPaymentAlertBox(
+                    playerName = taxPaymentPlayerName,
+                    amount = taxPaymentAmount,
+                    taxType = taxPaymentType
+                )
+            }
+            // Tax Payment Alert
+            if (showTaxPaymentAlert) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.TopCenter)   // mittig oben
-                        .padding(top = 6.dp)
-                        .zIndex(1f)                   // ganz oben stapeln
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.3f)
+                        .background(Color(0xFFFFA500).copy(alpha = 0.9f))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    timeLeft?.let { secs ->
-                        TurnTimer(
-                            seconds = secs,
-                            modifier = Modifier.size(52.dp)   // ggf. anpassen
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Autsch!",
+                            style = TextStyle(
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "$taxPaymentPlayerName muss ${taxPaymentAmount}€ $taxPaymentType an die Bank zahlen!",
+                            style = TextStyle(
+                                fontSize = 20.sp,
+                                color = Color.White
+                            )
                         )
                     }
                 }
-
             }
+
+        }
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -588,7 +572,7 @@ fun PlayboardScreen(
             }
         }
 
-    // Chat Overlay
+        // Chat Overlay
 
         if (chatOpen) {
             ChatOverlay(
@@ -726,6 +710,16 @@ fun PlayboardScreen(
                 onDismiss = onCardDialogDismiss
             )
         }
+
+        timeLeft?.let { secs ->
+            TurnTimer(
+                seconds = secs,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)   // zentriert oben
+                    .padding(top = 6.dp)
+                    .zIndex(3f)                   // höher als alles andere
+            )
+
+        }
     }
 }
-
