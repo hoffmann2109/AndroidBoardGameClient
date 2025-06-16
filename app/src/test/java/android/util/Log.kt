@@ -1,25 +1,28 @@
-package android.util;
+package android.util
 
-public class Log {
-    public static int d(String tag, String msg) {
-        System.out.println("DEBUG [" + tag + "]: " + msg);
-        return 0;
+object Log {
+
+    @JvmStatic
+    fun d(tag: String, msg: String): Int {
+        println("DEBUG [\$tag]: \$msg")
+        return 0
     }
 
-    public static int e(String tag, String msg) {
-        System.err.println("ERROR [" + tag + "]: " + msg);
-        return 0;
+    @JvmStatic
+    fun e(tag: String, msg: String): Int {
+        System.err.println("ERROR [\$tag]: \$msg")
+        return 0
     }
 
-    public static int w(String tag, String msg) {
-        System.out.println("WARN  [" + tag + "]: " + msg);
-        return 0;
+    @JvmStatic
+    fun w(tag: String, msg: String): Int {
+        println("WARN  [\$tag]: \$msg")
+        return 0
     }
 
-    public static int i(String tag, String msg) {
-        System.out.println("INFO  [" + tag + "]: " + msg);
-        return 0;
+    @JvmStatic
+    fun i(tag: String, msg: String): Int {
+        println("INFO  [\$tag]: \$msg")
+        return 0
     }
 }
-
-

@@ -16,6 +16,7 @@ import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import at.aau.serg.websocketbrokerdemo.data.properties.DummyProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.HouseableProperty
 import at.aau.serg.websocketbrokerdemo.data.properties.PropertyColor
+import at.aau.serg.websocketbrokerdemo.ui.components.PlayerCard
 import kotlinx.coroutines.test.runTest
 import org.junit.Ignore
 import org.junit.Rule

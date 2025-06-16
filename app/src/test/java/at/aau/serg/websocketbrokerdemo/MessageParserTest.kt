@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 class MessageParserTest {
 
     private lateinit var gson: Gson
-    // Note: PlayerMoney now requires a 'position' field
+
     private val dummyPlayers = listOf(
         PlayerMoney(id = "p1", name = "Alice", money = 0, position = 0,false,0, false),
         PlayerMoney(id = "p2", name = "Bob",   money = 0, position = 1,false,0, false)
@@ -23,18 +23,21 @@ class MessageParserTest {
     }
 
     @Test
-    fun testTaxPayment() {
+    fun `parse TAX_PAYMENT JSON invokes onTaxPayment with correct args`() {
         val json = """{"type":"TAX_PAYMENT","playerId":"p1","amount":250,"taxType":"INCOME"}"""
         var invoked = false
-        var capName: String? = null
-        var capAmt: Int? = null
-        var capType: String? = null
+        var capturedName: String? = null
+        var capturedAmt: Int? = null
+        var capturedType: String? = null
 
         val parser = MessageParser(
             gson = gson,
             getPlayers = { dummyPlayers },
             onTaxPayment = { name, amt, type ->
-                invoked = true; capName = name; capAmt = amt; capType = type
+                invoked = true
+                capturedName = name
+                capturedAmt = amt
+                capturedType = type
             },
             onPlayerPassedGo = { fail("should not hit passed GO") },
             onPropertyBought = { fail("should not hit property bought") },
@@ -48,7 +51,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -56,22 +59,25 @@ class MessageParserTest {
         parser.parse(json)
 
         assertTrue(invoked, "onTaxPayment must be invoked")
-        assertEquals("Alice", capName)
-        assertEquals(250, capAmt)
-        assertEquals("INCOME", capType)
+        assertEquals("Alice", capturedName)
+        assertEquals(250, capturedAmt)
+        assertEquals("INCOME", capturedType)
     }
 
     @Test
-    fun testPassedGo() {
+    fun `parse raw PASS_GO text invokes onPlayerPassedGo with player name`() {
         val raw = "Player p2 passed GO and collected 200"
         var invoked = false
-        var capName: String? = null
+        var capturedName: String? = null
 
         val parser = MessageParser(
             gson = gson,
             getPlayers = { dummyPlayers },
             onTaxPayment = { _, _, _ -> fail() },
-            onPlayerPassedGo = { name -> invoked = true;capName = name },
+            onPlayerPassedGo = { name ->
+                invoked = true
+                capturedName = name
+            },
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
@@ -83,7 +89,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -91,21 +97,24 @@ class MessageParserTest {
         parser.parse(raw)
 
         assertTrue(invoked, "onPlayerPassedGo must be invoked")
-        assertEquals("Bob", capName)
+        assertEquals("Bob", capturedName)
     }
 
     @Test
-    fun testPropertyBought() {
+    fun `parse raw PROPERTY_BOUGHT text invokes onPropertyBought with raw message`() {
         val raw = "XXX PROPERTY_BOUGHT YYY"
         var invoked = false
-        var capRaw: String? = null
+        var capturedRaw: String? = null
 
         val parser = MessageParser(
             gson = gson,
             getPlayers = { dummyPlayers },
             onTaxPayment = { _, _, _ -> fail() },
             onPlayerPassedGo = { fail() },
-            onPropertyBought = { rawText -> invoked = true; capRaw = rawText },
+            onPropertyBought = { msg ->
+                invoked = true
+                capturedRaw = msg
+            },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
@@ -116,7 +125,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -124,15 +133,15 @@ class MessageParserTest {
         parser.parse(raw)
 
         assertTrue(invoked)
-        assertEquals(raw, capRaw)
+        assertEquals(raw, capturedRaw)
     }
 
     @Test
-    fun testGameState() {
+    fun `parse GAME_STATE JSON invokes onGameStateReceived with list of PlayerMoney`() {
         val jsonList = "[]"
         val raw = "GAME_STATE:$jsonList"
         var invoked = false
-        var capList: List<PlayerMoney>? = null
+        var capturedList: List<PlayerMoney>? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -140,7 +149,10 @@ class MessageParserTest {
             onTaxPayment = { _, _, _ -> fail() },
             onPlayerPassedGo = { fail() },
             onPropertyBought = { fail() },
-            onGameStateReceived = { list -> invoked = true; capList = list },
+            onGameStateReceived = { list ->
+                invoked = true
+                capturedList = list
+            },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
             onCardDrawn = { _, _, _, _ -> fail() },
@@ -150,7 +162,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -158,15 +170,15 @@ class MessageParserTest {
         parser.parse(raw)
 
         assertTrue(invoked)
-        assertNotNull(capList)
-        assertEquals(0, capList!!.size)
+        assertNotNull(capturedList)
+        assertEquals(0, capturedList!!.size)
     }
 
     @Test
-    fun testPlayerTurn() {
+    fun `parse PLAYER_TURN text invokes onPlayerTurn with session ID`() {
         val raw = "PLAYER_TURN:session42"
         var invoked = false
-        var capId: String? = null
+        var capturedId: String? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -175,7 +187,10 @@ class MessageParserTest {
             onPlayerPassedGo = { fail() },
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
-            onPlayerTurn = { id -> invoked = true; capId = id },
+            onPlayerTurn = { id ->
+                invoked = true
+                capturedId = id
+            },
             onDiceRolled = { _, _, _, _ -> fail() },
             onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
@@ -184,7 +199,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -192,15 +207,15 @@ class MessageParserTest {
         parser.parse(raw)
 
         assertTrue(invoked)
-        assertEquals("session42", capId)
+        assertEquals("session42", capturedId)
     }
 
     @Test
-    fun testDiceRoll() {
+    fun `parse DICE_ROLL JSON invokes onDiceRolled with correct values`() {
         val json = """{"type":"DICE_ROLL","playerId":"p1","value":6,"manual":false,"isPasch":false}"""
         var invoked = false
-        var capPid: String? = null
-        var capVal: Int? = null
+        var capturedPid: String? = null
+        var capturedVal: Int? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -210,7 +225,11 @@ class MessageParserTest {
             onPropertyBought = { fail() },
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
-            onDiceRolled = { pid, v, _, _ -> invoked = true; capPid = pid; capVal = v },
+            onDiceRolled = { pid, v, _, _ ->
+                invoked = true
+                capturedPid = pid
+                capturedVal = v
+            },
             onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
@@ -218,7 +237,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -226,12 +245,12 @@ class MessageParserTest {
         parser.parse(json)
 
         assertTrue(invoked)
-        assertEquals("p1", capPid)
-        assertEquals(6, capVal)
+        assertEquals("p1", capturedPid)
+        assertEquals(6, capturedVal)
     }
 
     @Test
-    fun testCardDrawn() {
+    fun `parse CARD_DRAWN JSON invokes onCardDrawn with details`() {
         val json = """
         {
           "type":"CARD_DRAWN",
@@ -241,10 +260,10 @@ class MessageParserTest {
         }
         """.trimIndent()
         var invoked = false
-        var capPid: String? = null
-        var capType: String? = null
-        var capDesc: String? = null
-        var capId: Int? = null
+        var pid: String? = null
+        var type: String? = null
+        var desc: String? = null
+        var id: Int? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -255,8 +274,12 @@ class MessageParserTest {
             onGameStateReceived = { fail() },
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
-            onCardDrawn = { pid, type, desc, id ->
-                invoked = true; capPid = pid; capType = type; capDesc = desc; capId = id
+            onCardDrawn = { p, t, d, i ->
+                invoked = true
+                pid = p
+                type = t
+                desc = d
+                id = i
             },
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
@@ -264,7 +287,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -272,18 +295,18 @@ class MessageParserTest {
         parser.parse(json)
 
         assertTrue(invoked)
-        assertEquals("p2", capPid)
-        assertEquals("CHANCE", capType)
-        assertEquals("You win!", capDesc)
-        assertEquals(2, capId)
+        assertEquals("p2", pid)
+        assertEquals("CHANCE", type)
+        assertEquals("You win!", desc)
+        assertEquals(2, id)
     }
 
     @Test
-    fun testChatMessage() {
+    fun `parse CHAT_MESSAGE JSON invokes onChatMessageReceived with playerId and text`() {
         val json = """{"type":"CHAT_MESSAGE","playerId":"p1","message":"Hey!"}"""
         var invoked = false
-        var capPid: String? = null
-        var capMsg: String? = null
+        var pid: String? = null
+        var msg: String? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -295,17 +318,17 @@ class MessageParserTest {
             onPlayerTurn = { fail() },
             onDiceRolled = { _, _, _, _ -> fail() },
             onCardDrawn = { _, _, _, _ -> fail() },
-            onChatMessageReceived = { pid, msg ->
+            onChatMessageReceived = { p, m ->
                 invoked = true
-                capPid = pid
-                capMsg = msg
+                pid = p
+                msg = m
             },
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { fail() },
+            onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -313,16 +336,16 @@ class MessageParserTest {
         parser.parse(json)
 
         assertTrue(invoked)
-        assertEquals("p1", capPid)
-        assertEquals("Hey!", capMsg)
+        assertEquals("p1", pid)
+        assertEquals("Hey!", msg)
     }
 
     @Test
-    fun testCheatMessage() {
+    fun `parse CHEAT_MESSAGE JSON invokes onCheatMessageReceived with playerId and text`() {
         val json = """{"type":"CHEAT_MESSAGE","playerId":"p2","message":"kill all"}"""
         var invoked = false
-        var capPid: String? = null
-        var capMsg: String? = null
+        var pid: String? = null
+        var msg: String? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -335,16 +358,16 @@ class MessageParserTest {
             onDiceRolled = { _, _, _, _ -> fail() },
             onCardDrawn = { _, _, _, _ -> fail() },
             onChatMessageReceived = { _, _ -> fail() },
-            onCheatMessageReceived = { pid, msg ->
+            onCheatMessageReceived = { p, m ->
                 invoked = true
-                capPid = pid
-                capMsg = msg
+                pid = p
+                msg = m
             },
             onClearChat = { },
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -352,12 +375,12 @@ class MessageParserTest {
         parser.parse(json)
 
         assertTrue(invoked, "onCheatMessageReceived must be invoked")
-        assertEquals("p2", capPid)
-        assertEquals("kill all", capMsg)
+        assertEquals("p2", pid)
+        assertEquals("kill all", msg)
     }
 
     @Test
-    fun testClearChat() {
+    fun `parse CLEAR_CHAT JSON invokes onClearChat`() {
         val json = """{"type":"CLEAR_CHAT","reason":"Reset"}"""
         var invoked = false
 
@@ -377,7 +400,7 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail() },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -387,10 +410,10 @@ class MessageParserTest {
     }
 
     @Test
-    fun testHasWonMessage() {
+    fun `parse HAS_WON JSON invokes onHasWon with winnerId`() {
         val json = """{"type":"HAS_WON","userId":"p2"}"""
         var invoked = false
-        var capWinner: String? = null
+        var winner: String? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -405,13 +428,13 @@ class MessageParserTest {
             onChatMessageReceived = { _, _ -> fail() },
             onCheatMessageReceived = { _, _ -> fail() },
             onClearChat = { },
-            onHasWon = { winnerId ->
+            onHasWon = { id ->
                 invoked = true
-                capWinner = winnerId
+                winner = id
             },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -419,14 +442,14 @@ class MessageParserTest {
         parser.parse(json)
 
         assertTrue(invoked, "onHasWon must be invoked")
-        assertEquals("p2", capWinner)
+        assertEquals("p2", winner)
     }
 
     @Test
-    fun testFallback() {
+    fun `parse unrecognized text invokes fallback onMessageReceived`() {
         val raw = "SOME_UNRECOGNIZED_MESSAGE"
         var invoked = false
-        var capText: String? = null
+        var text: String? = null
 
         val parser = MessageParser(
             gson = gson,
@@ -442,12 +465,12 @@ class MessageParserTest {
             onCheatMessageReceived = { _, _ -> fail("should not hit cheat") },
             onClearChat = { },
             onHasWon = { _ -> },
-            onMessageReceived = { text ->
+            onMessageReceived = { t ->
                 invoked = true
-                capText = text
+                text = t
             },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
@@ -455,12 +478,11 @@ class MessageParserTest {
         parser.parse(raw)
 
         assertTrue(invoked)
-        assertEquals(raw, capText)
+        assertEquals(raw, text)
     }
 
     @Test
-    fun testDealProposal() {
-        // Minimal JSON containing only the "type" field → parser should invoke onDealProposal
+    fun `parse DEAL_PROPOSAL JSON invokes onDealProposal with message object`() {
         val json = """{"type":"DEAL_PROPOSAL"}"""
         var invoked = false
         var captured: DealProposalMessage? = null
@@ -480,25 +502,24 @@ class MessageParserTest {
             onClearChat = { },
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
-            onDealProposal = { proposal ->
+            onDealProposal = { msg ->
                 invoked = true
-                captured = proposal
+                captured = msg
             },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
             onDealResponse = { _: DealResponseMessage -> },
             onReset = {}
         )
 
         parser.parse(json)
 
-        assertTrue(invoked, "onDealProposal must be invoked when type is DEAL_PROPOSAL")
+        assertTrue(invoked, "onDealProposal should be invoked for DEAL_PROPOSAL")
         assertNotNull(captured)
-        assertEquals("DEAL_PROPOSAL", captured?.type, "DealProposalMessage.type should be parsed as DEAL_PROPOSAL")
+        assertEquals("DEAL_PROPOSAL", captured?.type)
     }
 
     @Test
-    fun testGiveUp() {
-        // Arrange
+    fun `parse GIVE_UP JSON invokes onGiveUpReceived with userId`() {
         val json = """{"type":"GIVE_UP","userId":"p1"}"""
         var invoked = false
 
@@ -523,17 +544,13 @@ class MessageParserTest {
             onReset = {}
         )
 
-        // Act
         parser.parse(json)
 
-        // Assert
-        assertTrue(invoked, "onGiveUpReceived must be invoked when type is GIVE_UP")
+        assertTrue(invoked, "onGiveUpReceived should be invoked for GIVE_UP")
     }
 
-
     @Test
-    fun testDealResponse() {
-        // Minimal JSON containing only the "type" field → parser should invoke onDealResponse
+    fun `parse DEAL_RESPONSE JSON invokes onDealResponse with message object`() {
         val json = """{"type":"DEAL_RESPONSE"}"""
         var invoked = false
         var captured: DealResponseMessage? = null
@@ -554,24 +571,23 @@ class MessageParserTest {
             onHasWon = { _ -> },
             onMessageReceived = { fail("should not hit fallback") },
             onDealProposal = { _: DealProposalMessage -> },
-            onGiveUpReceived = {fail("should not hit onGiveUp")},
-            onDealResponse = { response ->
+            onGiveUpReceived = { fail("should not hit onGiveUp") },
+            onDealResponse = { resp ->
                 invoked = true
-                captured = response
+                captured = resp
             },
             onReset = {}
         )
 
         parser.parse(json)
 
-        assertTrue(invoked, "onDealResponse must be invoked when type is DEAL_RESPONSE")
+        assertTrue(invoked, "onDealResponse should be invoked for DEAL_RESPONSE")
         assertNotNull(captured)
-        assertEquals("DEAL_RESPONSE", captured?.type, "DealResponseMessage.type should be parsed as DEAL_RESPONSE")
+        assertEquals("DEAL_RESPONSE", captured?.type)
     }
 
     @Test
-    fun testReset() {
-        // Arrange
+    fun `parse RESET JSON invokes onReset`() {
         val json = """{"type":"RESET"}"""
         var resetInvoked = false
 
@@ -596,12 +612,8 @@ class MessageParserTest {
             onReset = { resetInvoked = true }
         )
 
-        // Act
         parser.parse(json)
 
-        // Assert
-        assertTrue(resetInvoked, "onReset should be invoked when a RESET message arrives")
+        assertTrue(resetInvoked, "onReset should be invoked for RESET")
     }
-
-
 }
