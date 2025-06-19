@@ -162,6 +162,8 @@ class MainActivity : ComponentActivity() {
                     diceValue = value
                     cheatFlags[pid] = manual
 
+                    SoundManager.playSound(context, GameSound.DICE)
+
                     if (pid == localPlayerId) {
                         hasRolled = !isPasch
                         hasPasch = isPasch
