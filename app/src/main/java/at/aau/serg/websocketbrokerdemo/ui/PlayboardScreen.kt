@@ -56,6 +56,7 @@ import at.aau.serg.websocketbrokerdemo.ui.components.alerts.CheatTerminalOverlay
 import at.aau.serg.websocketbrokerdemo.ui.components.alerts.PassedGoAlertBox
 import at.aau.serg.websocketbrokerdemo.ui.components.alerts.PropertyPopup
 import at.aau.serg.websocketbrokerdemo.ui.components.alerts.TaxPaymentAlertBox
+import at.aau.serg.websocketbrokerdemo.ui.components.EnableImmersiveMode
 
 
 fun extractPlayerId(message: String): String {
@@ -103,6 +104,7 @@ fun PlayboardScreen(
     drawnCardDesc: String?,         // the description (fallback) if drawable not found
     onCardDialogDismiss: () -> Unit // called to clear the popup
 ) {
+    EnableImmersiveMode()
     val context = LocalContext.current
     val propertyViewModel = remember { PropertyViewModel() }
     val properties = remember {
