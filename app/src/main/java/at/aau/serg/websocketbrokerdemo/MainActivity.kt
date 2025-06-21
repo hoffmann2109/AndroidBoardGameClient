@@ -313,9 +313,6 @@ class MainActivity : ComponentActivity() {
                     onJoinGame = { navController.navigate("playerInfo") },
                     onStatisticsClick = { navController.navigate("statistics") },
                     onLeaderboardClick = { navController.navigate("leaderboard") },
-
-                    onOpenSettings = { navController.navigate("settings") },
-                    onOpenSoundSelection = { navController.navigate("soundSelection") },
                     onHelpClick = { showHelp = true }
 
                 )
