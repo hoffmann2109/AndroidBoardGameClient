@@ -147,6 +147,10 @@ fun PlayboardScreen(
 
     var showActionMenu by remember { mutableStateOf(false) }
 
+    val currentPlayerObj = players.find { it.id == currentPlayerId }
+
+    val isInJail = currentPlayerObj?.inJail ?: false
+    val jailTurns = currentPlayerObj?.jailTurns ?: 0
 
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
@@ -283,9 +287,9 @@ fun PlayboardScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val diceEnabled = isMyTurn && (!hasRolled || hasPasch)
+            val diceEnabled = isMyTurn && (!hasRolled || hasPasch) && !isInJail
             DiceRollingButton(
-                text = "Roll Dice",
+                text = if (isInJail) "In Jail ($jailTurns turns)" else "Roll Dice",
                 color = if (diceEnabled) Color(0xFF3FAF3F) else Color.Gray,
                 onClick = onRollDice,
                 diceValue = diceResult,
@@ -293,7 +297,7 @@ fun PlayboardScreen(
             )
 
             // Manual Dice Roll Section
-            if (isMyTurn) {
+            if (isMyTurn && !isInJail) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
@@ -323,6 +327,13 @@ fun PlayboardScreen(
                 ) {
                     Text("Custom Dice", fontSize = 10.sp)
                 }
+            }
+            if (isInJail) {
+                Text(
+                    text = "You are in jail for $jailTurns more turns",
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
 
