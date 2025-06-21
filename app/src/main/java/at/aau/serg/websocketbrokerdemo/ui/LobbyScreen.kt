@@ -136,11 +136,6 @@ fun LobbyScreen(
                     enabled = joinEnabled,
                     onClick = { if (joinEnabled) onJoinGame() }
                 )
-                AnimatedButton(
-                    text = "️Settings",
-                    color = Color(0xFF4CAF50),
-                    onClick = onOpenSettings
-                )
             }
 
             // WiFi Icon Animation (Connect)
