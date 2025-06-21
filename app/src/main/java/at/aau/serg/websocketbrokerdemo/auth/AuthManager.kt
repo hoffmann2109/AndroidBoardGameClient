@@ -12,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -108,14 +107,12 @@ object AuthManager {
     internal fun createUserIfNotExists(
         user: FirebaseUser,
         context: Context,
-        setErrorMessage: (String) -> Unit,
-        ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-        mainDispatcher: CoroutineDispatcher = Dispatchers.Main
+        setErrorMessage: (String) -> Unit
     ) {
         val userId = user.uid
         val docRef = FirebaseFirestore.getInstance().collection("users").document(userId)
 
-        CoroutineScope(ioDispatcher).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 val snapshot = docRef.get().await()
                 if (!snapshot.exists()) {
@@ -130,7 +127,7 @@ object AuthManager {
                 }
             } catch (e: Exception) {
                 Log.e("GoogleLogin", "Error creating or checking user profile", e)
-                withContext(mainDispatcher) {
+                withContext(Dispatchers.Main) {
                     setErrorMessage("Failed to sign in with Google.")
                 }
             }
