@@ -22,6 +22,7 @@ kotlin = "2.0.21"
 kotlinx-coroutines = "1.8.0"
 lifecycleRuntimeKtx = "2.6.1"
 mockito = "5.7.0"
+mockitoInline = "5.2.0"
 mockk = "1.13.5"
 mockkVersion = "1.13.7"
 navigation-compose = "2.5.3"
@@ -62,6 +63,7 @@ krossbow-stomp-core = { module = "org.hildan.krossbow:krossbow-stomp-core", vers
 krossbow-websocket-builtin = { module = "org.hildan.krossbow:krossbow-websocket-builtin", version.ref = "krossbowWebsocketBuiltin" }
 krossbow-websocket-okhttp = { module = "org.hildan.krossbow:krossbow-websocket-okhttp", version.ref = "krossbowWebsocketOkhttp" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockkVersion" }
