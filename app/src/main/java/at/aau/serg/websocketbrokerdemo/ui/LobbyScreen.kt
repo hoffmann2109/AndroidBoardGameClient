@@ -58,8 +58,6 @@ fun LobbyScreen(
     onStatisticsClick: () -> Unit,
     onLeaderboardClick: () -> Unit,
     onJoinGame: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSoundSelection: () -> Unit,
     onHelpClick: () -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
