@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SoundManager.init(this)
         setContent { MonopolyWebSocketApp() }
     }
 
@@ -161,6 +162,8 @@ class MainActivity : ComponentActivity() {
                     dicePlayer = pid
                     diceValue = value
                     cheatFlags[pid] = manual
+
+                    SoundManager.play( GameSound.DICE)
 
                     if (pid == localPlayerId) {
                         hasRolled = !isPasch
@@ -313,9 +316,6 @@ class MainActivity : ComponentActivity() {
                     onJoinGame = { navController.navigate("playerInfo") },
                     onStatisticsClick = { navController.navigate("statistics") },
                     onLeaderboardClick = { navController.navigate("leaderboard") },
-
-                    onOpenSettings = { navController.navigate("settings") },
-                    onOpenSoundSelection = { navController.navigate("soundSelection") },
                     onHelpClick = { showHelp = true }
 
                 )

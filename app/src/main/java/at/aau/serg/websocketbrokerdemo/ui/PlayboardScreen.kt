@@ -41,6 +41,8 @@ import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import at.aau.serg.websocketbrokerdemo.GameSound
+import at.aau.serg.websocketbrokerdemo.SoundManager
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
@@ -149,6 +151,7 @@ fun PlayboardScreen(
 
     val isInJail = currentPlayerObj?.inJail ?: false
     val jailTurns = currentPlayerObj?.jailTurns ?: 0
+    var lastJailStatus by remember { mutableStateOf(false) }
 
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
@@ -169,6 +172,7 @@ fun PlayboardScreen(
         }
     }
 
+
     LaunchedEffect(Unit) {
         webSocketClient.setPlayerInJailListener { playerId ->
             if (playerId == localPlayerId) {
@@ -177,6 +181,13 @@ fun PlayboardScreen(
                 gameEvents.add(msg)
             }
         }
+    }
+
+    LaunchedEffect(isInJail) {
+        if (isInJail && !lastJailStatus) {
+            SoundManager.play(GameSound.JAIL)
+        }
+        lastJailStatus = isInJail
     }
 
     LaunchedEffect(players, dicePlayerId) {
