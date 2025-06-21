@@ -237,7 +237,7 @@ dependencies {
     testImplementation (libs.junit.jupiter.api)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.junit.jupiter)
-    testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation(libs.mockito.inline)
     testImplementation(libs.kotlin.reflect)
     testImplementation(libs.mockk.v1135)
     testImplementation(libs.mockk.mockk)
