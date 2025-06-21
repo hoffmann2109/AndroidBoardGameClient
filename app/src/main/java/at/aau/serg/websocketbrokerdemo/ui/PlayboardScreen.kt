@@ -151,6 +151,7 @@ fun PlayboardScreen(
 
     val isInJail = currentPlayerObj?.inJail ?: false
     val jailTurns = currentPlayerObj?.jailTurns ?: 0
+    var lastJailStatus by remember { mutableStateOf(false) }
 
     // ShakeDetector:
     ShakeDetector(shakingThreshold = 15f) {
@@ -171,15 +172,22 @@ fun PlayboardScreen(
         }
     }
 
+
     LaunchedEffect(Unit) {
         webSocketClient.setPlayerInJailListener { playerId ->
-            SoundManager.play(GameSound.JAIL)
             if (playerId == localPlayerId) {
                 val msg = "🚓 You ended up in prison!"
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 gameEvents.add(msg)
             }
         }
+    }
+
+    LaunchedEffect(isInJail) {
+        if (isInJail && !lastJailStatus) {
+            SoundManager.play(GameSound.JAIL)
+        }
+        lastJailStatus = isInJail
     }
 
     LaunchedEffect(players, dicePlayerId) {
