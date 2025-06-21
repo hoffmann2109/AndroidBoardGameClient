@@ -41,6 +41,8 @@ import at.aau.serg.websocketbrokerdemo.data.ChatEntry
 import androidx.compose.ui.text.input.KeyboardType
 import at.aau.serg.websocketbrokerdemo.data.CheatEntry
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import at.aau.serg.websocketbrokerdemo.GameSound
+import at.aau.serg.websocketbrokerdemo.SoundManager
 import at.aau.serg.websocketbrokerdemo.data.messages.DealProposalMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseMessage
 import at.aau.serg.websocketbrokerdemo.data.messages.DealResponseType
@@ -167,6 +169,7 @@ fun PlayboardScreen(
 
     LaunchedEffect(Unit) {
         webSocketClient.setPlayerInJailListener { playerId ->
+            SoundManager.play(GameSound.JAIL)
             if (playerId == localPlayerId) {
                 val msg = "🚓 You ended up in prison!"
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()

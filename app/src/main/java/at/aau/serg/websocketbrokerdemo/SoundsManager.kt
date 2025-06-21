@@ -12,7 +12,7 @@ object SoundManager {
     private val loadedIds = mutableMapOf<GameSound, Int>()
 
     fun init(context: Context) {
-        if (soundPool != null) return         // already initialised
+        if (soundPool != null) return
 
         soundPool = SoundPool.Builder()
             .setMaxStreams(MAX_STREAMS)
