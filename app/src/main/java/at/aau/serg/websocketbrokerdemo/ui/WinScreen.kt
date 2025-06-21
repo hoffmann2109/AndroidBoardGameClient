@@ -32,7 +32,7 @@ fun WinScreen(onTimeout: () -> Unit) {
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        SoundManager.playSound(context, GameSound.WIN) // ← NEU
+        SoundManager.play(GameSound.WIN)
         visible.value = true
         delay(10000)
         onTimeout()
