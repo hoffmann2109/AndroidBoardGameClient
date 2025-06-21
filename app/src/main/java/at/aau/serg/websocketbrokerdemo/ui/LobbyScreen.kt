@@ -58,8 +58,6 @@ fun LobbyScreen(
     onStatisticsClick: () -> Unit,
     onLeaderboardClick: () -> Unit,
     onJoinGame: () -> Unit,
-    onOpenSettings: () -> Unit,
-    onOpenSoundSelection: () -> Unit,
     onHelpClick: () -> Unit,
 ) {
     var showWifiIcon by remember { mutableStateOf(false) }
@@ -135,11 +133,6 @@ fun LobbyScreen(
                     color = Color(0xFF9C27B0),
                     enabled = joinEnabled,
                     onClick = { if (joinEnabled) onJoinGame() }
-                )
-                AnimatedButton(
-                    text = "️Settings",
-                    color = Color(0xFF4CAF50),
-                    onClick = onOpenSettings
                 )
             }
 
