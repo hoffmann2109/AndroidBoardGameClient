@@ -20,11 +20,23 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 import androidx.compose.material3.Button
+import androidx.compose.ui.platform.LocalContext
+import at.aau.serg.websocketbrokerdemo.GameSound
+import at.aau.serg.websocketbrokerdemo.SoundManager
 
 @Composable
 fun WinScreen(onTimeout: () -> Unit) {
     val visible = remember { mutableStateOf(false) }
     val showGiftBox = remember { mutableStateOf(true) }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        SoundManager.play(GameSound.WIN)
+        visible.value = true
+        delay(10000)
+        onTimeout()
+    }
 
     // Zufällige Siegesnachricht
     val messages = listOf(
