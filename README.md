@@ -1,6 +1,6 @@
-# Monopoly Android Client
+# Board Game Android Client
 
-This repository contains the client-side Android application for a digital Monopoly game. It is built with Kotlin and Jetpack Compose, providing the user interface and handling communication with the game server.
+This repository contains the client-side Android application for a digital Monopoly-like game. It is built with Kotlin and Jetpack Compose, providing the user interface and handling communication with the game server.
 
 This application is the **game client** and is responsible for rendering the game board, handling user input, and communicating game actions to the server via WebSockets.
 
